@@ -1,0 +1,35 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Build
+build/
+dist/
+node_modules/
+.gradle/
+target/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/hooks/hook-log.txt
+.claude/hooks/test-permission.txt
+
+# Plans (generated during conversations)
+ProductSpecification/plans/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+bash.exe.stackdump
+/.claude/projects/
