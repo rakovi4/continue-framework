@@ -41,9 +41,9 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `workflow.md` sequenc
 | `red-*` (acceptance, usecase, adapter, selenium, frontend, frontend-api) | `red-agent.md` → `/test-review` → `/refactor` → commit |
 | `green-usecase`, `green-adapter X` | `green-agent.md` → `/refactor` → `/test-coverage {module} --focus` → commit |
 | `adapters-discovery` | Load `.claude/templates/workflow/adapter-discovery-checklist.md`, run all 3 checks (ports, exceptions, response shape), mark `[x] adapters-discovery`, insert concrete `red-adapter X` / `green-adapter X` steps (or `[S]`) → commit progress.md |
-| `green-acceptance` | `green-agent.md` → commit |
+| `green-acceptance` | Run inline (no subagent): read `green-agent.md` workflow, load acceptance implementation template, enable the disabled test (remove disable marker — only allowed test change), run acceptance tests, verify GREEN → commit |
 | `green-frontend`, `green-frontend-api` | `green-agent.md` → `/refactor` → commit |
-| `green-selenium` | `/run-backend` → `/run-frontend` → `green-agent.md` → commit |
+| `green-selenium` | `/run-backend` → `/run-frontend` → `green-agent.md` (remove-marker-only: no production code, no Statements changes, no backend changes — if test fails, STOP and report) → commit |
 | `align-design` | Build component → `/align-design` → `/design-review` (MANDATORY) → `/refactor` → `/align-design` verify-only → `/test-coverage frontend --focus` → commit |
 | `demo` | `/demo {scenario_test_class}` then progress-only commit |
 | `refactor usecase` / `refactor (...)` | Apply change then run affected tests then commit |
@@ -65,7 +65,8 @@ ALL sub-skills dispatch via Agent tool for context isolation:
 | Sub-skill | Dispatch method |
 |-----------|----------------|
 | `red-*` | `Agent tool` (subagent_type: `red-agent`) — pass layer, story folder path, scenario name, and ADR content (if loaded) |
-| `green-*` | `Agent tool` (subagent_type: `green-agent`) — pass layer, story folder path, scenario name, and ADR content (if loaded) |
+| `green-*` (except `green-acceptance`) | `Agent tool` (subagent_type: `green-agent`) — pass layer, story folder path, scenario name, and ADR content (if loaded) |
+| `green-acceptance` | **Inline** — no subagent. Main agent reads `green-agent.md`, loads acceptance template, enables the test, runs it. Full visibility for user. |
 | `/refactor` | `Agent tool` (subagent_type: `refactor-agent`) |
 | `/test-review` | `Agent tool` (subagent_type: `test-review-agent`) |
 | `/test-coverage` | `Agent tool` (subagent_type: `coverage-agent`) |

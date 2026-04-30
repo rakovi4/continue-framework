@@ -23,8 +23,10 @@ Never write production code without a failing test first.
 ### GREEN Phase
 - Implement ONLY minimal code to pass the test. No extra features, no "while I'm here" improvements.
 - Tests are READ-ONLY (only remove the test disable marker). Statements setup methods may be updated when GREEN adds domain fields/ports that the setup now needs to wire through.
+- **NEVER change assertion expected values in Statements.** Expected values (strings, numbers, prices, reason texts) were defined in RED and verified by prediction. If the running system returns different values than the Statements assert, the test is doing its job — the production code is wrong, not the test. Fix the production code to produce the expected values, or STOP and report the mismatch. Never "correct" assertions to match actual behavior — that defeats the purpose of TDD.
 - **NEVER delete assertions from Statements methods.** Not to meet file size limits, not to "simplify", not for any reason. If a file exceeds 200 lines, extract a new Statements class by concern — never trim assertions. Even when a wait-for-visibility call implies visibility, the explicit assertion is the documented test assertion and must stay.
 - Create: production code, database migrations, persistence entities, repositories as needed.
+- **green-acceptance and green-selenium are remove-marker-only phases.** The ONLY allowed change is removing the test disable/skip marker. No production code changes (backend or frontend), no Statements changes, no new files. If the test does not pass after removing the marker, STOP and report — the missing implementation belongs in an earlier phase (green-usecase, green-adapter, align-design) that was incomplete or skipped. Never "fix" backend code in a green-acceptance/green-selenium step.
 
 ### REFACTOR Phase
 - Improve structure (extract, rename, move, deduplicate). DO NOT change behavior or add features.
@@ -46,8 +48,9 @@ Never write production code without a failing test first.
 - REFACTOR → RED: only after all tests still pass.
 
 ### Zero Tolerance for Test Failures
-- When running tests, ALL failures must be investigated — not just the target test.
-- Never dismiss failures as "pre-existing" or "unrelated" without reading the error message and tracing the cause.
+- When running tests, ALL failures must be investigated and resolved — not just the target test.
+- **There is no such thing as a "pre-existing" failure.** Never dismiss a failure as pre-existing, known, or unrelated. If a test fails, it is YOUR problem right now. Either fix the root cause or create a task to fix it — but never report "all tests passed" when the build is red.
+- A build marked FAILED means tests failed. Qualifying it with "but all actual tests passed" or "unrelated OOM" is dismissal — the suite is red and must be fixed before proceeding.
 - If collateral tests fail after a green phase, the new production code likely broke them. Investigate before proceeding.
 - Report ALL test results (pass count AND failure count) in every summary.
 
