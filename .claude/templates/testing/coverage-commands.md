@@ -21,7 +21,7 @@ Group touched files by owning module to determine which coverage reports to run.
 |---------------------|-----------------|--------|
 | `domain` | `usecase` | Domain has no own tests; usecase tests exercise domain |
 | `usecase` | `usecase` | Direct |
-| `{adapter}` (rest, h2/db, email, etc.) | `{adapter}` | Direct |
+| `{adapter}` (rest, storage, email, etc.) | `{adapter}` | Direct |
 
 For each module with touched files, run its mapped test suite's coverage (if not already run as the primary module). Check each touched file against the coverage of its mapped module.
 

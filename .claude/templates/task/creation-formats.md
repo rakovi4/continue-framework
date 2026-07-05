@@ -102,8 +102,8 @@ Type: refactoring
 ## Fix
 
 ### Step 1: {description}
-- [ ] red-adapter h2
-- [ ] green-adapter h2
+- [ ] red-adapter storage
+- [ ] green-adapter storage
 
 ### Step 2: {description}
 - [ ] refactor usecase

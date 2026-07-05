@@ -11,7 +11,7 @@ Run this checklist when the `[ ] adapters-discovery` step is reached. Walk all t
 
 Read the usecase constructor. For each injected port:
 
-1. Find the adapter module that implements it (e.g., `BoardStorage` → `h2`)
+1. Find the adapter module that implements it (e.g., `BoardStorage` → `storage`)
 2. Check the adapter implementation against what this scenario needs:
    - **Missing**: no implementation exists → add `red-adapter {module}` / `green-adapter {module}`
    - **Stubbed**: method throws the not-implemented marker → add steps

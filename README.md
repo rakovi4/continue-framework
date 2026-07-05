@@ -44,7 +44,7 @@ interview → story → mockups → api-spec → test-spec
 Clean Architecture, dependency flow strictly inward:
 
 ```
-backend/domain  ←  backend/usecase  ←  backend/adapters/{rest,h2,email,...}  ←  backend/application
+backend/domain  ←  backend/usecase  ←  backend/adapters/{rest,storage,email,...}  ←  backend/application
 acceptance/     (black-box HTTP + browser tests, top-level)
 frontend/       (feature-based, Humble Object pattern)
 ```

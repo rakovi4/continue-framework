@@ -66,7 +66,7 @@ matching the test under review (load only the one that matches):
 |---------------------|--------------|
 | Usecase tests | `.claude/tech/{backend}/templates/testing/test-review-usecase.md` |
 | REST adapter tests | `.claude/tech/{backend}/templates/testing/test-review-rest.md` |
-| H2 adapter tests | `.claude/tech/{backend}/templates/testing/test-review-h2.md` |
+| Storage adapter tests | `.claude/tech/{backend}/templates/testing/test-review-storage.md` |
 | Acceptance tests | `.claude/tech/{backend}/templates/testing/test-review-acceptance.md` |
 | Other (selenium, email, scheduling, security) | `.claude/tech/{backend}/templates/testing/test-review-other.md` |
 

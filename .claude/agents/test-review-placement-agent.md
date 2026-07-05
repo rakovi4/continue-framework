@@ -33,7 +33,7 @@ through usecases; only external-service Fakes are allowed.
 
 Universal rules and anti-pattern catalog: `.claude/templates/testing/test-review-patterns.md`.
 For tech-specific patterns (assertion-library greps, private-member syntax) load
-the layer file matching the test: `.claude/tech/{backend}/templates/testing/test-review-{usecase|rest|h2|acceptance|other}.md`.
+the layer file matching the test: `.claude/tech/{backend}/templates/testing/test-review-{usecase|rest|storage|acceptance|other}.md`.
 
 ## Findings Output
 

@@ -17,7 +17,7 @@ All backend modules live under `backend/`. Never place them in the project root.
 | `backend/domain` | Entities, value objects, exceptions | None (code generation only) |
 | `backend/usecase` | Application services, port interfaces | domain |
 | `backend/adapters/rest` | Web controllers, auth | usecase |
-| `backend/adapters/h2` | Database repositories, migrations | usecase |
+| `backend/adapters/storage` | Database repositories, migrations | usecase |
 | `backend/adapters/email` | Mail integration | usecase |
 | `backend/application` | Entry point, wiring | all modules |
 | `acceptance` | Black-box API tests (top-level) | None (HTTP + Selenium) |

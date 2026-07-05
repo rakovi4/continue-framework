@@ -108,9 +108,9 @@ Templates often have multiple distinct sections that need coordinated updates:
 
 ### Layer-specific: new adapter convention
 
-**Input:** "H2 adapter tests should use FixtureCleanerExtension"
-**Classification:** Layer-specific to h2 adapter → `templates/h2/test-class.md`
-**Action:** Add to the h2 test template, not to universal rules.
+**Input:** "Storage adapter tests should use FixtureCleanerExtension"
+**Classification:** Layer-specific to storage adapter → `templates/storage/test-class.md`
+**Action:** Add to the storage test template, not to universal rules.
 
 ## Tech-Agnostic Verification
 

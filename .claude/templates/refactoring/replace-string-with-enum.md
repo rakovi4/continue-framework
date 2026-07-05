@@ -74,7 +74,7 @@ switch (status) {
 // After:  new Request(object.id, TaskStatus.from(object.status))
 ```
 
-**H2 entity** — store as String in DB, convert on boundaries:
+**Storage entity** — store as String in DB, convert on boundaries:
 ```java
 // from(): entity.status = domain.statusName();
 // toDomain(): TaskStatus.from(status)
@@ -100,7 +100,7 @@ import static com.example.domain.task.TaskStatus.*;
 4. [ ] Update usecase request/response (use enum internally)
 5. [ ] Update REST DTO (serialize via `statusName()`)
 6. [ ] Update API input DTO (parse via `Enum.from(string)`)
-7. [ ] Update H2 entity (string <-> enum conversion via `statusName()`/`from()`)
+7. [ ] Update storage entity (string <-> enum conversion via `statusName()`/`from()`)
 8. [ ] Update tests (static import enum values, compare to enum not string)
 9. [ ] Run `./gradlew build`
 
@@ -108,7 +108,7 @@ import static com.example.domain.task.TaskStatus.*;
 
 | Pitfall | Solution |
 |---------|----------|
-| H2 entity stores enum directly | Store as String, convert at boundary |
+| Storage entity stores enum directly | Store as String, convert at boundary |
 | Test compares enum to string | Compare to enum constant with static import |
 | API contract breaks | Keep JSON values as lowercase strings via `statusName()` |
 | Repeated `name().toLowerCase()` at boundaries | Use `value()` on the enum, `statusName()` on the entity |

@@ -72,7 +72,7 @@ Acceptance tests need a live backend. Predictions must be about feature behavior
 
 ## Adapter Layer: Multiple Test Methods
 
-For adapter layers (h2, rest, email, security), ONE test means **one test class per port method**. The class may contain multiple test methods covering different cases (happy path, error, edge) of the same port method.
+For adapter layers (storage, rest, email, security), ONE test means **one test class per port method**. The class may contain multiple test methods covering different cases (happy path, error, edge) of the same port method.
 
 - Use **class-level** test disable marker (not per-method) — one marker disables all methods
 - Predict failure for **each** test method separately

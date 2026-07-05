@@ -8,9 +8,9 @@ description: Run adapter module tests. First argument is adapter name (matches d
 ## Usage
 ```
 /test-adapter rest
-/test-adapter h2 LoginStorageTest
+/test-adapter storage LoginStorageTest
 /test-adapter email
-/test-adapter h2 TaskStorageTest
+/test-adapter storage TaskStorageTest
 ```
 
 ## Convention

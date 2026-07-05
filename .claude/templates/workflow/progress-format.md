@@ -23,9 +23,9 @@
 - [ ] green-acceptance
 
 #### After adapters-discovery resolves (example):
-- [x] adapters-discovery (h2, rest)
-- [ ] red-adapter h2
-- [ ] green-adapter h2
+- [x] adapters-discovery (storage, rest)
+- [ ] red-adapter storage
+- [ ] green-adapter storage
 - [ ] red-adapter rest
 - [ ] green-adapter rest
 - [ ] green-acceptance
@@ -142,8 +142,8 @@ Type: refactoring
 ## Fix
 
 ### Step 1: Step description
-- [~] red-adapter h2                  <- CURRENT
-- [ ] green-adapter h2
+- [~] red-adapter storage             <- CURRENT
+- [ ] green-adapter storage
 
 ### Step 2: Step description
 - [ ] refactor usecase

@@ -50,7 +50,7 @@ public User(..., String email, ...) {
 
 ## Step 4: Update Adapters
 
-**H2 Storage** — unwrap for JPA: `repository.findByEmail(email.getValue())`
+**Storage adapter** — unwrap for JPA: `repository.findByEmail(email.getValue())`
 
 **Fake Storage** — compare value objects: `user.getEmail().equals(email)`
 
@@ -71,7 +71,7 @@ Validation now happens in constructor — delete `validateEmail()` methods.
 1. [ ] Create value object in domain
 2. [ ] Update entity that contains it
 3. [ ] Update port interface in usecase
-4. [ ] Update H2 adapter (use `.getValue()` for JPA)
+4. [ ] Update storage adapter (use `.getValue()` for JPA)
 5. [ ] Update fake storage in tests
 6. [ ] Update request classes (add `toX()`)
 7. [ ] Remove validation from usecase

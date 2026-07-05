@@ -42,7 +42,7 @@ public record Column(UUID id, UUID boardId, String name,
 
 Remove `taskCount` parameter from all constructors/factories.
 
-## Step 3: Update H2 Entity + Migration
+## Step 3: Update Storage Entity + Migration
 
 ```sql
 ALTER TABLE columns DROP COLUMN task_count;
@@ -67,7 +67,7 @@ Remove `taskCount` from test data construction — it's computed automatically.
 2. [ ] Rename `effectiveX()` -> `x()` (computed method)
 3. [ ] Update factory methods (remove parameter)
 4. [ ] Add DB migration to drop column
-5. [ ] Update H2 entity
+5. [ ] Update storage entity
 6. [ ] Update usecase response mapping
 7. [ ] Update all test data construction
 8. [ ] Run `./gradlew build`

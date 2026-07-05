@@ -8,7 +8,7 @@ description: Run tests with coverage and report uncovered lines/branches per cla
 ## Usage
 ```
 /test-coverage usecase
-/test-coverage h2
+/test-coverage storage
 /test-coverage rest RegisterUserController
 /test-coverage usecase --focus    # only classes touched in recent git diff
 ```
@@ -17,7 +17,7 @@ description: Run tests with coverage and report uncovered lines/branches per cla
 
 First word is the module:
 - `usecase` → `:usecase`
-- `h2`, `rest`, `email`, `scheduling`, `security` → `:adapters:{name}`
+- `storage`, `rest`, `email`, `scheduling`, `security` → `:adapters:{name}`
 - `domain` → `:domain`
 
 Optional second word filters the report to classes matching that name.

@@ -55,7 +55,7 @@ A length limit in a prompt must target a **produced artifact** — a file, a fie
 - Rule applies to ALL layers → **rules** file; agents/skills reference it
 - Rule is tech-specific (framework annotation, library API, build command) → **tech binding** (`.claude/tech/{concern-value}/`)
 - Rule is phase-specific (red/green/refactor) → **agent**
-- Rule is layer-specific (h2, rest, selenium) → **skill** or **template**
+- Rule is layer-specific (storage, rest, selenium) → **skill** or **template**
 - Reference material (code examples, checklists, before/after patterns) → **template**; agents load on demand via file path. Agents keep only workflow + routing tables.
 - Test execution commands → **test-runner.md** agent only; skills/agents use `Skill tool`
 - Skill with unique workflow (not shared across skills) → keep workflow **inline in the skill**. Only extract to an agent when multiple skills share the same behavioral workflow (e.g., `red-agent` serves red-usecase, red-adapter, red-acceptance). A 1:1 agent-to-skill mapping is unnecessary indirection.

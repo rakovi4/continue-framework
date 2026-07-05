@@ -120,7 +120,7 @@ ALL sub-skills dispatch via Agent tool for context isolation:
 | `agent-review` (pre-commit) | `Agent tool` (subagent_type: `agent-review-agent`) — pass the behavior commit's range (`HEAD`, or `HEAD~N..HEAD`) + one line of intent. Dispatched in the `/refactor` batch, concurrently with premortem. |
 | `premortem` (pre-commit) | `Agent tool` (subagent_type: `premortem-agent`) — pass the behavior commit's range (`HEAD`, or `HEAD~N..HEAD`) + one line of intent. Dispatched in the `/refactor` batch, concurrently with agent-review. |
 
-Derive the layer from the checkbox (e.g., `red-adapter h2` → layer `h2`, `green-usecase` → layer `usecase`). Both red-agent and green-agent receive: layer, story folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow.
+Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`). Both red-agent and green-agent receive: layer, story folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow.
 
 **CHAINING: After each sub-step completes (Agent tool return), echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Do NOT wait for user input between sub-steps — the echo is informational only. (The two review passes are the exception: they dispatch together in one message, in the same batch as `/refactor`.)**
 
@@ -136,7 +136,7 @@ Derive the layer from the checkbox (e.g., `red-adapter h2` → layer `h2`, `gree
 
 - Execute exactly ONE work unit per invocation — a work unit includes ALL sub-skills through the final commit, including the two review passes that run just before it (in the `/refactor` batch). Never stop between sub-skills.
 - A `/refactor` work unit ends in two commits: the behavior commit (carries the `progress.md` advance), then a separate refactor commit (skipped if `/refactor` changed nothing). Otherwise one commit carries `progress.md`.
-- Task commit prefix: `task:` (e.g., `task: red-adapter h2 (Task 1, Step 1)`)
+- Task commit prefix: `task:` (e.g., `task: red-adapter storage (Task 1, Step 1)`)
 - If a sub-skill fails, stop immediately -- do NOT mark the step complete
 - Mandatory sub-skills per phase: see `.claude/guidelines/workflow-detail.md` sequences
 

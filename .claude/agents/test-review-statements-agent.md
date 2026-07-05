@@ -31,7 +31,7 @@ on where calls live (cluster P) or how strict assertions are (cluster A).
 
 Universal rules and anti-pattern catalog: `.claude/templates/testing/test-review-patterns.md`.
 For tech-specific patterns load the layer file matching the test:
-`.claude/tech/{backend}/templates/testing/test-review-{usecase|rest|h2|acceptance|other}.md`.
+`.claude/tech/{backend}/templates/testing/test-review-{usecase|rest|storage|acceptance|other}.md`.
 The not-implemented marker convention is in `technology.md`.
 
 ## Findings Output

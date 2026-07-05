@@ -27,7 +27,7 @@ Every entry starts with this heading — MANDATORY, exact format:
 ## {step-name} ({YYYY-MM-DD})
 ```
 
-`step-name` matches the progress.md checkbox label (`red-usecase`, `green-adapter h2`, `align-design`). The date is required. If the conversation ran no work unit (discussion only), use the most recently completed step, or `discussion`.
+`step-name` matches the progress.md checkbox label (`red-usecase`, `green-adapter storage`, `align-design`). The date is required. If the conversation ran no work unit (discussion only), use the most recently completed step, or `discussion`.
 
 **The header is the step and date — never the block type.** `## Codebase Quirk — initial load ignores PAGE_SIZE` is WRONG. `## green-frontend-api (2026-05-14)` is right. The block type is the *inner* structure of the entry (see below), not the heading.
 
@@ -112,7 +112,7 @@ A property of the system that future scenarios will encounter. Quirk entries are
 ```
 
 ```
-## green-adapter h2 (2026-05-14)
+## green-adapter storage (2026-05-14)
 
 **Surprise:** Column ordering relied on row insertion order in the database adapter, not on the position field that was added in scenario 2.
 **Why:** Storage queries used the default ordering and never sorted by the position field.
@@ -147,7 +147,7 @@ Wrote the test, predicted failure, ran it, marked disabled.
 ```
 
 ```
-## green-adapter h2 (2026-05-14)      ← DON'T WRITE
+## green-adapter storage (2026-05-14) ← DON'T WRITE
 Added migration. Repository wired. Tests passed.
 ```
 

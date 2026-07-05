@@ -33,7 +33,7 @@ Gather from user:
 
 **Bug:** Problem (as thorough as possible — symptoms, observed vs. expected, environment, frequency, any captured response/error) and Reproduction steps. Do NOT gather a Solution, Affected Layers, or Key Files at creation — those are produced by the discovery sequence (root cause analysis records the cause and key files in `spec.md`; design settles the fix approach; steps discovery scopes the layers). Describe the problem fully; defer every claim about the fix.
 
-**Refactoring:** Problem, Solution, Affected Layers (domain, usecase, h2, rest, email, frontend), Key Files, and numbered steps with clear scope.
+**Refactoring:** Problem, Solution, Affected Layers (domain, usecase, storage, rest, email, frontend), Key Files, and numbered steps with clear scope.
 
 **QA only:** Problem (why this checklist exists), Solution (when to run, environment, session duration), Cases (numbered one-line items expressing intent — no Gherkin, no implementation detail). No Affected Layers, no Key Files (QA tasks don't change code).
 
