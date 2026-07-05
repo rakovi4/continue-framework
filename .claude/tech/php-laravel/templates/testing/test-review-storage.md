@@ -1,8 +1,8 @@
-# Test Review Patterns: H2 Adapter Layer (PHP/Laravel)
+# Test Review Patterns: Storage Adapter Layer (PHP/Laravel)
 
 PHP/PHPUnit code examples for persistence adapter test anti-patterns. For universal rules: `.claude/templates/testing/test-review-patterns.md`
 
-## PHP-Specific Rules (H2)
+## PHP-Specific Rules (Storage)
 
 1. **Use descriptive assertion messages** -- add a third argument to `assertEquals` for clear failure messages
 2. **Prefer object equality** -- replace 2+ sequential per-field `assertEquals` calls with `assertEquals($expected, $actual)` (PHPUnit does deep structural comparison on objects)
@@ -16,4 +16,4 @@ Persistence adapter tests share many patterns with usecase and acceptance tests.
 - **Missing field assertions** on `toDomain()` results -- assert ALL domain fields after round-trip
 - **Timestamp precision mismatches** -- use `assertEqualsWithDelta` within 60 seconds, never truncate
 
-See `test-review-usecase.md` for Statements purity patterns and `test-review-acceptance.md` for assertion strictness patterns -- both apply to H2 adapter tests.
+See `test-review-usecase.md` for Statements purity patterns and `test-review-acceptance.md` for assertion strictness patterns -- both apply to storage adapter tests.
