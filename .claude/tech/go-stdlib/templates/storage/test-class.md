@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/db/{feature}/{feature}_storage_test.go`
-- Test setup: `backend/adapters/db/testutil/db_test_setup.go`
-- Storage example: `backend/adapters/db/{feature}/{feature}_storage.go`
-- Entity example: `backend/adapters/db/{feature}/{feature}_row.go`
+- Test example: `backend/adapters/storage/{feature}/{feature}_storage_test.go`
+- Test setup: `backend/adapters/storage/testutil/db_test_setup.go`
+- Storage example: `backend/adapters/storage/{feature}/{feature}_storage.go`
+- Entity example: `backend/adapters/storage/{feature}/{feature}_row.go`
 
 ## Naming Convention
 
@@ -29,7 +29,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/db/{feature}/`
-- Production: `backend/adapters/db/{feature}/`
-- Entities/Rows: `backend/adapters/db/{feature}/`
-- Migrations: `backend/adapters/db/migrations/`
+- Tests: `backend/adapters/storage/{feature}/`
+- Production: `backend/adapters/storage/{feature}/`
+- Entities/Rows: `backend/adapters/storage/{feature}/`
+- Migrations: `backend/adapters/storage/migrations/`

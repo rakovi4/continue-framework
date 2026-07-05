@@ -63,7 +63,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — Java/Spring Specifics
 
-- H2 adapter tests: `@DataJpaTest` + `FixtureCleanerExtension`
+- Storage adapter tests: `@DataJpaTest` + `FixtureCleanerExtension`
 - REST adapter tests: `@SpringBootTest` + `MockMvc`
 - Mockito: reset mocks/fakes before each test (`@BeforeEach` reset or `Mockito.reset()`)
 - Mutating load tests: declare the dedicated baked disposable user on the Statements as `private static final String USER_EMAIL = "loaduserNN@example.test"` and expose `loginBaselineUser()` for the test to call once. Per-user data IDs (UUIDs, external resource IDs, child entity IDs, business keys) are also `private static final` constants computed from the generator's deterministic formulas. Load tests extend `AbstractLoadTest` — there is no separate "mutating" base class and no `@AfterEach` baseline-reset hook.

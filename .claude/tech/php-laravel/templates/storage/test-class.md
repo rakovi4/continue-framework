@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/db/tests/Access/{Feature}/{Feature}StorageTest.php`
-- Test setup: `backend/adapters/db/tests/TestCase.php`
-- Storage example: `backend/adapters/db/src/Access/{Feature}/{Feature}Storage.php`
-- Model example: `backend/adapters/db/src/Model/{Feature}/{Feature}Model.php`
+- Test example: `backend/adapters/storage/tests/Access/{Feature}/{Feature}StorageTest.php`
+- Test setup: `backend/adapters/storage/tests/TestCase.php`
+- Storage example: `backend/adapters/storage/src/Access/{Feature}/{Feature}Storage.php`
+- Model example: `backend/adapters/storage/src/Model/{Feature}/{Feature}Model.php`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/db/tests/Access/`
-- Production: `backend/adapters/db/src/Access/`
-- Models: `backend/adapters/db/src/Model/`
+- Tests: `backend/adapters/storage/tests/Access/`
+- Production: `backend/adapters/storage/src/Access/`
+- Models: `backend/adapters/storage/src/Model/`
 - Migrations: `database/migrations/`

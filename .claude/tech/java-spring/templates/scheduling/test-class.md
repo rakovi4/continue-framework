@@ -5,7 +5,7 @@
 - Use `@SpringBootTest(classes = SchedulingTestConfiguration.class, properties = {...})` to boot a full context with ShedLock + Liquibase
 - Override `cleanup.cron` to fire every second (`* * * * * *`) for fast tests
 - Override `cleanup.lock-at-least-for` to `PT1S` to avoid lock contention
-- Set `spring.liquibase.change-log=classpath:liquibase/changelog.xml` — real migrations from h2 adapter (`testRuntimeOnly project(':adapters:h2')`)
+- Set `spring.liquibase.change-log=classpath:liquibase/changelog.xml` — real migrations from the storage adapter (`testRuntimeOnly project(':adapters:storage')`)
 - Mock usecase dependencies (e.g., `ProcessCleanup`) — scheduling tests verify wiring, not business logic
 - Use Awaitility (`await().atMost(3, SECONDS).untilAsserted(...)`) to assert async scheduled invocations
 
@@ -24,7 +24,7 @@
 - Test configuration: `backend/adapters/scheduling/src/test/java/com/example/scheduling/SchedulingTestConfiguration.java`
 - Existing test: `backend/adapters/scheduling/src/test/java/com/example/scheduling/CleanupJobTest.java`
 - Production code: `backend/adapters/scheduling/src/main/java/com/example/scheduling/`
-- Liquibase migrations: `backend/adapters/h2/src/main/resources/liquibase/` (provided via `testRuntimeOnly`)
+- Liquibase migrations: `backend/adapters/storage/src/main/resources/liquibase/` (provided via `testRuntimeOnly`)
 
 ## Test Configuration
 
@@ -33,7 +33,7 @@
 - `@ComponentScan` — picks up `SchedulingConfiguration` (ShedLock `LockProvider` + `@EnableSchedulerLock`) and `CleanupJob`
 - Mock `ProcessCleanup` bean — verifiable via Mockito
 
-Liquibase runs the real migrations from the h2 adapter — no duplicated schema files.
+Liquibase runs the real migrations from the storage adapter — no duplicated schema files.
 
 ## Naming Convention
 

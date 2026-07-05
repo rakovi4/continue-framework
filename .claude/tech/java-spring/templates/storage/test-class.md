@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/h2/src/test/java/com/example/h2/access/task/H2TaskStorageSaveTest.java`
-- H2Test interface: `backend/adapters/h2/src/test/java/com/example/h2/H2Test.java`
-- Storage example: `backend/adapters/h2/src/main/java/com/example/h2/access/user/H2TaskStorage.java`
-- Entity example: `backend/adapters/h2/src/main/java/com/example/h2/entity/task/TaskEntity.java`
+- Test example: `backend/adapters/storage/src/test/java/com/example/storage/access/task/H2TaskStorageSaveTest.java`
+- H2Test interface: `backend/adapters/storage/src/test/java/com/example/storage/H2Test.java`
+- Storage example: `backend/adapters/storage/src/main/java/com/example/storage/access/user/H2TaskStorage.java`
+- Entity example: `backend/adapters/storage/src/main/java/com/example/storage/entity/task/TaskEntity.java`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/h2/src/test/java/com/example/h2/access/`
-- Production: `backend/adapters/h2/src/main/java/com/example/h2/access/`
-- Entities: `backend/adapters/h2/src/main/java/com/example/h2/entity/`
-- Repositories: `backend/adapters/h2/src/main/java/com/example/h2/repository/`
+- Tests: `backend/adapters/storage/src/test/java/com/example/storage/access/`
+- Production: `backend/adapters/storage/src/main/java/com/example/storage/access/`
+- Entities: `backend/adapters/storage/src/main/java/com/example/storage/entity/`
+- Repositories: `backend/adapters/storage/src/main/java/com/example/storage/repository/`

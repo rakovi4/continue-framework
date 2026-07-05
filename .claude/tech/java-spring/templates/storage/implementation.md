@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/h2/src/main/java/com/example/h2/access/task/H2TaskStorage.java`
-- Entity example: `backend/adapters/h2/src/main/java/com/example/h2/entity/task/TaskEntity.java`
-- Repository example: `backend/adapters/h2/src/main/java/com/example/h2/repository/task/TaskJpaRepository.java`
+- Storage example: `backend/adapters/storage/src/main/java/com/example/storage/access/task/H2TaskStorage.java`
+- Entity example: `backend/adapters/storage/src/main/java/com/example/storage/entity/task/TaskEntity.java`
+- Repository example: `backend/adapters/storage/src/main/java/com/example/storage/repository/task/TaskJpaRepository.java`
 
 ## JPA Repository Query Methods
 
@@ -29,6 +29,6 @@ Spring Data JPA derives queries from method names. If repository doesn't have re
 
 ## Key Paths
 
-- Storage: `backend/adapters/h2/src/main/java/com/example/h2/access/`
-- Entities: `backend/adapters/h2/src/main/java/com/example/h2/entity/`
-- Repositories: `backend/adapters/h2/src/main/java/com/example/h2/repository/`
+- Storage: `backend/adapters/storage/src/main/java/com/example/storage/access/`
+- Entities: `backend/adapters/storage/src/main/java/com/example/storage/entity/`
+- Repositories: `backend/adapters/storage/src/main/java/com/example/storage/repository/`

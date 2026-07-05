@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/sqlite/src/access/task/sqlite_task_storage.cpp`
-- Row example: `backend/adapters/sqlite/src/entity/task/task_row.h`
-- Migration example: `backend/adapters/sqlite/src/migrations/`
+- Storage example: `backend/adapters/storage/src/access/task/sqlite_task_storage.cpp`
+- Row example: `backend/adapters/storage/src/entity/task/task_row.h`
+- Migration example: `backend/adapters/storage/src/migrations/`
 
 ## SQLite Prepared Statement Patterns
 
@@ -30,6 +30,6 @@ Use `sqlite3_prepare_v2`, `sqlite3_bind_*`, and `sqlite3_step` for all queries. 
 
 ## Key Paths
 
-- Storage: `backend/adapters/sqlite/src/access/`
-- Row structs: `backend/adapters/sqlite/src/entity/`
-- Migrations: `backend/adapters/sqlite/src/migrations/`
+- Storage: `backend/adapters/storage/src/access/`
+- Row structs: `backend/adapters/storage/src/entity/`
+- Migrations: `backend/adapters/storage/src/migrations/`

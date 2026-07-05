@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/db/src/__tests__/access/{feature}/{Feature}Storage.test.ts`
-- Test setup: `backend/adapters/db/src/__tests__/setup/DbTest.ts`
-- Storage example: `backend/adapters/db/src/access/{feature}/{Feature}Storage.ts`
-- Entity example: `backend/adapters/db/src/entity/{feature}/{Feature}Entity.ts`
+- Test example: `backend/adapters/storage/src/__tests__/access/{feature}/{Feature}Storage.test.ts`
+- Test setup: `backend/adapters/storage/src/__tests__/setup/DbTest.ts`
+- Storage example: `backend/adapters/storage/src/access/{feature}/{Feature}Storage.ts`
+- Entity example: `backend/adapters/storage/src/entity/{feature}/{Feature}Entity.ts`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/db/src/__tests__/access/`
-- Production: `backend/adapters/db/src/access/`
-- Entities: `backend/adapters/db/src/entity/`
-- ORM config: `backend/adapters/db/src/config/`
+- Tests: `backend/adapters/storage/src/__tests__/access/`
+- Production: `backend/adapters/storage/src/access/`
+- Entities: `backend/adapters/storage/src/entity/`
+- ORM config: `backend/adapters/storage/src/config/`

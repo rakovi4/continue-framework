@@ -32,7 +32,7 @@ Tech binding for `coding-rules.md`. Shared section structure: `.claude/templates
 
 - Files: `snake_case.h`/`.cpp`. Classes: `PascalCase`. Members: `snake_case_` (trailing underscore).
 - Free functions/methods: `snake_case`. Persistence: `{Name}Row`. Converters: `to_dto()`/`to_row()`/`to_domain()`.
-- Interfaces: `I` prefix. Namespaces: `domain::`, `usecase::`, `adapters::grpc::`, `adapters::sqlite::`.
+- Interfaces: `I` prefix. Namespaces: `domain::`, `usecase::`, `adapters::grpc::`, `adapters::storage::`.
 
 ## Immutability
 

@@ -8,8 +8,8 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/db/src/Access/{Feature}/{Feature}Storage.php`
-- Model example: `backend/adapters/db/src/Model/{Feature}/{Feature}Model.php`
+- Storage example: `backend/adapters/storage/src/Access/{Feature}/{Feature}Storage.php`
+- Model example: `backend/adapters/storage/src/Model/{Feature}/{Feature}Model.php`
 - Migration directory: `database/migrations/`
 
 ## Eloquent Query Methods
@@ -30,6 +30,6 @@
 
 ## Key Paths
 
-- Storage: `backend/adapters/db/src/Access/`
-- Models: `backend/adapters/db/src/Model/`
+- Storage: `backend/adapters/storage/src/Access/`
+- Models: `backend/adapters/storage/src/Model/`
 - Migrations: `database/migrations/`

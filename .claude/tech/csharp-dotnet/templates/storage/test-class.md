@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/Adapters/Db.Tests/Access/{Feature}/{Feature}StorageTest.cs`
-- Test setup: `backend/Adapters/Db.Tests/TestFixture.cs`
-- Storage example: `backend/Adapters/Db/Access/{Feature}/{Feature}Storage.cs`
-- Entity example: `backend/Adapters/Db/Model/{Feature}/{Feature}Entity.cs`
+- Test example: `backend/Adapters/Storage.Tests/Access/{Feature}/{Feature}StorageTest.cs`
+- Test setup: `backend/Adapters/Storage.Tests/TestFixture.cs`
+- Storage example: `backend/Adapters/Storage/Access/{Feature}/{Feature}Storage.cs`
+- Entity example: `backend/Adapters/Storage/Model/{Feature}/{Feature}Entity.cs`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/Adapters/Db.Tests/Access/`
-- Production: `backend/Adapters/Db/Access/`
-- Entities: `backend/Adapters/Db/Model/`
-- Migrations: `backend/Adapters/Db/Migrations/`
+- Tests: `backend/Adapters/Storage.Tests/Access/`
+- Production: `backend/Adapters/Storage/Access/`
+- Entities: `backend/Adapters/Storage/Model/`
+- Migrations: `backend/Adapters/Storage/Migrations/`

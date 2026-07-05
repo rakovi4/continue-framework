@@ -63,7 +63,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — C++ Specifics
 
-- SQLite adapter tests: in-memory database (`:memory:`) with schema setup in `SetUp()` and teardown in `TearDown()`
+- Storage adapter tests: in-memory database (`:memory:`) with schema setup in `SetUp()` and teardown in `TearDown()`
 - gRPC adapter tests: mock gRPC service or in-process server with GMock
 - GMock: reset mocks before each test via `SetUp()` or fresh construction
 - Fakes: plain C++ classes implementing port interfaces with in-memory `std::unordered_map` or `std::vector` storage

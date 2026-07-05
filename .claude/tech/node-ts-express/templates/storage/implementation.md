@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/db/src/access/{feature}/{Feature}Storage.ts`
-- Entity example: `backend/adapters/db/src/entity/{feature}/{Feature}Entity.ts`
-- ORM config: `backend/adapters/db/src/config/`
+- Storage example: `backend/adapters/storage/src/access/{feature}/{Feature}Storage.ts`
+- Entity example: `backend/adapters/storage/src/entity/{feature}/{Feature}Entity.ts`
+- ORM config: `backend/adapters/storage/src/config/`
 
 ## ORM Query Examples (Prisma)
 
@@ -32,6 +32,6 @@
 
 ## Key Paths
 
-- Storage: `backend/adapters/db/src/access/`
-- Entities: `backend/adapters/db/src/entity/`
-- Migrations: `backend/adapters/db/src/migrations/` or `prisma/migrations/`
+- Storage: `backend/adapters/storage/src/access/`
+- Entities: `backend/adapters/storage/src/entity/`
+- Migrations: `backend/adapters/storage/src/migrations/` or `prisma/migrations/`

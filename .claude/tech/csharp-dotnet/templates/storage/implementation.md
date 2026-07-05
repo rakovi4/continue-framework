@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/Adapters/Db/Access/{Feature}/{Feature}Storage.cs`
-- Entity example: `backend/Adapters/Db/Model/{Feature}/{Feature}Entity.cs`
-- Migration directory: `backend/Adapters/Db/Migrations/`
+- Storage example: `backend/Adapters/Storage/Access/{Feature}/{Feature}Storage.cs`
+- Entity example: `backend/Adapters/Storage/Model/{Feature}/{Feature}Entity.cs`
+- Migration directory: `backend/Adapters/Storage/Migrations/`
 
 ## EF Core Query Methods
 
@@ -30,7 +30,7 @@
 
 ## Key Paths
 
-- Storage: `backend/Adapters/Db/Access/`
-- Entities: `backend/Adapters/Db/Model/`
-- Migrations: `backend/Adapters/Db/Migrations/`
-- DbContext: `backend/Adapters/Db/AppDbContext.cs`
+- Storage: `backend/Adapters/Storage/Access/`
+- Entities: `backend/Adapters/Storage/Model/`
+- Migrations: `backend/Adapters/Storage/Migrations/`
+- DbContext: `backend/Adapters/Storage/AppDbContext.cs`

@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/db/src/access/{feature}/{feature}_storage.py`
-- Model example: `backend/adapters/db/src/model/{feature}/{feature}_model.py`
-- Migration directory: `backend/adapters/db/migrations/`
+- Storage example: `backend/adapters/storage/src/access/{feature}/{feature}_storage.py`
+- Model example: `backend/adapters/storage/src/model/{feature}/{feature}_model.py`
+- Migration directory: `backend/adapters/storage/migrations/`
 
 ## Django ORM Query Methods
 
@@ -30,6 +30,6 @@
 
 ## Key Paths
 
-- Storage: `backend/adapters/db/src/access/`
-- Models: `backend/adapters/db/src/model/`
-- Migrations: `backend/adapters/db/migrations/`
+- Storage: `backend/adapters/storage/src/access/`
+- Models: `backend/adapters/storage/src/model/`
+- Migrations: `backend/adapters/storage/migrations/`

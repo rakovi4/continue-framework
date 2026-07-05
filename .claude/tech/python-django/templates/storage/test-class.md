@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/db/tests/access/{feature}/test_{feature}_storage.py`
-- Test setup: `backend/adapters/db/tests/conftest.py`
-- Storage example: `backend/adapters/db/src/access/{feature}/{feature}_storage.py`
-- Model example: `backend/adapters/db/src/model/{feature}/{feature}_model.py`
+- Test example: `backend/adapters/storage/tests/access/{feature}/test_{feature}_storage.py`
+- Test setup: `backend/adapters/storage/tests/conftest.py`
+- Storage example: `backend/adapters/storage/src/access/{feature}/{feature}_storage.py`
+- Model example: `backend/adapters/storage/src/model/{feature}/{feature}_model.py`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/db/tests/access/`
-- Production: `backend/adapters/db/src/access/`
-- Models: `backend/adapters/db/src/model/`
-- Migrations: `backend/adapters/db/migrations/`
+- Tests: `backend/adapters/storage/tests/access/`
+- Production: `backend/adapters/storage/src/access/`
+- Models: `backend/adapters/storage/src/model/`
+- Migrations: `backend/adapters/storage/migrations/`

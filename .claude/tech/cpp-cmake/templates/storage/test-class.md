@@ -16,10 +16,10 @@
 
 ## Reference (read before generating)
 
-- Test example: `backend/adapters/sqlite/tests/access/task/sqlite_task_storage_save_test.cpp`
-- Test fixture base: `backend/adapters/sqlite/tests/sqlite_test_fixture.h`
-- Storage example: `backend/adapters/sqlite/src/access/task/sqlite_task_storage.cpp`
-- Row example: `backend/adapters/sqlite/src/entity/task/task_row.h`
+- Test example: `backend/adapters/storage/tests/access/task/sqlite_task_storage_save_test.cpp`
+- Test fixture base: `backend/adapters/storage/tests/sqlite_test_fixture.h`
+- Storage example: `backend/adapters/storage/src/access/task/sqlite_task_storage.cpp`
+- Row example: `backend/adapters/storage/src/entity/task/task_row.h`
 
 ## Naming Convention
 
@@ -28,7 +28,7 @@
 
 ## Key Paths
 
-- Tests: `backend/adapters/sqlite/tests/access/`
-- Production: `backend/adapters/sqlite/src/access/`
-- Row structs: `backend/adapters/sqlite/src/entity/`
-- Migrations: `backend/adapters/sqlite/src/migrations/`
+- Tests: `backend/adapters/storage/tests/access/`
+- Production: `backend/adapters/storage/src/access/`
+- Row structs: `backend/adapters/storage/src/entity/`
+- Migrations: `backend/adapters/storage/src/migrations/`

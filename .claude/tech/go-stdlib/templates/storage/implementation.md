@@ -8,9 +8,9 @@
 
 ## Reference (read before generating)
 
-- Storage example: `backend/adapters/db/{feature}/{feature}_storage.go`
-- Row/entity example: `backend/adapters/db/{feature}/{feature}_row.go`
-- DB config: `backend/adapters/db/config/`
+- Storage example: `backend/adapters/storage/{feature}/{feature}_storage.go`
+- Row/entity example: `backend/adapters/storage/{feature}/{feature}_row.go`
+- DB config: `backend/adapters/storage/config/`
 
 ## Query Examples (pgx)
 
@@ -32,7 +32,7 @@
 
 ## Key Paths
 
-- Storage: `backend/adapters/db/{feature}/`
-- Row structs: `backend/adapters/db/{feature}/`
-- Migrations: `backend/adapters/db/migrations/`
-- sqlc config: `backend/adapters/db/sqlc.yaml`
+- Storage: `backend/adapters/storage/{feature}/`
+- Row structs: `backend/adapters/storage/{feature}/`
+- Migrations: `backend/adapters/storage/migrations/`
+- sqlc config: `backend/adapters/storage/sqlc.yaml`
