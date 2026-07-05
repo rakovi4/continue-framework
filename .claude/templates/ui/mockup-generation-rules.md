@@ -63,7 +63,7 @@ Typical components to extract (the exact set depends on the project):
 - Standalone HTML with embedded CSS. External dependencies: Google Fonts (Inter), Lucide icons CDN.
 - `lang="ru"`. Interface text in Russian.
 - All design tokens, spacing, typography, and component styles MUST match `ui-conventions.md`.
-- Icons: use Lucide CDN per `frontend-rules.md`. Add `<script src="https://unpkg.com/lucide@latest"></script>` in `<head>` and `<script>lucide.createIcons();</script>` before `</body>`. Reference icons by name using `<i data-lucide="icon-name"></i>`.
+- Icons: use Lucide CDN per `.claude/guidelines/frontend-rules.md`. Add `<script src="https://unpkg.com/lucide@latest"></script>` in `<head>` and `<script>lucide.createIcons();</script>` before `</body>`. Reference icons by name using `<i data-lucide="icon-name"></i>`.
 - Unsplash URLs for product images.
 - One file per screen state. Naming: `NN-descriptive-name.html`.
 - Desktop and mobile are separate files, NOT responsive breakpoints.

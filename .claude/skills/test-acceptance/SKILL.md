@@ -75,7 +75,7 @@ With arguments:
 
 ## Execution Strategy
 
-Follow `tdd-rules.md` "Stop on first failure" protocol:
+Read `.claude/guidelines/tdd-rules.md` and follow its "Stop on first failure" protocol:
 
 1. **Launch in background:** `run_in_background: true` — note the output file path from the result. Store `SEEN=0` to track lines already shown.
 2. **Poll with separate Bash calls:** Make repeated **individual** Bash calls (NOT a loop inside one call — that hides output until the loop finishes). Each call checks for new lines and the terminal signal:
@@ -95,7 +95,7 @@ Follow `tdd-rules.md` "Stop on first failure" protocol:
 
 ## Post-Run Cleanup (load only)
 
-When the load-testing session is finished — NOT between iterative re-runs — stop the load infrastructure. It is resource-heavy and, unlike the dev backend, not meant to stay up. See `.claude/rules/infrastructure.md` "Load-Test Infrastructure".
+When the load-testing session is finished — NOT between iterative re-runs — stop the load infrastructure. It is resource-heavy and, unlike the dev backend, not meant to stay up. See `.claude/guidelines/infrastructure-detail.md` "Load-Test Infrastructure".
 
 - Iterative `green-acceptance` re-runs reuse the same warm backend + baseline container — leave them running.
 - Once load testing is done, stop the load backend (the specific PID you started) and the baseline container (by name, matching your repo index).

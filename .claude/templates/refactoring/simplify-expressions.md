@@ -70,7 +70,7 @@ for (Task task : tasks) {
     }
 }
 // After — stream pipeline
-var doneTasks = tasks.stream()
+List<Task> doneTasks = tasks.stream()
         .filter(task -> task.status().equals("done"))
         .toList();
 
@@ -80,7 +80,7 @@ for (Task task : tasks) {
     ids.add(task.taskId());
 }
 // After — stream pipeline
-var ids = tasks.stream()
+List<UUID> ids = tasks.stream()
         .map(Task::taskId)
         .toList();
 ```
@@ -116,29 +116,29 @@ CompletableFuture.runAsync(() -> latchedNotification(event, latch));
 
 ## Inline Variable
 
-**NEVER inline a local variable that isolates a side-effecting call from a pure return mapping.** Any call to an injected dependency (usecase, port, repository, API client) is side-effecting regardless of verb — `getTasks()` hits the DB just like `save()` does. The variable exists to separate the side effect from the value transformation — removing it buries side effects inside expressions where they are invisible and reordering-sensitive. See `coding-rules.md` "Don't extract local variables" exception.
+**NEVER inline a local variable that isolates a side-effecting call from a pure return mapping.** Any call to an injected dependency (usecase, port, repository, API client) is side-effecting regardless of verb — `getTasks()` hits the DB just like `save()` does. The variable exists to separate the side effect from the value transformation — removing it buries side effects inside expressions where they are invisible and reordering-sensitive. See `.claude/guidelines/coding-detail.md` "Don't extract local variables" exception.
 
 ```java
 // Before — single-accessor local
-var taskId = createTaskResponse.taskId();
+UUID taskId = createTaskResponse.taskId();
 columnStatements.moveTask(userLoginResponse, taskId);
 // After — use object.field() directly
 columnStatements.moveTask(userLoginResponse, createTaskResponse.taskId());
 
-// Before — var used once in lambda
-var request = createRequest();
+// Before — variable used once in lambda
+Request request = createRequest();
 assertThatThrownBy(() -> process(request))...
 // After
 assertThatThrownBy(() -> process(createRequest()))...
 
 // KEEP — side-effecting call isolated from return mapping
-var tasks = taskStorage.findByColumnId(columnId);  // side effect: DB read
+List<Task> tasks = taskStorage.findByColumnId(columnId);  // side effect: DB read
 return buildResponse(tasks);                       // pure mapping
 // WRONG — inlining buries the side effect
 return buildResponse(taskStorage.findByColumnId(columnId));
 
 // KEEP — usecase call is always side-effecting (DB read), even with "get" verb
-var board = boardUseCase.getBoard(userId, page, pageSize);
+Board board = boardUseCase.getBoard(userId, page, pageSize);
 return ResponseEntity.ok(BoardResponseDto.fromDomain(board));
 // WRONG — inlining a usecase call
 return ResponseEntity.ok(BoardResponseDto.fromDomain(

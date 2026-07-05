@@ -1,20 +1,25 @@
 # Extract Tailwind @apply Class
 
-**When to use:** A `className` string contains any Tailwind utility with an arbitrary value (`text-[#4b5563]`, `shadow-[...]`, `ring-[3px]`, `border-[#e5e7eb]`, `bg-[#f1f3f5]`) that obscures visual intent. Even a single `bg-[#hex]` qualifies — hex codes are opaque. Also applies to repeated utility combinations across 2+ components.
+**When to use:** A standalone `className` string contains 2+ Tailwind utilities. The count is the whole test — readability of each token and whether it restructures across breakpoints are NOT exemptions, and variants (`lg:`, `hover:`) count as utilities. Also applies to a single utility with an arbitrary value (`text-[#4b5563]`, `shadow-[...]`, `ring-[3px]`, `bg-[#f1f3f5]`) — even one hex code is opaque — and to any combination repeated across 2+ components. A chain of self-documenting tokens is still a chain the reader must parse and re-assemble into one intent; give the intent a name.
 
 **Examples:**
 - `shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]` → `.auth-card`
 - `border border-[#e5e7eb] bg-white px-4 py-3 text-[15px] text-[#111827] placeholder:text-[#9ca3af]` → `.input-field`
 - `flex items-center justify-center rounded-full` → `.status-icon`
+- `flex gap-2` → `.button-row` (2-utility chain)
+- `mb-5 text-center` → `.section-heading` (2-utility chain)
+- `min-w-0 flex-1` → `.grow-cell` (2-utility chain)
+- `hidden lg:inline` → `.nav-label-desktop` (variants count — 2-utility chain)
+- `flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6` → `.detail-header-row`
+- `mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2` → `.detail-grid-2`
 
-**NOT candidates** (already readable):
-- `mb-5 text-center` — self-documenting, leave inline
-- `flex gap-2` — simple layout, no arbitrary values
-- `p-12` as a single override alongside a semantic class — fine inline
+**NOT candidates** (stay inline):
+- A single standalone utility — `p-12`, `text-center`, `hidden` — one token, nothing to name
+- A semantic base class plus override/variant utilities — `auth-card p-12`, `btn-primary hover:shadow-md active:translate-y-px` — the semantic class is already extracted; the remaining overrides are composition, not a chain
 
 ## Step 1: Identify the Pattern
 
-Find `className` strings with any arbitrary-value utility (`[#hex]`, `[Npx]`, `[N.Nrem]`). Even one hex color is opaque — extract it. Ask: "Can a developer understand the visual intent without decoding these values?" If not, extract.
+Find `className` strings that are either (a) a single arbitrary-value utility (`[#hex]`, `[Npx]`, `[N.Nrem]`) — even one hex color is opaque, or (b) a standalone chain of 2+ utilities (count every space-separated token, variants included; skip tokens that are an already-extracted semantic class). The only stay-inline cases are a single standalone utility and a semantic base class plus override/variant utilities.
 
 ## Step 2: Choose a Semantic Name
 
@@ -78,7 +83,7 @@ If the extracted class replaces a TypeScript constant (e.g., `INPUT_DEFAULT` fro
 
 ## Checklist
 
-1. [ ] Opaque className identified (1+ arbitrary-value utilities)
+1. [ ] Extractable className identified (2+ standalone utilities, or 1+ arbitrary-value utility)
 2. [ ] Semantic class name chosen (describes UI concept)
 3. [ ] Class added to `@layer components` in `theme.css`
 4. [ ] All component usages replaced

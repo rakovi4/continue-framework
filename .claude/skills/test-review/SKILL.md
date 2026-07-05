@@ -24,10 +24,26 @@ description: Review tests to replace loose validation (contains, isNotNull, isNo
 
 ## Workflow
 
-1. Load `.claude/agents/test-review-agent.md`
-2. **Run the mandatory checklist** defined in the agent — grep each pattern, paste results. Fix violations before proceeding.
-3. Load `.claude/templates/testing/test-review-patterns.md` for universal rules and anti-pattern catalog
-4. Determine the layer of the test being reviewed, load the matching tech-specific file (see agent Reference section)
-5. Verify all response fields have strict assertions (read DTO, check every field)
-6. Replace loose assertions with exact assertions on parsed fields
-7. Run tests via `/test-runner` to verify behavior unchanged
+Scatter–gather: **parallel read-only detectors** find violations, then a **single
+serial fixer** applies them. The detectors never edit — only the fixer writes, one
+file at a time — so there are no concurrent writes to shared Statements files.
+
+1. **Determine the test's layer** (usecase / rest / h2 / acceptance / selenium) —
+   this selects the tech file each detector loads and whether the selenium
+   detector runs.
+2. **Dispatch the detectors in parallel** (single message, multiple agent calls).
+   Each runs only its cluster of `.claude/templates/workflow/test-review-checklist.md`
+   and returns a findings table:
+   - `test-review-assertions-agent` — cluster A (assertion strictness)
+   - `test-review-placement-agent` — cluster P (test-class vs Statements placement)
+   - `test-review-statements-agent` — cluster S (Statements internal quality)
+   - `test-review-selenium-agent` — cluster Se — **only for selenium/frontend tests**; skip for pure backend tests.
+3. **Gather + fix:** hand all findings to `.claude/agents/test-review-agent.md`
+   (the serial fixer). It merges, dedups, applies fixes one file at a time, runs
+   `/test-runner`, and prints the filled `test-review-output-format.md`.
+
+### Small-file shortcut
+
+If the target test is small with very few assertions, skip the fan-out and run a
+single `test-review-agent` pass over the whole checklist — the detector
+orchestration + merge overhead can exceed the single-agent cost on tiny files.

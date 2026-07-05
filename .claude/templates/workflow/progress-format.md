@@ -85,7 +85,7 @@
 
 ## Task (bug)
 
-Bug tasks start with discovery, not pre-planned TDD steps. `steps-discovery` is a gate (analogous to `adapters-discovery` in stories) -- it expands in place into concrete TDD steps once the root cause is known. Prod-copy bugs prepend a `reproduce in prod-copy` step.
+Bug tasks start with discovery, not pre-planned TDD steps. `steps-discovery` is a gate (analogous to `adapters-discovery` in stories) -- it expands in place into concrete TDD steps once the root cause is known. A `design` step (`/design-preview`) runs before `steps discovery` so the steps are planned against an approved fix approach. Prod-copy bugs prepend a `reproduce in prod-copy` step. When the gate resolves, its marker MUST record the hazard scan (`scanned all _index.md groups; GAPs: …`) — a bare `[x] steps discovery` is an unscanned gate (see "Hazard scan at steps discovery" in `.claude/guidelines/workflow-detail.md`).
 
 ```markdown
 # Task N: Title — Progress
@@ -98,6 +98,7 @@ Type: bug
 ## Fix: Bug description
 - [x] reproduce in prod-copy          <- only for prod-copy bugs
 - [~] root cause analysis             <- CURRENT
+- [ ] design                          <- /design-preview; [S] when fix approach is obvious
 - [ ] steps discovery
 ```
 
@@ -107,11 +108,25 @@ After `steps discovery` resolves, `/continue` replaces it with concrete TDD step
 ## Fix: Bug description
 - [x] reproduce in prod-copy
 - [x] root cause analysis
-- [x] steps discovery (frontend logic + component)
+- [x] design
+- [x] steps discovery (scope: frontend logic + component; scanned all _index.md groups; GAPs: none fired)
 - [~] red-frontend                    <- CURRENT
 - [ ] green-frontend
 - [ ] align-design
 - [ ] demo
+```
+
+When the fix changes externally observable behavior (or tightens acceptance-level test infrastructure such as an external-service mock), discovery must also schedule a `red-acceptance` + `green-acceptance` pair (see "Acceptance red when application behavior changes" in `.claude/guidelines/workflow-detail.md`). All red steps land before the first green when one production fix resolves every red surface:
+
+```markdown
+## Fix: Bug description
+- [x] root cause analysis
+- [x] design
+- [x] steps discovery (scope: adapter X production code + adapter-test stubs + acceptance mock; scanned all _index.md groups; GAPs: 1 folded → red-acceptance for outbound re-attempt idempotency)
+- [~] red-adapter X                   <- CURRENT (tighten adapter-test stubs, predict failure)
+- [ ] red-acceptance                  (tighten acceptance mock, predict failure in affected flows)
+- [ ] green-adapter X                 (single production fix — resolves both red surfaces)
+- [ ] green-acceptance                (verification only; no production or test changes)
 ```
 
 ## Task (refactoring)

@@ -38,6 +38,7 @@ Read the content. Answer the question. **Cite the line or section as evidence, o
 | B4 | Is there duplicated content between this file and another layer? | Quote both locations |
 | B5 | Are all templates referenced in routing/smell tables also listed in the skill's Available Templates? | List any missing references |
 | B6 | Does a universal file (`.claude/rules/`, `.claude/templates/`) contain tech-specific content? (framework names, annotations, library APIs, CLI commands) | Quote the content — belongs in `.claude/tech/{concern-value}/` |
+| B7 | Does the file constrain the *model's reasoning* with a brevity directive? ("be brief", "be concise", "don't overthink", "answer quickly", "skip the analysis", any cap on thinking) | Quote the content — remove it; length caps may target a produced artifact (file, field, user-facing message) but never the reasoning before it. See `.claude/guidelines/prompt-rules.md` "Brevity: constrain artifacts, never reasoning" |
 
 ## Scan output format
 
@@ -60,6 +61,7 @@ B3. Workflow in skill: {none found | "{quoted content}" L{N} → VIOLATION: move
 B4. Duplication: {none found | "{content}" in both {file1} and {file2} → VIOLATION}
 B5. Template refs: {all listed | "{template}" missing from skill → VIOLATION}
 B6. Tech leakage: {none found | "{quoted content}" L{N} → VIOLATION: move to tech binding}
+B7. Reasoning-brevity directive: {none found | "{quoted content}" L{N} → VIOLATION: remove — constrains model reasoning}
 ```
 
 **If any item has a violation, fix it BEFORE reporting "no issues."**

@@ -50,6 +50,21 @@ Stories declare prerequisites (e.g., "board must exist", "column must exist"). E
 - Cross-reference existing stories for established blocker patterns (e.g., Story 5 `02_UI_Tests.md` section 0)
 - If a prerequisite has two states (unlinked vs expired), generate separate scenarios for each
 
+### Side-Effect & Idempotency Guard Checklist
+
+For every operation that **moves money, calls an external system, or mutates persisted state** AND can be re-run (scheduled job, webhook delivery, user-initiated retry), generate re-run-safety scenarios in BOTH directions. A re-run-safe operation produces the side effect at most once regardless of how many times it is triggered.
+
+**How to extract operations:** Read the story spec and `interview.md` for any payment, external API call, email send, or batch state change. Each is a guard target. If unsure whether an operation is re-runnable, assume it is.
+
+| Direction | What to assert | Example scenario |
+|-----------|---------------|------------------|
+| Inbound (duplicate event) | A duplicate trigger produces the same result with no duplicate side effect | Same webhook delivered twice → charged/recorded once |
+| Outbound (re-attempt after partial failure) | A re-run after a crash or partial-batch failure does not repeat an already-completed side effect | Batch renews A, fails on B; next run must NOT re-charge A |
+
+**Rules:**
+- Both directions are mandatory for any money-moving operation — covering one (e.g. inbound webhooks) does NOT cover the other (e.g. outbound re-charge on retry). This is the exact gap that ships double-charge bugs.
+- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved), not in `extended/` — re-run safety for a side effect is critical-path, never nice-to-have.
+
 ## 02_UI_Tests.md (5-8 tests)
 
 Same TDD-sequential ordering philosophy. Start with what needs the least code, build up.

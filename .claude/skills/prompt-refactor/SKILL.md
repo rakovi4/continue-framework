@@ -24,8 +24,8 @@ Orchestrates prompt-refactor-agent to find and fix structural and layer placemen
 
 ## Layer-Specific
 
-- Classification rules: `.claude/rules/prompt-rules.md`
-- Two-layer structure: `.claude/rules/technology-loading.md`
+- Classification rules: `.claude/guidelines/prompt-rules.md`
+- Two-layer structure: `.claude/guidelines/technology-loading.md`
 - Scan checklist: `.claude/templates/documentation/prompt-scan-checklist.md`
 
 ## Next Step

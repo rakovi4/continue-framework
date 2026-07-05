@@ -47,7 +47,7 @@ return buildResponse(result);
 ```java
 // Usecase — owns the "when to archive" decision
 public void process(Request request) {
-    var board = storage.findById(request.boardId()).orElseThrow();
+    Board board = storage.findById(request.boardId()).orElseThrow();
 
     board.moveTask(request.taskId(), request.columnId(), now);
 
@@ -72,7 +72,7 @@ public void moveTask(UUID taskId, UUID columnId, Instant now) {
 
 // Usecase — just delegates
 public void process(Request request) {
-    var board = storage.findById(request.boardId()).orElseThrow();
+    Board board = storage.findById(request.boardId()).orElseThrow();
     board.moveTask(request.taskId(), request.columnId(), now);
     storage.save(board);
 }

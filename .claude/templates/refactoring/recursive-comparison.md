@@ -6,6 +6,7 @@
 - `assertAllFields`/`assertEntry`-style utility classes or methods comparing two records field by field
 - Test helper with 2+ sequential `assertThat(actual.fieldX()).isEqualTo(expected.fieldX())` lines
 - Loops that iterate a list and compare each element's fields individually
+- A run of 2+ per-field reads off the **same actual object** whose expected values are scattered (a sibling object + captured ids + enum constants) and where behavioral-predicate assertions are interleaved — the shape is a state-field run, even though there is no single `assertAllFields(actual, expected)` helper. If a natural sibling expected exists in scope (the just-saved entity captured before the round-trip), the state-field run is a subset reconstruction of it → collapse to one whole-object comparison; see "After — Subset Against a Sibling Expected" below
 
 ## Before
 
@@ -59,6 +60,28 @@ assertThat(actual).usingRecursiveComparison()
     .ignoringFields("id", "createdAt")
     .isEqualTo(expected);
 ```
+
+## After — Subset Against a Sibling Expected
+
+When a test reads several state fields off `actual` and compares them to a sibling object that is already in scope (e.g., the entity returned by the setup `save`), the per-field run is reconstructing that sibling. Collapse the **state-field** assertions into one whole-object comparison; keep behavioral-predicate assertions (derived booleans the scenario verifies) as separate lines — they are not state.
+
+```java
+// Before — state fields of the loaded object checked one-by-one against the
+// saved sibling + constants, with derived-behaviour predicates interleaved
+assertThat(actual.id()).isEqualTo(saved.id());
+assertThat(actual.title()).isEqualTo(title);
+assertThat(actual.status()).isEqualTo(Status.ACTIVE);
+assertThat(actual.isReady()).isTrue();         // derived behaviour
+assertThat(actual.needsAttention()).isTrue();  // derived behaviour
+
+// After — one whole-object comparison proves the object round-tripped;
+// behavioural predicates stay separate
+assertThat(actual).usingRecursiveComparison().isEqualTo(saved);
+assertThat(actual.isReady()).isTrue();
+assertThat(actual.needsAttention()).isTrue();
+```
+
+Use `.ignoringFields(...)` only for fields that legitimately differ in the round-trip (e.g., a DB-assigned surrogate key). **Guard:** only collapse when a sibling expected genuinely exists. If the asserted fields are a deliberate subset against scattered constants with no sibling to compare against, keep them per-field — over-collapsing into `isEqualTo` would start constraining unrelated fields the scenario never intended to pin. To know whether the read reproduces every field, read the mapper (does `save`/`find` return `toDomain`?) — never infer it from how another test asserts.
 
 ## Steps
 

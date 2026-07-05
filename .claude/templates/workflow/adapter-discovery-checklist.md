@@ -18,6 +18,7 @@ Read the usecase constructor. For each injected port:
    - **Insufficient**: implementation exists from a prior scenario but doesn't support the current one (e.g., returns hardcoded data instead of reading from storage, persists a subset of fields, ignores a new parameter). Read the acceptance test to understand what end-to-end behavior is expected — if the adapter can't support it, add steps.
    - **Sufficient**: implementation already handles this scenario's needs → `[S]` with reason
 3. Check each method the usecase calls on the port, not just the port as a whole — one method may be sufficient while another is stubbed or insufficient
+4. **Derive each adapter test from the real usecase flow — reproduce it, don't shortcut it.** Look at how the scenario's data actually moves through the usecases: it is written by one usecase and read by another — a writer usecase persists it through one storage port, and a separate reader usecase queries it back through a different storage port. The adapter test must reproduce that flow at the persistence layer — **write through the writer usecase's port, read through the reader usecase's port** (save through the first storage, then assert through the second storage's finder/selection method). That write-here-read-there shape is the convention, not a collapse to avoid: it proves the data actually crosses between the two real code paths. A same-port round-trip (save → read-back on one storage) only pins that one storage's own mapping — it does NOT exercise the cross-usecase flow. So when the write and the read live in different usecases through different ports, emit a `red-adapter` / `green-adapter` pair that runs the actual write-port → read-port flow. The anti-pattern is testing only the round-trip and deferring the real cross-usecase selection/query to `green-acceptance` — a coarse black-box net, not a substitute for a focused adapter test on the riskiest query logic.
 
 ## Check 2: Domain Exceptions → Inbound Adapter Error Handling
 
@@ -60,5 +61,7 @@ Check 1 (ports): {adapter} — {reason}
 Check 2 (exceptions): {inbound adapter} — {reason} OR [S] — {reason}
 Check 3 (response shape): {inbound adapter} — {reason} OR [S] — {reason}
 ```
+
+Check 1 produces **one line per usecase data-flow**, not per port. When the scenario's data is written by one usecase and read by another, that write→read flow is a single adapter test (write via the writer's port, read via the reader's port) — one line, one pair. List each such flow on its own line with its own `red-adapter X` / `green-adapter X` steps. Never reduce a write-here-read-there flow to a same-port round-trip and defer the real cross-usecase read to `green-acceptance`.
 
 Then insert the concrete `red-adapter X` / `green-adapter X` steps into progress.md below `adapters-discovery`.

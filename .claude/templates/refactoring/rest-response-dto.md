@@ -22,7 +22,7 @@ Create a REST-layer response DTO record with `@JsonProperty` annotations and a `
 
 ```java
 // Controller
-var response = usecase.execute(request);
+CreateTaskResponse response = usecase.execute(request);
 return ResponseEntity.ok(response);
 // Returns: {"redirectUrl": "...", "createdAt": "..."}
 ```
@@ -46,7 +46,7 @@ public record CreateTaskResponseDto(
 }
 
 // Controller
-var response = usecase.execute(request);
+CreateTaskResponse response = usecase.execute(request);
 return ResponseEntity.ok(CreateTaskResponseDto.from(response));
 // Returns: {"task_id": "...", "title": "Fix login bug", "status": "todo"}
 ```

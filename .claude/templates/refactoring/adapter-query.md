@@ -52,12 +52,12 @@ Three wins: (1) query owns its spec building (move behavior to data), (2) static
 ```java
 // BAD: untyped array with index-based access + manual null handling
 private TaskSummary computeSummary(Specification<TaskEntity> spec) {
-    var cb = entityManager.getCriteriaBuilder();
-    var cq = cb.createQuery(Object[].class);
-    var root = cq.from(TaskEntity.class);
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+    Root<TaskEntity> root = cq.from(TaskEntity.class);
     cq.where(spec.toPredicate(root, cq, cb));
     cq.multiselect(sumCase(cb, statusChanged), sumCase(cb, movedCount), ...);
-    var result = entityManager.createQuery(cq).getSingleResult();
+    Object[] result = entityManager.createQuery(cq).getSingleResult();
     return new TaskSummary(toLong(result[0]), toLong(result[1]), toLong(result[2]), ...);
 }
 private static long toLong(Object value) { return value != null ? ((Number) value).longValue() : 0L; }
@@ -100,9 +100,9 @@ After extracting adapter query + projection, the storage method becomes trivial:
 ```java
 // BAD: 40+ lines of query building, spec construction, result mapping
 public TaskPage findPage(TaskQuery query) {
-    var spec = TaskSpecs.fromQuery(query);
-    var pageable = PageRequest.of(query.page() - 1, query.size(), Sort.by(...));
-    var page = repository.findAll(spec, pageable);
+    Specification<TaskEntity> spec = TaskSpecs.fromQuery(query);
+    Pageable pageable = PageRequest.of(query.page() - 1, query.size(), Sort.by(...));
+    Page<TaskEntity> page = repository.findAll(spec, pageable);
     return new TaskPage(
             page.getContent().stream().map(Entity::toDomain).toList(),
             query.page(), query.size(), page.getTotalElements(),

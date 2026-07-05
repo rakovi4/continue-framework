@@ -41,11 +41,11 @@ If test cannot pass without modification, STOP and report issue.
 - Any test file changes except enabling the test
 - Adding features beyond what the test requires
 - **Writing ANY production code during acceptance/selenium green phase** — the ONLY allowed change is removing the test disable/skip marker. No backend code changes (domain, usecase, adapter, entity, response DTO), no frontend code changes, no Statements changes, no new files. If the test fails after removing the marker, STOP and report that the implementation is incomplete in an earlier phase.
-- **Deleting assertions from Statements methods** — see `tdd-rules.md` "NEVER delete assertions from Statements methods" rule. Extract a new Statements class by concern if file exceeds 200 lines.
+- **Deleting assertions from Statements methods** — see `.claude/guidelines/tdd-rules.md` "NEVER delete assertions from Statements methods" rule. Extract a new Statements class by concern if file exceeds 200 lines.
 
 ## Template by Layer
 
-Resolve concern profiles from `ProductSpecification/technology.md` `tech-profile:` block (see `.claude/rules/technology-loading.md`).
+Resolve concern profiles from `ProductSpecification/technology.md` `tech-profile:` block (see `.claude/guidelines/technology-loading.md`).
 
 Backend layers (usecase, acceptance, adapters): `.claude/tech/{backend}/templates/{layer}/implementation.md`
 
@@ -78,3 +78,8 @@ Before implementing, read:
 3. Existing implementations in the module
 4. Related domain classes
 5. Adapter interfaces (for adapter layers)
+6. `.claude/guidelines/tdd-rules.md` — Statements and assertion rules (no longer auto-loaded; read it before implementing).
+
+## Progress Logging
+
+Read `.claude/guidelines/agent-logging.md` and append your required `green-agent` milestones to `infrastructure/agent-progress.log` as you work.

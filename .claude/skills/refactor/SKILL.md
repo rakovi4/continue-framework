@@ -5,7 +5,10 @@ description: Refactor code using Martin Fowler's patterns. Improves readability,
 
 # /refactor
 
-Spawns `refactor-agent` for code improvements.
+Scatter–gather: **three parallel read-only detectors** scan for smells, then a
+**single serial fixer** applies refactorings one at a time. Detectors never edit
+— only the fixer writes, and it re-scans cascades after each change, so the
+"one refactoring at a time" invariant is preserved.
 
 ## Usage
 
@@ -17,18 +20,34 @@ Spawns `refactor-agent` for code improvements.
 
 ## Workflow
 
-1. Load `.claude/agents/refactor-agent.md`
-2. Agent reads target file + tests
-3. **Run the scan checklist** defined in the agent — enumerate (Section A) + judge (Section B). Fix violations before declaring clean.
-4. Identifies smell, loads template from `.claude/templates/refactoring/`
-5. Applies ONE refactoring, runs tests
-6. Repeats until clean
+1. **Identify the target** file (and its tests / siblings). This determines which
+   file-type checks apply (backend vs `.tsx`).
+2. **Dispatch the detectors in parallel** (single message, multiple agent calls).
+   Each runs only its cluster of `.claude/templates/refactoring/scan-checklist.md`
+   and returns a candidate table:
+   - `refactor-mechanics-agent` — cluster M (size, complexity, variables, dead code)
+   - `refactor-design-agent` — cluster D (domain modeling, behavior placement, type safety)
+   - `refactor-duplication-agent` — cluster T (sibling/cross-class duplication, tests, frontend)
+3. **Gather + fix:** hand all candidate tables to `.claude/agents/refactor-agent.md`
+   (the serial fixer). It merges, dedups, orders highest-impact-first, applies
+   ONE refactoring at a time (loading the template from the Code Smells Routing
+   Table), runs tests, and re-scans cascades inline — repeating until clean.
+
+### Small-file shortcut
+
+If the target is small with few methods/concerns, skip the fan-out and run a
+single `refactor-agent` pass over the whole checklist — the detector
+orchestration + merge overhead can exceed the single-agent cost on tiny files.
 
 ## Available Templates
 
 ### Backend (`.claude/templates/refactoring/`)
 
-- `scan-checklist.md` - Mandatory structural + judgment scan checklist
+- `scan-checklist.md` - Scan hub: detector clusters + output format (links the three below)
+- `scan-mechanics.md` - Cluster M checks (structural mechanics)
+- `scan-design.md` - Cluster D checks (design + domain judgment)
+- `scan-duplication.md` - Cluster T checks (duplication, tests, frontend)
+- `code-smells-routing-table.md` - Smell → fix → template map (serial fixer)
 - `value-object.md` - Replace primitive with value object
 - `replace-string-with-enum.md` - Replace string constants with domain enum
 - `computed-field.md` - Remove persisted field, replace with computed method

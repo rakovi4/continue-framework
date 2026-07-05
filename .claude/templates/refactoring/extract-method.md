@@ -8,7 +8,7 @@ When code is organized with comments or followed by blank lines, each commented 
 ```java
 // Before — commented sections signal separate concerns
 // Normal save-load-save cycle — forces version round-trip through domain
-var loaded = storage.findByTaskId(task.getTaskId()).orElseThrow();
+Task loaded = storage.findByTaskId(task.getTaskId()).orElseThrow();
 loaded.archive();
 em.clear();
 storage.save(loaded);
@@ -33,7 +33,7 @@ When code blocks are separated by blank lines without comments, each block is an
 
 ```java
 // Before — blank lines signal separate concerns but no names provided
-var user = storage.findById(userId).orElseThrow();
+User user = storage.findById(userId).orElseThrow();
 
 if (user.getRole() != UserRole.ADMIN) {
     throw new AccessDeniedException("Admin only");
@@ -120,7 +120,7 @@ When consecutive guards (find + validate) protect the same concern, extract a vo
 The main method reads as a clean sequence; the guard encapsulates all precondition checks.
 ```java
 // Before — inline guards clutter the happy path
-var task = taskStorage.findById(taskId)
+Task task = taskStorage.findById(taskId)
         .orElseThrow(() -> new TaskNotFoundException("..."));
 if (task.isArchived()) {
     throw new TaskArchivedException("...");
@@ -132,7 +132,7 @@ checkTask(taskId);
 // ... happy path ...
 
 private void checkTask(UUID taskId) {
-    var task = taskStorage.findById(taskId)
+    Task task = taskStorage.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException("..."));
     if (task.isArchived()) {
         throw new TaskArchivedException("...");
@@ -192,8 +192,8 @@ transformation step as a named method so the parent reads as a clean sequence of
 ```java
 // Before — inline pipeline mixes orchestration with transformation
 public void sendConcurrentNotifications(String event) {
-    var latch = new CountDownLatch(1);
-    var futures = IntStream.range(0, CONCURRENT_COUNT)
+    CountDownLatch latch = new CountDownLatch(1);
+    CompletableFuture[] futures = IntStream.range(0, CONCURRENT_COUNT)
             .mapToObj(i -> CompletableFuture.runAsync(latchedNotification(event, latch)))
             .toArray(CompletableFuture[]::new);
     latch.countDown();
@@ -201,8 +201,8 @@ public void sendConcurrentNotifications(String event) {
 }
 // After — each pipeline step is a named method
 public void sendConcurrentNotifications(String event) {
-    var latch = new CountDownLatch(1);
-    var futures = runNotificationsAsync(event, latch);
+    CountDownLatch latch = new CountDownLatch(1);
+    CompletableFuture[] futures = runNotificationsAsync(event, latch);
     latch.countDown();
     CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
 }

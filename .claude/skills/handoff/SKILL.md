@@ -27,9 +27,9 @@ Run this to persist what a future session would otherwise lose. `/handoff` runs 
 
 ## Constraints
 
-The append-only, lazy-creation, idempotent, strict-format, and no-forward-looking-instructions rules are defined in `.claude/templates/workflow/summary-format.md` and `.claude/rules/workflow.md` (Resuming Across Conversations). Apply them — do not restate them. `/handoff` is the sole writer of journey summaries and carryover; `/continue` only reads them.
+The append-only, lazy-creation, idempotent, strict-format, and no-forward-looking-instructions rules are defined in `.claude/templates/workflow/summary-format.md` and `.claude/guidelines/workflow-detail.md` (Resuming Across Conversations). Apply them — do not restate them. `/handoff` is the sole writer of journey summaries and carryover; `/continue` only reads them.
 
 ## Authoritative References
 
-- `.claude/rules/workflow.md` -- "Resuming Across Conversations": how journey summaries fit the workflow, who writes and reads them.
+- `.claude/guidelines/workflow-detail.md` -- "Resuming Across Conversations": how journey summaries fit the workflow, who writes and reads them.
 - `.claude/templates/workflow/summary-format.md` -- when to write, entry header, block types, length limit, DO/DON'T-WRITE examples.

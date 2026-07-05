@@ -11,6 +11,16 @@
 
 ## spec.md Format
 
+At creation a **bug** spec captures only the observable problem and how to
+reproduce it — describe the problem as thoroughly as possible. Do NOT pre-fill a
+root cause, a proposed Solution, affected layers, or Key Files: those are
+produced later by the discovery sequence (`root cause analysis` records the
+cause and key files in `spec.md`; `design` settles the fix approach). Pre-baking
+a solution at creation commits to an assumption before any investigation has run.
+
+**Refactoring** and **qa** specs do state a Solution at creation (the intended
+structural change / when-to-run), since there is no unknown cause to discover.
+
 ```markdown
 # Task {N}: {Title}
 
@@ -18,13 +28,15 @@ Type: {bug|refactoring|qa}
 
 ## Problem
 
+{description — for a bug, as thorough as possible: symptoms, observed vs.
+expected, environment, frequency, any captured response/error}
+
+## Solution  <- refactoring and qa only (omit for bug — produced during design)
+
 {description}
 
-## Solution
-
-{description}
-
-## Key Files  <- bug and refactoring only (omit for qa)
+## Key Files  <- refactoring only (omit for qa; for a bug, key files are
+                 recorded by root cause analysis, not at creation)
 
 - {file paths}
 
@@ -42,7 +54,7 @@ Type: {bug|refactoring|qa}
 
 ### Bug (any layer)
 
-Bug tasks do NOT pre-plan TDD steps at creation time. The progress file starts with a discovery sequence; concrete TDD steps are inserted by `/continue` once `steps-discovery` resolves (see Task Workflow in `.claude/rules/workflow.md`). This applies to every bug regardless of affected layer -- backend, frontend, or both.
+Bug tasks do NOT pre-plan TDD steps at creation time. The progress file starts with a discovery sequence; concrete TDD steps are inserted by `/continue` once `steps-discovery` resolves (see Task Workflow Detail in `.claude/guidelines/workflow-detail.md`). This applies to every bug regardless of affected layer -- backend, frontend, or both.
 
 ```markdown
 # Task {N}: {Title} -- Progress
@@ -54,6 +66,7 @@ Type: bug
 
 ## Fix: {bug description}
 - [ ] root cause analysis
+- [ ] design
 - [ ] steps discovery
 ```
 
@@ -72,6 +85,7 @@ Type: bug
 ## Fix: {bug description}
 - [ ] reproduce in prod-copy
 - [ ] root cause analysis
+- [ ] design
 - [ ] steps discovery
 ```
 

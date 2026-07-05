@@ -75,7 +75,7 @@ Each entry names a smell the reviewer must detect. Tech templates provide BAD/GO
 25. **No unreferenced domain classes/fields from RED** -- every class/field must be referenced by test or Statements
 26. **Assert ALL items in a collection** -- if setup produces N items, assert every item
 27. **Assert full object contents, not just IDs** -- verify all fields of domain objects
-28. **Prefer recursive comparison over sequential per-field assertions** -- when 2+ consecutive assertions target fields of the same object, replace with a single recursive/structural comparison call
+28. **Prefer recursive comparison over sequential per-field assertions** -- when 2+ consecutive assertions target fields of the same object, replace with a single recursive/structural comparison call. See `recursive-comparison.md` to decide whether to collapse and which fields to exclude
 29. **No null assertions on domain VO fields** -- domain is null-free; `isNull()` on a VO field means the domain model is wrong, not the test
 
 ## Assertion Improvements (Concept Level)

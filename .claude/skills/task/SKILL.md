@@ -31,11 +31,9 @@ Create `ProductSpecification/tasks/{N}-{type}-{slug}/` where slug is lowercase-h
 
 Gather from user:
 
-**Bug / Refactoring:** Problem, Solution, Affected Layers (domain, usecase, h2, rest, email, frontend), Key Files.
+**Bug:** Problem (as thorough as possible — symptoms, observed vs. expected, environment, frequency, any captured response/error) and Reproduction steps. Do NOT gather a Solution, Affected Layers, or Key Files at creation — those are produced by the discovery sequence (root cause analysis records the cause and key files in `spec.md`; design settles the fix approach; steps discovery scopes the layers). Describe the problem fully; defer every claim about the fix.
 
-**Bug only:** Reproduction steps.
-
-**Refactoring only:** Numbered steps with clear scope.
+**Refactoring:** Problem, Solution, Affected Layers (domain, usecase, h2, rest, email, frontend), Key Files, and numbered steps with clear scope.
 
 **QA only:** Problem (why this checklist exists), Solution (when to run, environment, session duration), Cases (numbered one-line items expressing intent — no Gherkin, no implementation detail). No Affected Layers, no Key Files (QA tasks don't change code).
 
@@ -49,13 +47,11 @@ Select fix profile based on type and affected layers:
 
 | Type / Affected Layers | Section |
 |------------------------|---------|
-| Bug — Backend only | `## Backend` (standard backend sequence with `[ ] adapters-discovery`) |
-| Bug — Frontend only | `## Frontend` (standard frontend sequence) |
-| Bug — Both | `## Backend` + `## Frontend` |
+| Bug — any layer (backend, frontend, or both) | `## Fix: {description}` discovery-first: `[ ] root cause analysis` → `[ ] design` → `[ ] steps discovery`. Prepend `[ ] reproduce in prod-copy` when the bug is observed in prod-copy. Concrete TDD steps (including any `adapters-discovery`) are inserted by `/continue` at `steps discovery`. |
 | Refactoring | `## Fix` with user-defined steps |
 | QA | `## Cases` with one `[ ]` checkbox per case (no TDD sub-steps) |
 
-Write `ProductSpecification/tasks/{N}-{type}-{slug}/progress.md` using the matching format from the template. Bug tasks use `[ ] adapters-discovery` -- adapter discovery runs when this step is reached. Refactoring steps are user-defined from step 4. QA tasks mirror the `## Cases` section of `spec.md` as checkboxes — the tester ticks them during a session.
+Write `ProductSpecification/tasks/{N}-{type}-{slug}/progress.md` using the matching format from the template. Bug tasks are discovery-first regardless of affected layer — never pre-plant `adapters-discovery` at creation; it is a sub-step `steps discovery` inserts, not the bug gate. Refactoring steps are user-defined from step 4. QA tasks mirror the `## Cases` section of `spec.md` as checkboxes — the tester ticks them during a session.
 
 ### 7. Review and Commit
 

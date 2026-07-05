@@ -6,7 +6,7 @@ Tech-specific language constructs are in `.claude/tech/{concern-value}/coding.md
 
 ## Backend Coding Sections
 
-Every backend `coding.md` follows these sections. Each section provides ONLY the language-specific construct — the universal concept lives in `coding-rules.md`.
+Every backend `coding.md` follows these sections. Each section provides ONLY the language-specific construct — the universal concept lives in `coding-rules.md` (Deployment, Clean Architecture) or `.claude/guidelines/coding-detail.md` (all other sections).
 
 | Section | What the tech file provides |
 |---------|----------------------------|
@@ -21,6 +21,7 @@ Every backend `coding.md` follows these sections. Each section provides ONLY the
 | Null Boundary | Controller null-wrapping syntax, request DTO optional field defaults |
 | Request DTO Conversions | Type conversion examples and method naming for the language |
 | Branching | Language switch/match expression syntax |
+| Local Variables | Language type-inference keyword and whether it is forbidden or idiomatic (e.g. Java `var` forbidden; C# `var`, Go `:=` idiomatic) |
 | Controllers | Response builder syntax, HTTP status code API, error handler name |
 | Storage Adapters | ORM entity mapping syntax, trivial method pattern, query object type |
 | Refactor Agent Terms | Language-specific equivalents for generic refactor-agent smell terms |
@@ -30,7 +31,7 @@ Every backend `coding.md` follows these sections. Each section provides ONLY the
 
 ## Refactor Agent — Generic Terms
 
-The refactor agent uses these generic terms in the scan-checklist routing table. Each backend `coding.md` maps them to language-specific keywords.
+The refactor agent uses these generic terms in the code smells routing table. Each backend `coding.md` maps them to language-specific keywords.
 
 | Generic term (in agent) | What to map |
 |--------------------------|-------------|
@@ -43,10 +44,11 @@ The refactor agent uses these generic terms in the scan-checklist routing table.
 
 ## Scan Checklist — Generic Storage Checks
 
-The scan checklist (A33-A44) references "see tech binding" for ORM-specific patterns. Each backend `coding.md` provides grep patterns for these checks.
+The scan checklist references "see tech binding" for patterns each backend `coding.md` must supply: A33-A44 (ORM-specific storage) and A58 (type-inference locals, only where the binding forbids them).
 
 | # | Check | What to grep for |
 |---|-------|------------------|
+| A58 | Type-inference local declarations | Language type-inference keyword (e.g. `var`, `:=`) — only where the binding forbids it |
 | A33 | Manual row grouping | ORM grouping utilities, intermediate row DTOs, manual collection assembly |
 | A34 | Multi-repository injection | Count ORM repository/data-access fields per storage class |
 | A42 | Static spec/query utility | Static methods returning framework query objects from filter objects |
@@ -55,7 +57,7 @@ The scan checklist (A33-A44) references "see tech binding" for ORM-specific patt
 
 ## Browser Testing Sections
 
-Shared rules for `selenium`, `cypress`, and `playwright` coding.md files. The universal rules live in `frontend-rules.md` (Selenium Tests section). Each tech file provides ONLY:
+Shared rules for `selenium`, `cypress`, and `playwright` coding.md files. The universal rules live in `.claude/guidelines/frontend-rules.md` (Selenium Tests section). Each tech file provides ONLY:
 
 | Section | What the tech file provides |
 |---------|----------------------------|
@@ -68,7 +70,7 @@ Shared rules for `selenium`, `cypress`, and `playwright` coding.md files. The un
 
 ## Frontend Coding Sections
 
-Shared structure for `react-ts`, `angular-ts`, and `vue-ts` coding.md files. The universal rules live in `frontend-rules.md`. Each tech file provides ONLY:
+Shared structure for `react-ts`, `angular-ts`, and `vue-ts` coding.md files. The universal rules live in `.claude/guidelines/frontend-rules.md`. Each tech file provides ONLY:
 
 | Section | What the tech file provides |
 |---------|----------------------------|

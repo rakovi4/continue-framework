@@ -7,8 +7,8 @@
 ```java
 @Test
 void should_reject_missing_permission() {
-    var loginResponse = statements.loginUser();
-    var request = statements.createRequestWithoutPermission();
+    LoginResponse loginResponse = statements.loginUser();
+    Request request = statements.createRequestWithoutPermission();
     statements.assertMissingPermission(loginResponse, request);
 }
 ```
@@ -18,7 +18,7 @@ void should_reject_missing_permission() {
 ```java
 @Test
 void should_reject_missing_permission() {
-    var loginResponse = statements.loginUser();
+    LoginResponse loginResponse = statements.loginUser();
     statements.assertMissingPermission(loginResponse);  // Creates request internally
 }
 ```

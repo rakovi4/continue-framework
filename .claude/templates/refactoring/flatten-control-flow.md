@@ -25,7 +25,7 @@ return DONE;
 ## Optional: Replace isPresent/get with ifPresentOrElse
 ```java
 // Before — isPresent()/get() anti-pattern
-var existing = findTask(id);
+Optional<Task> existing = findTask(id);
 if (existing.isPresent()) {
     tasks.remove(existing.get());
     tasks.add(new Task(id, status, now));

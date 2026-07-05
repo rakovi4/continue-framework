@@ -56,6 +56,10 @@ Tech binding for `coding-rules.md`. Shared section structure: `.claude/templates
 
 - `switch` expressions (arrow `->`) for enums/sealed types. Pattern matching for sealed subtypes.
 
+## Local Variables
+
+- Never `var`. Declare the explicit type on every local (`Board board = ...`, not `var board = ...`). An inferred type forces the reviewer to reconstruct it from the right-hand side; an explicit type makes the declaration self-documenting in diffs and review.
+
 ## Controllers
 
 - `toUsecaseRequest()` on request DTO.
@@ -80,10 +84,11 @@ Tech binding for `coding-rules.md`. Shared section structure: `.claude/templates
 | Collection pipeline terminal operation | `.collect(toList())` / `.toList()` |
 | Manual per-field assertion for immutable data types | Applies to records and value objects |
 
-## Scan Checklist — JPA Grep Patterns
+## Scan Checklist — Java Grep Patterns
 
 | # | Grep pattern / indicator |
 |---|--------------------------|
+| A58 | `\bvar\b` — type-inference local declaration. Java forbids `var`; every match is a violation (replace with the explicit type). |
 | A33 | `Collectors.groupingBy`, `Map.Entry`, `Map<..., List<...>>`, Row/Projection DTOs |
 | A34 | Count `JpaRepository` / `EntityManager` fields per storage class |
 | A42 | Static methods returning `Specification` or `CriteriaQuery` |
@@ -97,3 +102,8 @@ Tech binding for `coding-rules.md`. Shared section structure: `.claude/templates
 ## Error Handling
 
 - Domain exceptions extend `RuntimeException`. Bubble to `GlobalExceptionHandler`.
+
+## Logging
+
+- Use SLF4J parametrized messages — `log.info("did X for user={} chrt={}", userId, chrtId)` — one line per call site. Interpolated values land in the final message string, which is what you grep in prod.
+- FORBIDDEN: the SLF4J 2.x fluent KV API (`log.atInfo().setMessage(...).addKeyValue(...).log()`), `Markers`, per-one-shot-value `MDC.put(...)`, and `StructuredArguments.kv(...)`. They add ~5 lines of ceremony per call for per-field JSON keys that aren't wanted. Request-scoped context (userId, request/trace ID) goes in MDC once via the auth/request filter — not per call site.

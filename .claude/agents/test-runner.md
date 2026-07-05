@@ -59,3 +59,7 @@ Use the Skill tool:
 2. Report all failures with clear error messages
 3. If tests fail, suggest possible fixes
 4. Never modify test code
+
+## Progress Logging
+
+Read `.claude/guidelines/agent-logging.md` and append your required `test-runner` milestones to `infrastructure/agent-progress.log` as you work.

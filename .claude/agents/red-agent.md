@@ -36,7 +36,7 @@ Before writing the test, document prediction. See `.claude/templates/workflow/re
 
 ## Template by Layer
 
-Resolve concern profiles from `ProductSpecification/technology.md` `tech-profile:` block (see `.claude/rules/technology-loading.md`).
+Resolve concern profiles from `ProductSpecification/technology.md` `tech-profile:` block (see `.claude/guidelines/technology-loading.md`).
 
 Backend layers (usecase, acceptance, adapters): `.claude/tech/{backend}/templates/{layer}/test-class.md`
 
@@ -55,15 +55,15 @@ Frontend layers:
 - Run test to confirm RED state before disabling
 - Prediction must match actual failure (validates understanding)
 - Follow layer-specific patterns from template
-- No implementation code (in production classes). Statements must be fully functional (see `tdd-rules.md` "Statements are test infrastructure" rule).
+- No implementation code (in production classes). Statements must be fully functional (see `.claude/guidelines/tdd-rules.md` "Statements are test infrastructure" rule).
 - No comments in code
 - **Selenium: assertions must cover all spec-mentioned sub-elements** — when the spec says "cards with title, status, assignee, and priority", each sub-element needs its own locator and assertion in the Statements method. A shallow count-only check misses the spec's intent. Cross-reference every spec line with the DSL Technical Reference table to identify required `data-testid` elements.
-- **Selenium: NEVER navigate via URL** — see `frontend-rules.md` "FORBIDDEN in-app navigation via URL" rule. Find or create a Statements `navigate*` method that clicks through the UI.
-- **NEVER inject storage Fakes into Statements** — Statements must set up data through usecases, not by pre-seeding Fake storage directly. This applies to ALL storage ports including read-only, count-only, and aggregation ports. If setup through usecases is complex, extract compound Statements methods. See `tdd-rules.md` Assertion Rules.
+- **Selenium: NEVER navigate via URL** — see `.claude/guidelines/frontend-rules.md` "FORBIDDEN in-app navigation via URL" rule. Find or create a Statements `navigate*` method that clicks through the UI.
+- **NEVER inject storage Fakes into Statements** — Statements must set up data through usecases, not by pre-seeding Fake storage directly. This applies to ALL storage ports including read-only, count-only, and aggregation ports. If setup through usecases is complex, extract compound Statements methods. See `.claude/guidelines/tdd-rules.md` Assertion Rules.
 
 ## Acceptance Layer: Running Backend Required
 
-Acceptance tests need a live backend. Predictions must be about feature behavior (see `tdd-rules.md`).
+Acceptance tests need a live backend. Predictions must be about feature behavior (see `.claude/guidelines/tdd-rules.md`).
 
 1. Before running the test, ensure the backend is up (`/run-backend` or check health endpoint)
 2. Predict the **actual application-level failure** — assertion error, wrong HTTP status, missing data, etc.
@@ -77,6 +77,7 @@ For adapter layers (h2, rest, email, security), ONE test means **one test class 
 - Use **class-level** test disable marker (not per-method) — one marker disables all methods
 - Predict failure for **each** test method separately
 - All methods must fail before adding the class-level disable marker
+- **Reproduce the real usecase flow.** When the data under test is written by one usecase and read by another, set up through the writer-usecase's port and assert through the reader-usecase's port (write-here-read-there). A same-port save→read round-trip only pins that storage's own mapping, not the cross-usecase flow. See `adapter-discovery-checklist.md` Check 1.
 
 ## Disable Marker / Output Formats
 
@@ -96,3 +97,8 @@ Before writing tests, read:
 2. `ProductSpecification/stories/{story}/` - story details
 3. Layer template (see "Template by Layer" table above)
 4. Existing tests in the target module
+5. `.claude/guidelines/tdd-rules.md` — assertion rules, Statements rules, RED-phase protocol (no longer auto-loaded; read it before writing the test). For the `selenium` layer, also read `.claude/guidelines/frontend-rules.md`.
+
+## Progress Logging
+
+Read `.claude/guidelines/agent-logging.md` and append your required `red-agent` milestones to `infrastructure/agent-progress.log` as you work.

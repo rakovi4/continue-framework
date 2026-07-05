@@ -41,7 +41,7 @@ public class GetBoardView {
     public void execute() {
         boardStorage.findByUserId(userId).stream()
             .forEach(board -> {
-                var columns = columnStorage.findByBoardId(board.id());  // N+1
+                List<Column> columns = columnStorage.findByBoardId(board.id());  // N+1
                 columns.forEach(column ->
                     taskStorage.findByColumnId(column.id()));           // N+1
             });
@@ -88,7 +88,7 @@ public class H2FooStorage implements FooStorage {
     private final BazJpaRepository bazRepo;
 
     public List<Foo> findAll() {
-        var rows = fooRepo.findFlatRows();
+        List<FooRow> rows = fooRepo.findFlatRows();
         return rows.stream()
             .collect(Collectors.groupingBy(FooRow::bar))  // manual grouping
             .entrySet().stream()

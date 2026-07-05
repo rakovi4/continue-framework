@@ -41,6 +41,7 @@ Locate the UI test base class and Browser statements class using tech profile te
 **UI test base class:**
 - Set close-browser-after-tests flag to false
 - Comment out headless mode configuration
+- Shrink the Chrome `--window-size` argument so the visible window fits the host display. The headless default (e.g. `1920,1080`) often equals the full screen resolution; in non-headless mode the compositor cannot place a full-screen-sized window with decorations and Chrome dies on connect (`session deleted ... not connected to DevTools` / `NoSuchSessionException` at the first interaction). Use a size comfortably smaller than the screen (e.g. `1280,800`). Revert this with the other demo changes.
 
 **Browser statements class:**
 - Add a demo delay constant (1200ms)

@@ -1,6 +1,6 @@
 # Journey Summary Format
 
-When to write a journey summary entry, and the strict format for scenario summaries and carryover entries. This file is the authority for both — `/handoff` writes entries, `/continue` reads them. See `.claude/rules/workflow.md` — Resuming Across Conversations — for how summaries fit the workflow.
+When to write a journey summary entry, and the strict format for scenario summaries and carryover entries. This file is the authority for both — `/handoff` writes entries, `/continue` reads them. See `.claude/guidelines/workflow-detail.md` — Resuming Across Conversations — for how summaries fit the workflow.
 
 ## When to Write
 

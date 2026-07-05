@@ -20,8 +20,8 @@ Classify a piece of new content and write it to the correct file(s) in the proje
 2. **Understand the content.** What does it mean? Is it a principle, a detection pattern, a code example, a workflow step?
 3. **Classify targets** using `.claude/templates/documentation/prompt-update-classification.md`. Walk ALL 4 decision questions explicitly — principle, detection pattern, code example, layer-specific context. Show the classification before writing:
    ```
-   1. Principle? → frontend-rules.md (new section)
-   2. Detection? → refactor-agent.md (smell table) + scan-checklist.md (A-check)
+   1. Principle? → .claude/guidelines/frontend-rules.md (new section)
+   2. Detection? → code-smells-routing-table.md (smell table) + scan-duplication.md (A-check)
    3. Template?  → new templates/refactoring/extract-tailwind-class.md
    4. Layer-specific? → n/a
    ```
@@ -29,8 +29,9 @@ Classify a piece of new content and write it to the correct file(s) in the proje
 4. **Check for duplication** — grep key terms across `.claude/rules/`, `.claude/tech/`, `.claude/agents/`, `.claude/skills/`, `.claude/templates/`. If a duplicate exists, report it and ask: skip, merge, or replace?
 5. **Write to all target files** in one pass. Match each file's existing style.
 6. **Tech-agnostic gate** — for every write targeting a universal file (`.claude/rules/`, `.claude/templates/`), scan the content you just wrote for tech leaks. See "Tech-Agnostic Verification" in the classification template. If a leak is found, rephrase in universal terms first — only relocate to tech binding when the content is inherently tech-specific.
-7. **Report** what was written and where (see Output format in classification template).
-8. **Verify with `/skill-creator`** — see Impact Assessment in classification template.
+7. **Product-agnostic gate** — after writing, re-read every edit you made (all layers, not just universal) and scrub product-specific information: product/company name, business-domain terms, external vendor/integration names, concrete domain entity names, and story/feature names or numbers. Replace each with the generic concept it represents. See "Product-Agnostic Verification" in the classification template. The prompt library must be reusable across products; product instances belong only in `ProductSpecification/`.
+8. **Report** what was written and where (see Output format in classification template).
+9. **Verify with `/skill-creator`** — see Impact Assessment in classification template.
 
 ## Constraints
 

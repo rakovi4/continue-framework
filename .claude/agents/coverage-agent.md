@@ -52,3 +52,7 @@ See `.claude/templates/workflow/coverage-formats.md` for dead code comment forma
 - Never modify test files — only progress.md
 - If ALL gaps are dead code, report clean (no steps to add) and list dead code for refactor
 - Keep coverage descriptions concise — 5-10 words max
+
+## Progress Logging
+
+Read `.claude/guidelines/agent-logging.md` and append your required `coverage-agent` milestones to `infrastructure/agent-progress.log` as you work.

@@ -16,6 +16,8 @@ description: Preview the planned design for a scenario before writing tests. Sho
 
 Before writing any test code, present the planned implementation design to the user for approval. This catches design disagreements early — before red-usecase locks in the approach.
 
+This is also the reuse gate for a scenario invented mid-cycle (see `.claude/guidelines/workflow-detail.md` "Net-New Scenarios Introduced Mid-Cycle"): a scenario not traceable to a scanned `tests/*` scenario must pass through here so step 2a scans its hazards before its red phase locks.
+
 ## Workflow
 
 ### 1. Gather Context
@@ -35,6 +37,26 @@ Think through 2-3 viable approaches. For each option, capture:
 - **Cons** — 2-3 bullets
 
 Mark one option as **Recommended** with a one-line rationale ("why this over the others"). For trivial scenarios (validation, error handling, mechanical CRUD) where alternatives would be contrived, present a single option labelled "Only viable approach" instead of forcing artificial alternatives.
+
+### 2a. Hazard Catalogue Scan (before presenting)
+
+Before presenting the options, scan the drafted design against the hazard catalogue —
+the spec-time, closed-list complement to the open-ended commit-time review passes. Per
+`.claude/guidelines/hazard-catalogue/_index.md` (read its "How to apply it"), fan out one
+`hazard-scan-agent` per group in the index's **Groups** list — iterate that list, never a
+hand-copied set, or a newly-added group goes unchecked — each carrying the drafted design,
+`_index.md`, and its one group file; dispatch them concurrently, collect each pass's GAPs
+and seam flags, then run one synthesis pass (per `_index.md`'s "Reason across the seams")
+over the index-named seams and every flagged seam. Fold every GAP back into the design
+before presenting: the option the user approves must already carry the forced guard (a
+domain method, a port contract, a specific check), not a vague mitigation. Do not proceed
+to step 3 with an open GAP — a hazard the design can't yet guard is a reason to widen the
+options or escalate to `/architecture`, not to present anyway. Groups whose triggers can't
+fire at this usecase altitude — the client/frontend group above all — are dismissed as a
+block with one explicit "out of altitude here" line (per `_index.md`'s "A dead group is
+dismissed as a block"), never silently passed. When you present, surface the scan outcome —
+the group set scanned, each fired-trigger GAP, and the guard the chosen option carries for
+it — so the user approves a design whose hazards are visible, not hidden.
 
 ### 3. Present Options
 
@@ -76,4 +98,4 @@ Pick which option to mark "(Recommended)" based on the choice the user just made
 - Never create files — design lives in the conversation (unless escalated to `/architecture`)
 - Keep it concise — the goal is alignment, not a design document
 - If trivially similar to a previous scenario, say so and ask to approve
-- **Scope of progress.md changes:** design-preview may ONLY mark the `design` checkbox as `[x]`. It must NOT modify, skip, or rewrite any other steps (usecase, adapter, green-acceptance). Skip recommendations go in the design output text only — `/continue` applies approved skips to progress.md after the design work unit completes, validating each skip against the "zero production files modified" rule in tdd-rules.md.
+- **Scope of progress.md changes:** design-preview may ONLY mark the `design` checkbox as `[x]`. It must NOT modify, skip, or rewrite any other steps (usecase, adapter, green-acceptance). Skip recommendations go in the design output text only — `/continue` applies approved skips to progress.md after the design work unit completes, validating each skip against the "zero production files modified" rule in `.claude/guidelines/tdd-rules.md`.
