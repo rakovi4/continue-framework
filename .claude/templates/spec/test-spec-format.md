@@ -7,6 +7,12 @@ consequence-of-failure split that orders scenarios *across* categories, its
 The counts in the category headings below size a **category**; they say nothing
 about tier, and Tier 1 has no count of its own.
 
+**Consolidation** — merging scenarios that share one execution, so a story spends one
+TDD cycle per interaction rather than one per checked fact — is defined in
+[`consolidation-rules.md`](consolidation-rules.md) and applied to the whole drafted set
+by its own pass. The counts below are not a budget and never a consolidation target:
+a merge removes a duplicated pass, never a checked fact.
+
 ## 01_API_Tests.md (8-12 tests)
 
 Tests are ordered for **sequential TDD implementation** — each section builds on the previous one. You can implement group N without needing group N+1.
@@ -142,7 +148,14 @@ Generate **only scenarios relevant to the story's actual attack surface**. Do no
 
 **Provenance**: every row stamps `sec:{row}` on the scenarios it produces — `sec:SQLi`, `sec:RateLimit`, `sec:IDOR`, and so on. Two of them are **floor rows**: `sec:IDOR` and `sec:JWT` are kept out of Tier 3 by the pinned floor (`tier-ladder.md`); every other row tiers freely. All of them stamp, because the token count in this file is also what tells a downstream pass the checklist ran at all.
 
-**Merge related scenarios**: combine SQL injection across fields into one scenario, combine input length limits into one scenario. Aim for 6-10 focused tests, not 50 generic ones.
+**Merge related scenarios**: this category is where the practice started — combine
+injection attempts across fields into one scenario, combine input length limits into
+one — and the rule that governs it in *every* category is
+[`consolidation-rules.md`](consolidation-rules.md). It applies here unchanged: those
+merges are legal because one entry point, one Given and one set of co-occurring
+rejections make them one execution, and the merged scenario keeps every assertion and
+unions the `sec:` tokens of what it absorbed. Aim for 6-10 focused tests, not 50
+generic ones.
 
 ## 06_Integration_Tests.md (3-4 tests)
 1. External API success flow

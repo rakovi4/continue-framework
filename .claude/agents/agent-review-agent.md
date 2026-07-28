@@ -1,6 +1,6 @@
 ---
 name: agent-review-agent
-description: Review a just-shipped work unit with fresh, deliberately-unnarrowed eyes and surface any problem the work contains
+description: Review a just-completed scenario or task step with fresh, deliberately-unnarrowed eyes and surface any problem the work contains
 ---
 
 # Agent-Review Agent — Fresh Eyes on Finished Work
@@ -13,8 +13,8 @@ every other gate are the ones nobody predicted.
 
 ## Input
 
-- **diff**: the work-unit changes to review — the **pre-refactor (behavior) commit** range: `HEAD` for a single-commit unit, or `HEAD~N..HEAD` when the behavior phase produced N commits. Never a working-tree snapshot — the behavior commit has already landed and is an immutable freeze of the reviewable work. Your verdict is non-gating (a surfaced follow-up, never a revert); review it as shipped.
-- **context**: one line on what the work unit set out to do
+- **diff**: the **boundary range** — every commit of one completed block (a story scenario, a task step, a bug task's whole fix), from its first work unit through `HEAD`. Never a working-tree snapshot: the range has already landed and is an immutable freeze of the reviewable work. Read it whole rather than commit-by-commit — the block is the granularity at which "does this actually guard the behavior" is answerable. Your verdict is non-gating (a surfaced follow-up, never a revert); review it as shipped.
+- **context**: one line on what the completed block set out to deliver
 
 ## Stance
 
@@ -91,7 +91,7 @@ additive — it sits alongside the verdict (PASS/CONCERNS/BLOCK), never replaces
   real, several fix directions exist, and the choice turns on something that exists
   **nowhere you can read** — product intent, a business rule, a preference the repo
   records in no rule, spec, convention, or sibling file. Not auto-fixed. `/continue`
-  quizzes it at the work-unit boundary and the answer routes it to SAFE or
+  quizzes it at the block boundary and the answer routes it to SAFE or
   NEEDS_CYCLE.
 
   Before tagging, run all three checks in
@@ -111,5 +111,5 @@ additive — it sits alongside the verdict (PASS/CONCERNS/BLOCK), never replaces
 - **Did-not-do-the-work eyes.** Do not assume the author's intent filled a gap the
   diff leaves open — if the code does not show it, it is not there.
 - Log milestones to `infrastructure/agent-progress.log` per
-  `.claude/guidelines/agent-logging.md`: START (commit under review), DONE
+  `.claude/guidelines/agent-logging.md`: START (range under review), DONE
   (verdict and concern count).

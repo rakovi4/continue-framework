@@ -43,16 +43,12 @@ and 5 apply to every plan, tiered or not. All six are greps over `progress.md` a
    whose steps are now orphaned. `tests/tier3/` is never counted: Tier 3 never enters the
    plan.
 
-   **One sanctioned sub-case, and it does not stop dispatch.** A `tests/*.md` heading
-   absent from the plan whose tier+category section **precedes the current `[~]`** is a
-   *pending deferred placement*: a mid-cycle newcomer whose position collides with the
-   cursor waits for the next scenario boundary
-   (`.claude/guidelines/workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle").
-   Report it by name and **keep dispatching** — it becomes blocking again once no `[~]`
-   remains inside a scenario block, which is the boundary where the block is placed and
-   the cursor moves onto it. Blocking here instead would stop the very first resume after
-   the deferral, so the in-flight scenario could never finish and the boundary the block
-   waits for would never arrive. Every other form of this shape still stops.
+   **No sub-case is exempt.** A mid-cycle newcomer's `progress.md` block always lands in
+   the same `review-fix:` commit as its test file, because the review passes fire only at a
+   block boundary, where nothing is in flight to strand
+   (`.claude/guidelines/workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). So
+   a heading in the tests with no steps in the plan is never a legitimate transient state —
+   every form of it stops.
 
 5. **Every scenario heading carries steps.** Inside a scenario section, each `### `
    heading is followed by at least one `- [ ]`/`[~]`/`[x]`/`[S]` line before the next

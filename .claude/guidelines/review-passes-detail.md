@@ -1,15 +1,16 @@
-# Pre-Commit Review Passes — Detail
+# Boundary Review Passes — Detail
 
 Deferred companion to `.claude/rules/workflow.md` and `.claude/guidelines/workflow-detail.md`.
-It holds the *why* of the two commit-time review passes, the triage predicate that may skip
-them, the three-way partition of their findings, and the tier a mid-cycle finding's scenario
-defaults to. `/continue` owns the mechanics. Read it before running or triaging a review pass.
+It holds the *why* of the two commit-time review passes, the boundary cadence they run at,
+the triage predicate that may skip them, the three-way partition of their findings, and the
+tier a mid-cycle finding's scenario defaults to. `/continue` owns the mechanics. Read it
+before running or triaging a review pass.
 
-Every work-unit commit — in any scenario sequence (backend, frontend, integration,
-security, load, infra) and in task work — is preceded by two **fresh-context**
-review passes that differ *in kind* from the in-loop `/test-review` and `/refactor`.
-Those read the work as it is built and within the author's framing; these read the
-finished diff cold:
+Every **completed block** — a story scenario in any sequence (backend, frontend,
+integration, security, load, infra), a task step, a bug task's whole fix — is
+followed by two **fresh-context** review passes that differ *in kind* from the
+in-loop `/test-review` and `/refactor`. Those read the work as it is built and
+within the author's framing; these read the finished diff cold:
 
 - `agent-review-agent` — surfaces any problem the diff *contains*, deliberately
   unnarrowed (not bound to a checklist).
@@ -18,10 +19,10 @@ finished diff cold:
 
 They are independent reads of the same diff, so they run **concurrently with each other
 and in the same batch as `/refactor`** — overlapping it rather than adding a serial tail
-to every work unit. The behavior commit lands first; the passes read that **immutable
-commit** while `/refactor` mutates the tree toward a separate refactor commit, so there is
-no read/write race. The cost is that they do not see `/refactor`'s behavior-preserving
-delta, which its own green test run already gates.
+to the unit. The boundary unit's behavior commit lands first; the passes read the
+block's **immutable committed range** while `/refactor` mutates the tree toward a
+separate refactor commit, so there is no read/write race. The cost is that they do not
+see `/refactor`'s behavior-preserving delta, which its own green test run already gates.
 
 They run **before the refactor commit** but are **not a gate**: a CONCERNS or BLOCK
 verdict surfaces as a follow-up and never blocks, reverts, or amends either commit — the
@@ -29,24 +30,46 @@ work always lands. This layer exists so a defect that every same-kind gate read 
 meets one reader who did not — the gap that defense-in-depth-by-kind closes. Overlapping
 them with `/refactor` is a pure latency win and costs no fidelity: both passes read at the
 behavior/correctness altitude, and `/refactor` preserves behavior, so a cold read of the
-behavior commit is identical whether it lands a second before or a second after the
-refactor commit — we take the second that overlaps `/refactor`.
+range is identical whether it lands a second before or a second after the refactor
+commit — we take the second that overlaps `/refactor`.
 
-**Triage decides whether a unit runs the passes at all.** These two passes are one of
-the heaviest costs in the loop — about 28% of a gated backend scenario's
-agent-work, more than every code-writing phase combined — and that cost is paid on
-every commit whether or not the diff warrants a cold read. That is a lot of time to
-spend reviewing a change that never needed it, so triage exists to reclaim it: running
-the passes on a progress-flip-adjacent test-only red phase buys nothing a same-kind
-gate has not already read. So a deterministic triage predicate runs first and SKIPs both passes
-for low-consequence units — progress-only diffs, or diffs touching only test files,
-specs, and non-governing docs. Triage never trades away safety on the diffs that
-matter: any diff touching production code, persistence/storage, auth/security,
-money/quantity/domain-invariants, concurrency/external effects, or a
-**workflow-governing doc** (a skill, rule, guideline, or agent prompt — a broken
-edit to the dispatch loop is itself high-consequence) always RUNs. The skip is
-logged with its reason; it is a latency cut on the units that never needed a cold
-read, not a narrowing of what gets reviewed.
+**The cadence is one pass per block, not one per work unit.** These two passes are the
+heaviest single cost in the loop — about 28% of a gated backend scenario's agent-work,
+more than every code-writing phase combined — and they used to charge it on *every*
+commit. A scenario is six to ten work units, so it was read cold six to ten times, each
+read spending the user twice: on the pass's own latency, and on decoding its findings
+and working the follow-up steps they generate. Multiplied by every unit, the review
+layer cost more than the work it reviewed. So the passes now fire **once, at the moment
+a block closes** — a story scenario, a task step, a bug task's whole fix — over every
+commit of that block at once.
+
+**The wider diff is the better read, not merely the cheaper one.** A per-unit pass
+sees one slice of a scenario: a red test with no implementation, or an implementation
+with the acceptance test still disabled. Half of what it could say is unanswerable
+from inside that slice — whether the test guards the behavior, whether the adapter
+honours the contract the usecase declared, whether the error path was ever wired up.
+It compensates by reporting what it *can* see, which is how one shallow finding
+surfaced in three consecutive units. A completed scenario is the smallest diff at
+which the questions these passes exist to ask are answerable at all.
+
+**The residual cost is detection latency, and it is real.** A defect introduced in a
+scenario's first work unit is now found at the end of the scenario, with the rest of
+it already built on top. That is the trade: the fix is bigger when it lands. It is
+acceptable because the passes were never the first line — `/test-review` and
+`/refactor` still gate every unit, and they are the gates that block — and because a
+finding that fires against the whole scenario names the right fix, where the per-unit
+version named a symptom that had already moved.
+
+**Triage now only skips genuinely inert boundaries.** The predicate survives,
+re-scoped to the boundary range's changed paths, but its job has shrunk: a completed
+scenario nearly always touches code, so at this cadence it RUNs almost every time.
+What it still catches is the boundary with nothing to read — a scenario every step of
+which was `[S]`, a `## Spec` block, a step that only moved progress. So it is one
+clause instead of a five-trigger list: SKIP only when every changed path is a
+specification artifact under `ProductSpecification/`. The old triggers are implied,
+not dropped — storage, auth, money and concurrency changes are all source files, and
+any source file, infrastructure file, or **workflow-governing doc** under `.claude/**`
+(a broken edit to the dispatch loop is itself high-consequence) is already a RUN.
 
 **The auto-fix closes findings instead of surfacing-and-forgetting them.** A
 CONCERNS/BLOCK finding used to become a follow-up that no one acted on. Now each
@@ -57,10 +80,10 @@ inline and committed. **NEEDS_CYCLE** (the fix would change production behavior)
 stays a follow-up, untouched — auto-fixing it would violate "no production behavior
 change without a failing test first," so the auto-fixer never promotes it.
 **NEEDS_CLARIFICATION** (the concern is real but the fix direction is a judgment
-call) becomes an answered decision rather than a dropped follow-up: at the
-work-unit boundary `/continue` asks the user once, and the answer routes the
-finding to SAFE (apply) or NEEDS_CYCLE (plan) — the quiz picks *which* fix, never
-whether to bypass TDD.
+call) becomes an answered decision rather than a dropped follow-up: in the boundary
+unit `/continue` asks the user once, and the answer routes the finding to SAFE
+(apply) or NEEDS_CYCLE (plan) — the quiz picks *which* fix, never whether to bypass
+TDD. Boundary cadence lowers the quiz's frequency by the same factor as the passes'.
 
 **Escalation is the last resort, and the bar is deliberately high.** A quiz is not
 the neutral, safe choice it looks like from inside a review pass. It halts a work
@@ -75,8 +98,8 @@ business rule, or a priority the repo records nowhere. The three checks that
 implement this — not derivable, no better option, statable in one plain sentence —
 are in `.claude/templates/workflow/clarification-escalation-test.md`, which both
 agents and `/continue` read; that file also carries the consumer's obligation to
-demote an ill-formed finding rather than ask about it. Two passes converging on one
-contradiction is evidence it is decidable, not evidence it needs a user.
+demote an ill-formed finding rather than ask about it, and the reading of two passes
+converging on one contradiction.
 
 **The auto-fix stays non-gating and separately reviewable.** The SAFE fixes land in
 their own trailing `review-fix:` commit, on top of the behavior and refactor
@@ -88,11 +111,12 @@ not a revert. The passes and their auto-fix stay non-gating throughout: the
 behavior and refactor commits land regardless of verdict, and the only two gates
 that block a commit remain `/test-review` and `/refactor`.
 
-`/continue` owns the dispatch mechanics — reading the behavior commit, the
-surface-don't-block handling, the triage SKIP/RUN predicate, the three-way
-partition, the boundary quiz, and the inline SAFE-only auto-fixer — in its
-"Pre-Commit Review Passes", "Triage & Auto-Fix", and "Sub-Skill Dispatch"
-sections. This file holds the *why*; it does not restate the mechanics.
+`/continue` owns the dispatch mechanics — detecting the boundary off the staged
+`progress.md`, deriving the boundary range, the surface-don't-block handling, the
+triage SKIP/RUN predicate, the three-way partition, the quiz, and the inline
+SAFE-only auto-fixer — in its "Boundary Review Passes", "Triage & Auto-Fix", and
+"Sub-Skill Dispatch" sections. This file holds the *why*; it does not restate the
+mechanics.
 
 ## Mid-cycle findings default to Tier 2
 
@@ -149,26 +173,27 @@ tier lives in the test file, but `/continue` never re-derives an existing
 `progress.md`, so a scenario whose marker says Tier 2 and whose steps nobody added is
 a scenario that will never be built — the failure mode this rule exists to prevent,
 reintroduced one layer down. The steps therefore go into the matching section of the
-scenario's own tier, at the end, never above the current `[~]` step: a pending block
-above the cursor takes `/continue`'s next-step pointer and abandons the in-flight
-cycle. When those two collide — the newcomer's section precedes the cursor — the plan
-block is deferred to the next scenario boundary while the test file lands now
-(`.claude/guidelines/workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle").
-That window is the one sanctioned case of the marker-without-steps state named above,
-and it is bounded by a single scenario. Which actor writes them is *not* fixed, because `progress.md` already has many
-writers and naming one more does not stop the others; instead every resume runs the
-plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`), whose
-marker↔plan agreement check is what actually catches a scenario left in the test files
-with no steps.
+scenario's own tier, at the end, in the same `review-fix:` commit as the test file.
+Boundary cadence is what makes that unconditional: the passes fire only when the block
+they read has closed, so there is no in-flight cycle for a block placed above the cursor
+to abandon — the deferral the old per-unit cadence needed is gone, and with it the
+marker-without-steps window it opened. Which actor writes them is *not* fixed, because
+`progress.md` already has many writers and naming one more does not stop the others;
+instead every resume runs the plan-integrity check
+(`.claude/templates/workflow/plan-integrity-check.md`), whose marker↔plan agreement check
+is what actually catches a scenario left in the test files with no steps.
 
-**A finding can land after its item was flipped to Done.** The `done/` move and the
-Done-table row-move ride the *behavior* commit, and the passes run after it, so on a
-work item's final unit a finding may need steps in a plan already declared complete —
-in a folder `/continue`'s resolver no longer matches. Then the `review-fix:` commit
-that lands the steps also reopens the item: the task folder comes back out of `done/`,
-or the story row back to In Progress. Reopening is honest about what happened; leaving
-the steps in a done-flipped plan makes them unreachable, which is how a surfaced
-finding turns into a silently dropped one.
+**A finding can land after its item was flipped to Done — and now usually does.** The
+`done/` move and the Done-table row-move ride the *behavior* commit, and the passes run
+after it, so on a work item's final unit a finding may need steps in a plan already
+declared complete — in a folder `/continue`'s resolver no longer matches. That final unit
+is always a boundary, so this is no longer the rare case it was under per-unit cadence: a
+bug task, whose entire fix is one block, meets it on the only pass it ever runs. Then the
+`review-fix:` commit that lands the steps also reopens the item: the task folder comes back
+out of `done/`, or the story row back to In Progress, and the newcomer's first step becomes
+the plan's only `[~]`. Reopening is honest about what happened; leaving the steps in a
+done-flipped plan makes them unreachable, which is how a surfaced finding turns into a
+silently dropped one.
 
 Scope: a tier-major story. An untiered story has no tiers to default into and keeps
 today's behaviour — the permanent branch, not a transitional one.

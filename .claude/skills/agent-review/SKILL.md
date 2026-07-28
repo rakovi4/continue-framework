@@ -27,13 +27,13 @@ repeated read.
 
 ## Dispatch context
 
-When an orchestrator (`/continue`) dispatches this as a work-unit review pass, the
+When an orchestrator (`/continue`) dispatches this as a boundary review pass, the
 agent runs **concurrently** with `premortem` — two independent fresh-context reads
-of the same diff. The timing and the diff it reads in that path (the pre-refactor
-behavior commit — `HEAD` or `HEAD~N..HEAD` — dispatched in the `/refactor` batch)
-are owned by `/continue`; see its
-"Pre-Commit Review Passes" section. A deterministic triage predicate runs *before*
-that dispatch and may skip both passes for a low-consequence unit. When they do run,
+of the same diff. The timing and the diff it reads in that path (every commit of the
+just-completed scenario or task step, dispatched in that boundary unit's `/refactor`
+batch — it does not run on mid-block units) are owned by `/continue`; see its
+"Boundary Review Passes" section. A deterministic triage predicate runs *before*
+that dispatch and may skip both passes for an inert boundary. When they do run,
 `/continue` reads each finding's fixability tag and consumes the SAFE subset in an
 inline auto-fix (a separate `review-fix:` commit), while a NEEDS_CLARIFICATION
 finding — the last resort, gated by

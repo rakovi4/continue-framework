@@ -180,3 +180,20 @@ Type: refactoring
 - [ ] refactor (cleanup)
 - [ ] green-acceptance
 ```
+
+## Blocks and boundaries
+
+A **block** is the unit the commit-time review passes fire at the end of
+(`.claude/skills/continue/SKILL.md`, "Boundary Review Passes"), and it is read straight off
+the shapes above — no extra syntax, no marker. A block is a story scenario's `### N.M {Title}`
+heading and its steps; a refactoring task's `### Step N: …` and its steps; a bug task's whole
+`## Fix: …` section (its steps carry no `### ` heading); or a `## Spec` / `## Harvest — Tier 1
+→ Tier 2` section. Slice one from its heading to the next heading of same or higher level.
+
+A block is **closed** when that slice holds no `- [ ]` and no `- [~]` line — every step reads
+`[x]` or `[S]` — and the work unit whose commit closes it is a **boundary**. The block's
+**first commit** is the oldest commit whose `progress.md` already shows one of its steps
+`[x]`/`[S]`; walking `git log --follow` over `progress.md` newest-to-oldest finds it, and
+`{that commit}~1..HEAD` is everything the block cost — the range a boundary reviews. Nothing
+in the file records any of this: it is recomputed from the checkboxes each time, so a plan
+written before boundaries existed reads identically and no actor can leave a stale one behind.

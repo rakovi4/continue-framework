@@ -18,8 +18,8 @@ description: Continue working on a story or task by reading progress.md, executi
 9. **Update progress** -- mark completed, advance next
 10. **Update stories.md** -- for stories only, update the phase columns in `ProductSpecification/stories.md` (see below)
 11. **Behavior commit** -- commit the work unit's behavior change (include progress.md, and `ProductSpecification/stories.md` for stories). Then gate the `done/` move on the **staged file**, not on what you believe you wrote: stage progress.md, confirm the advance is in the staged content, and confirm zero `[ ]`/`[~]` entries remain (`git diff --cached` on progress.md; `grep -c '^- \[[ ~]\]'` must be 0). Only then move the task folder to `ProductSpecification/tasks/done/` and include the move in this commit. An unstaged advance is the live failure mode -- editing progress.md and then `git mv`-ing the folder commits the rename carrying the *pre-edit* content, shipping a "task complete" commit whose source of truth still says in-progress.
-12. **Refactor batch + pre-commit review passes** -- dispatch `/refactor`; then, unless the triage predicate SKIPs (see "Triage & Auto-Fix" below), dispatch the two review passes (`agent-review-agent` + `premortem-agent`) concurrently over the behavior commit (see "Pre-Commit Review Passes" below); the passes are non-gating -- collect their verdicts for the report. Land the refactor commit (`/refactor`'s changes only; skipped if it changed nothing). Skip `/refactor`, triage, and the passes for a progress-only behavior commit.
-13. **Triage & auto-fix** -- partition the passes' tagged findings (SAFE / NEEDS_CYCLE / NEEDS_CLARIFICATION), quiz any NEEDS_CLARIFICATION at the work-unit boundary, apply the SAFE subset inline, and land a single trailing `review-fix:` commit (skipped when nothing is SAFE). Fold all verdicts into the stop-and-report.
+12. **Refactor batch (+ review passes at a boundary)** -- dispatch `/refactor`; land the refactor commit (`/refactor`'s changes only; skipped if it changed nothing). If this unit is a **boundary** and triage says RUN, dispatch the two review passes (`agent-review-agent` + `premortem-agent`) concurrently in the same batch, over the **boundary range** (see "Boundary Review Passes" below); they are non-gating -- collect their verdicts for the report. Skip `/refactor` for a progress-only behavior commit.
+13. **Triage & auto-fix (boundary units only)** -- partition the passes' tagged findings (SAFE / NEEDS_CYCLE / NEEDS_CLARIFICATION), quiz any NEEDS_CLARIFICATION after the passes return, apply the SAFE subset inline, and land a single trailing `review-fix:` commit (skipped when nothing is SAFE). Fold all verdicts into the stop-and-report.
 
 The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/rules/workflow.md`; the detailed scenario sequences, adapter-discovery procedure, progress mechanics, and task sequences are in `.claude/guidelines/workflow-detail.md`. Progress file format examples are in `.claude/templates/workflow/progress-format.md`.
 
@@ -58,7 +58,9 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 
 ## Stop and Report
 
-A single `/continue` invocation executes exactly ONE work unit. Within that work unit, don't pause between sub-skills. A `/refactor` work unit ends in up to three commits — behavior commit, then a separate refactor commit, then a trailing `review-fix:` commit (skipped when no SAFE finding applies); STOP only after the last landed commit, NEVER after the behavior commit while `/refactor` or triage is still pending. The two review passes run in the `/refactor` batch, before the refactor commit (skipped for progress-only commits). Once the last commit lands, stop and report: completed step, test results (pass/fail counts from every test run in the work unit), the review-pass verdicts, next step, progress fraction, how to continue. Do NOT read the next `[ ]` step and keep going.
+A single `/continue` invocation executes exactly ONE work unit. Within that work unit, don't pause between sub-skills. A `/refactor` work unit ends in two commits — behavior commit, then a separate refactor commit; a **boundary** unit adds a third, the trailing `review-fix:` commit (skipped when no SAFE finding applies). STOP only after the last landed commit, NEVER after the behavior commit while `/refactor` or a boundary's triage is still pending. Once the last commit lands, stop and report: completed step, test results (pass/fail counts from every test run in the work unit), the review-pass verdicts (boundary units only), next step, progress fraction, how to continue. Do NOT read the next `[ ]` step and keep going.
+
+**Re-orientation block (mandatory, last):** close the report with the re-orientation block specified in `.claude/templates/workflow/continue-report-format.md` -- work item type/number/name, scenario or step, step just done, next step, position, and a two-sentence plain-language summary. It goes below everything else and immediately above the `/plain` hint: a terminal scrolls, and a user running several parallel `/continue` sessions must recover which work item this one is without reading back up. Emit it on both stop points, including a sub-skill failure.
 
 End the report with a one-line `/plain` hint (e.g. `Press /plain to have this report re-explained in plain words`) so the user has a button to press when the technical summary didn't land. This is only a pointer -- never invoke `/plain` yourself; it is a manual button the user presses.
 
@@ -66,88 +68,82 @@ End the report with a one-line `/plain` hint (e.g. `Press /plain to have this re
 
 **Red prediction (mandatory for red-* work units):** When the work unit included any red-* phase, copy the red-agent's **Predicted failure**, **Actual failure**, and **Comparison** sections verbatim into the final report — same wording as the Output Summary Format in `.claude/templates/workflow/red-phase-formats.md`. Do NOT collapse to phrases like "test passed as predicted" or "prediction matched" — the user must see both the prediction and the actual result side by side, in their own labelled sections, so the match can be audited without re-reading the agent's return.
 
-**Review-pass findings (mandatory when triage RAN the passes):** include the `agent-review` and `premortem` verdicts. PASS → one line each (`agent-review: PASS`, `premortem: PASS`). CONCERNS/BLOCK → list each finding with its place in the diff and the named missing guard. SAFE findings applied by the auto-fixer → `review-fix: applied N SAFE finding(s) [<sha>]` plus one line per fix; NEEDS_CYCLE findings → follow-ups the user can act on; NEEDS_CLARIFICATION → the quiz question and the routed outcome. When triage SKIPped, report `Review passes: SKIPPED (triage — <reason>)`. The passes and the auto-fix never revert the behavior commit.
+**Review-pass findings (mandatory in a boundary unit when triage RAN the passes):** include the `agent-review` and `premortem` verdicts. PASS → one line each (`agent-review: PASS`, `premortem: PASS`). CONCERNS/BLOCK → list each finding with its place in the diff and the named missing guard. SAFE findings applied by the auto-fixer → `review-fix: applied N SAFE finding(s) [<sha>]` plus one line per fix; NEEDS_CYCLE findings → follow-ups the user can act on; NEEDS_CLARIFICATION → the quiz question and the routed outcome. When triage SKIPped, report `Review passes: SKIPPED (triage — <reason>)`. In a non-boundary unit report nothing about them. The passes and the auto-fix never revert the behavior commit.
 
-## Pre-Commit Review Passes
+## Boundary Review Passes
 
-After the **behavior commit** lands, and concurrently with `/refactor`, dispatch two
-**fresh-context** passes over that commit, **in one message as two concurrent Agent
-calls** — so they overlap `/refactor` instead of adding a serial tail to every work unit:
+The two **fresh-context** passes — `agent-review-agent` (audits what the work *contains*) and
+`premortem-agent` (imagines what it is *missing*) — run **once per boundary**, not once per unit.
 
-- `agent-review-agent` — audits what the work *contains*: any problem, unnarrowed.
-- `premortem-agent` — imagines what the work is *missing*: the incident it would cause.
+**Is this unit a boundary, and what range do the passes read?** Both are computed off the
+**staged** `progress.md` (`git show :<path>` — the blob step 11 committed, never your
+recollection of the edit) by `.claude/templates/workflow/progress-format.md`, "Blocks and
+boundaries": slice out the **block** holding the step just completed; the unit is a **boundary**
+iff that slice has zero `- [ ]` and zero `- [~]` lines; the **boundary range** is the block's first
+commit `~1..HEAD`, found by walking `git log --follow` over `progress.md` for the oldest blob whose
+slice already carries an `[x]`/`[S]` step — so no commit needs tagging and `progress.md` needs no new
+syntax. If the walk cannot resolve it, review `HEAD` alone and report `range unresolved — reviewed HEAD
+only`: it degrades to the old single-commit read, loudly, never to nothing. A **mid-block** unit runs
+`/refactor`, skips the passes, and ends at two commits.
 
-**Input is the behavior commit, not a working-tree snapshot.** Pass each pass the behavior commit's
-range (`HEAD`, or `HEAD~N..HEAD` if the behavior phase produced N commits) plus one line on what the
-unit did. Reading the immutable committed range is what makes overlapping `/refactor` safe — no
-read/write race; the passes just don't see `/refactor`'s structural changes, an accepted residual
-since `/refactor` gates itself green.
-
-**Non-gating.** The refactor commit lands regardless of verdict — a CONCERNS or BLOCK does
-NOT block, revert, or amend it; its SAFE findings are auto-fixed in `review-fix:` and the
-rest surface as follow-ups. Running the passes in the `/refactor` batch changes *when* they
-read, never their authority. The only two gates that block a commit stay `/test-review` and `/refactor`.
-
-Whether a unit runs or skips the passes is decided by the triage predicate in **Triage &
-Auto-Fix** below. A unit with no `/refactor` step (e.g. `green-acceptance`, `green-selenium`)
-produces a single commit; run triage over it and dispatch the passes only if triage says RUN.
-
-Why these run as a separate layer — defense-in-depth that differs *in kind* from the in-loop
-`/test-review` and `/refactor` — is in `.claude/guidelines/review-passes-detail.md`.
+**Input is committed history, not a working-tree snapshot.** Pass each pass the range plus one line on
+what the completed block delivered; they read immutable commits, which is what makes overlapping
+`/refactor` safe. **Non-gating:** every commit lands regardless of verdict — SAFE findings are auto-fixed
+in `review-fix:`, the rest surface as follow-ups, and the only two gates that block a commit stay
+`/test-review` and `/refactor`. Whether a boundary runs or skips is the triage predicate's call, below;
+a boundary unit with no `/refactor` step (`green-acceptance`, `green-selenium`) produces a single commit
+but still runs triage. A QA task dispatches nothing and has no boundary. Why this layer exists, and why
+the cadence is per boundary: `.claude/guidelines/review-passes-detail.md`.
 
 ## Triage & Auto-Fix
 
-**Triage SKIP/RUN predicate (before dispatching the passes).** From the behavior commit's
-changed paths (`git show --stat`), SKIP both passes (no auto-fix; log the reason) iff the
-diff is **progress-only** OR touches **only** test files / specs / non-governing docs — AND
-hits **none** of the five always-review triggers: persistence/storage (`adapters/storage`,
-migrations, repository writes, schema); auth/security (authn/authz, tokens, permission
-checks, `adapters/rest` auth); money/quantity/domain-invariants; concurrency/external-effects
-(multi-instance state, locking, email/external-API/publish); **workflow-governing docs**
-(`.claude/{skills,rules,guidelines,agents}/**` — prompts that govern execution, so a broken
-edit to the dispatch loop itself can never skip review). Any diff touching production code
-under `backend/**`, or a workflow-governing doc, always RUNs. Deterministic, no agent.
+**Triage SKIP/RUN predicate (before dispatching the passes).** From the boundary range's changed
+paths (`git diff --name-only <range>`), SKIP both passes (no auto-fix; log the reason) iff
+**every** path is under `ProductSpecification/` — progress, stories, spec artifacts, `tests/*.md`
+case files. Everything else RUNs: any source file (production or test), any infrastructure file,
+and every **workflow-governing doc** under `.claude/**`, so a broken edit to the dispatch loop
+itself can never skip review. Deterministic, no agent — and at boundary cadence it RUNs almost
+always, skipping only a genuinely inert boundary (a fully-`[S]` scenario, the `## Spec` block).
 
-**Three-way partition.** After the passes return, partition every CONCERNS/BLOCK finding by
-the fixability tag its review agent set (a PASS carries no tag — nothing to fix): **SAFE** →
-stage for auto-fix; **NEEDS_CYCLE** → add to the follow-up plan (surfaced, never
-auto-applied); **NEEDS_CLARIFICATION** → quiz (below). A finding that is **untagged or
-carries an unrecognized tag defaults to NEEDS_CYCLE** — the auto-fixer never touches what it
-cannot positively read as SAFE. Collect SAFE findings as `{ source, file, line, problem, suggested_fix }`.
+**Three-way partition.** After the passes return, partition every CONCERNS/BLOCK finding by the
+fixability tag its review agent set (a PASS carries no tag — nothing to fix): **SAFE** → stage for
+auto-fix; **NEEDS_CYCLE** → add to the follow-up plan (surfaced, never auto-applied);
+**NEEDS_CLARIFICATION** → quiz (below). A finding that is **untagged or carries an unrecognized tag
+defaults to NEEDS_CYCLE** — the auto-fixer never touches what it cannot positively read as SAFE.
+Collect SAFE findings as `{ source, file, line, problem, suggested_fix }`.
 
-**A NEEDS_CYCLE follow-up that becomes a scenario is Tier 2.** In a tier-major story it goes
-through `/design-preview` step 2a like any mid-cycle scenario, which writes it into its
-`tests/` category file with a **resolved** marker — never `Tier: ?`. `Tier: 2` is the default;
-it is **Tier 1** when the failure mode means the feature does not work for its primary user,
-which every BLOCK verdict is — promotion is expected, not a deviation owing an argument. Its
-`progress.md` steps go in as a `### {N}.{M} {Title}` block at the **end** of the matching
-`## Tier N — {Category} Scenarios ({file})` section for its own tier, and **never above the
-current `[~]`**, which strands the in-flight cycle. When those two collide — the section
-precedes the cursor — commit the test file now and let the plan block wait for the next scenario
-boundary (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). Any actor may write
-it; step 4's plan-integrity check catches a break. If this unit already flipped the item to
-`done/` or the Done table, reopen it in the same `review-fix:` commit. Untiered stories are
-unchanged. Why, and the `tier3/` exit: `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
+**A NEEDS_CYCLE follow-up that becomes a scenario is Tier 2.** In a tier-major story it goes through
+`/design-preview` step 2a like any mid-cycle scenario, which writes it into its `tests/` category file
+with a **resolved** marker — never `Tier: ?`. `Tier: 2` is the default; it is **Tier 1** when the failure
+mode means the feature does not work for its primary user, which every BLOCK verdict is — promotion is
+expected, not a deviation owing an argument. Its `progress.md` steps go in as a `### {N}.{M} {Title}` block at the **end** of the matching
+`## Tier N — {Category} Scenarios ({file})` section for its own tier, in the same `review-fix:`
+commit as the test file. The passes fire only at a boundary, so no cycle is in flight to strand:
+when that section precedes the cursor, mark the newcomer's first step `[~]` and return the next
+block's `[~]` to `[ ]` (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). If this
+unit already flipped the item to `done/` or the Done table, reopen it in the same `review-fix:`
+commit. Untiered stories are unchanged. Why, and the `tier3/` exit:
+`.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
 
 **Quiz (NEEDS_CLARIFICATION only) — last resort, gated.** Enforce "Consumer obligations" in
-`.claude/templates/workflow/clarification-escalation-test.md`: **demote to NEEDS_CYCLE** any finding
-with no recommended option or no one-plain-sentence question, batch the rest into **one**
-`AskUserQuestion` at the **work-unit boundary** (after the passes, before `review-fix:`, never
-mid-batch), and read a declined quiz as *you decide* — take each recommendation. Route each answer:
-behavior-preserving → SAFE stage; production-behavior-change → NEEDS_CYCLE plan. **TDD guardrail:** the
-quiz resolves *which* fix, never whether to bypass "no behavior change without a failing test first."
+`.claude/templates/workflow/clarification-escalation-test.md`: **demote to NEEDS_CYCLE** any finding with
+no recommended option or no one-plain-sentence question, batch the rest into **one** `AskUserQuestion` in
+the boundary unit (after the passes, before `review-fix:`, never mid-batch), and read a declined quiz as
+*you decide* — take each recommendation. Route each answer: behavior-preserving → SAFE stage;
+production-behavior-change → NEEDS_CYCLE plan. **TDD guardrail:** the quiz resolves *which* fix, never
+whether to bypass "no behavior change without a failing test first."
 
-**Inline SAFE-only auto-fixer.** Apply the staged SAFE findings directly (no subagent — the
-orchestrator already holds them) and run the affected tests. **If any go RED, discard that fix (it
-was mis-tagged) and re-route the finding to a follow-up — a `review-fix:` commit never lands red.**
-Land a single trailing `review-fix:` commit with the fixes that stayed green, **after** the quiz so
-directly-SAFE and clarified-then-SAFE fixes share one commit. Commit order per work unit: behavior →
-`refactor:` → `review-fix:`. Skip the commit when triage SKIPped, no finding fired, or nothing SAFE
-survived. Non-gating — discarding an un-committed fix is not a revert; a landed commit is never reverted.
+**Inline SAFE-only auto-fixer.** Apply the staged SAFE findings directly (no subagent — the orchestrator
+already holds them) and run the affected tests. **If any go RED, discard that fix (it was mis-tagged) and
+re-route the finding to a follow-up — a `review-fix:` commit never lands red.** Land a single trailing
+`review-fix:` commit with the fixes that stayed green, **after** the quiz so directly-SAFE and
+clarified-then-SAFE fixes share one commit. Commit order per boundary unit: behavior → `refactor:` →
+`review-fix:`. Skip it when triage SKIPped, no finding fired, or nothing SAFE survived. Non-gating —
+discarding an un-committed fix is not a revert; a landed commit is never reverted.
 
 ## Pre-Commit Checklist
 
-Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch, before the refactor commit. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the triage predicate was evaluated, and if it said RUN the two review passes ran over the behavior commit, (6) any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit moves a task folder to `done/`, verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit. If `/refactor` was skipped, or triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
+Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the boundary test was evaluated against the **staged** progress.md, and in a boundary unit the triage predicate was evaluated and — on RUN — the two passes ran over the boundary range, (6) in a boundary unit, any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit moves a task folder to `done/`, verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit. If `/refactor` was skipped, or a boundary's triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
 
 ## Sub-Skill Dispatch
 
@@ -162,14 +158,14 @@ ALL sub-skills dispatch via Agent tool for context isolation:
 | `/refactor` | `Agent tool` (subagent_type: `refactor-agent`) |
 | `/test-review` | `Agent tool` (subagent_type: `test-review-agent`) |
 | `/test-coverage` | `Agent tool` (subagent_type: `coverage-agent`) |
-| `agent-review` (pre-commit) | `Agent tool` (subagent_type: `agent-review-agent`) — pass the behavior commit's range (`HEAD`, or `HEAD~N..HEAD`) + one line of intent. Dispatched in the `/refactor` batch, concurrently with premortem. |
-| `premortem` (pre-commit) | `Agent tool` (subagent_type: `premortem-agent`) — pass the behavior commit's range (`HEAD`, or `HEAD~N..HEAD`) + one line of intent. Dispatched in the `/refactor` batch, concurrently with agent-review. |
+| `agent-review` (boundary) | `Agent tool` (subagent_type: `agent-review-agent`) — pass the boundary range + one line of intent. Dispatched in a boundary unit's `/refactor` batch, concurrently with premortem. |
+| `premortem` (boundary) | `Agent tool` (subagent_type: `premortem-agent`) — pass the boundary range + one line of intent. Dispatched in a boundary unit's `/refactor` batch, concurrently with agent-review. |
 
 Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`). Both red-agent and green-agent receive: layer, story folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow. The triage predicate and the SAFE-only auto-fixer are **inline in `/continue`** — no subagent, no new dispatch row (see "Triage & Auto-Fix").
 
 **CHAINING: After each sub-step completes (Agent tool return), echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Do NOT wait for user input between sub-steps — the echo is informational only. (The two review passes are the exception: they dispatch together in one message, in the same batch as `/refactor`.)**
 
-**AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. The two review passes log too (they run in the `/refactor` batch, before the refactor commit); after the last commit, include the log contents in the stop-and-report summary.**
+**AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. In a boundary unit the two review passes log too (they run in the `/refactor` batch); after the last commit, include the log contents in the stop-and-report summary.**
 
 **LOG REMINDER: Every time you dispatch a sub-agent (Agent tool call), output this line immediately before the call:**
 ```
@@ -179,8 +175,8 @@ Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `stora
 
 ## Rules
 
-- Execute exactly ONE work unit per invocation — a work unit includes ALL sub-skills through the last commit, including the two review passes that run in the `/refactor` batch. Never stop between sub-skills.
-- A `/refactor` work unit ends in up to three commits: the behavior commit (carries the `progress.md` advance), a separate refactor commit (skipped if `/refactor` changed nothing), then a trailing `review-fix:` commit (skipped when no SAFE finding applies). STOP only after the last landed commit. Otherwise one commit carries `progress.md`.
+- Execute exactly ONE work unit per invocation — a work unit includes ALL sub-skills through the last commit, including a boundary's review passes that run in the `/refactor` batch. Never stop between sub-skills.
+- A `/refactor` work unit ends in two commits: the behavior commit (carries the `progress.md` advance) and a separate refactor commit (skipped if `/refactor` changed nothing). A **boundary** unit adds a trailing `review-fix:` commit (skipped when no SAFE finding applies). STOP only after the last landed commit. Otherwise one commit carries `progress.md`.
 - Task commit prefix: `task:` (e.g., `task: red-adapter storage (Task 1, Step 1)`)
 - If a sub-skill fails, stop immediately -- do NOT mark the step complete
 - Mandatory sub-skills per phase: see `.claude/guidelines/workflow-detail.md` sequences
@@ -194,3 +190,4 @@ After updating `progress.md` for a **story** (not tasks), update the story's row
 - `.claude/templates/workflow/progress-format.md` -- progress file format for stories, bug tasks, and refactoring tasks
 - `.claude/templates/workflow/stories-md-format.md` -- stories.md phase/Tests/% column rules (tier-major and untiered)
 - `.claude/templates/workflow/plan-integrity-check.md` -- the six pre-dispatch checks over `progress.md` (step 4)
+- `.claude/templates/workflow/continue-report-format.md` -- the re-orientation block that closes every stop-and-report

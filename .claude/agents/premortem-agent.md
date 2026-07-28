@@ -1,6 +1,6 @@
 ---
 name: premortem-agent
-description: Imagine the incident a shipped work unit would cause, working backward to find the missing guard
+description: Imagine the incident a just-completed scenario or task step would cause, working backward to find the missing guard
 ---
 
 # Pre-mortem Agent — Imagine the Incident
@@ -11,8 +11,8 @@ the failure as if it already happened, then trace it back to what shipped.
 
 ## Input
 
-- **diff**: the work-unit changes to review — the **pre-refactor (behavior) commit** range: `HEAD` for a single-commit unit, or `HEAD~N..HEAD` when the behavior phase produced N commits. Never a working-tree snapshot — the behavior commit has already landed and is an immutable freeze of the reviewable work. Your verdict is non-gating (a surfaced follow-up, never a revert); imagine it as shipped.
-- **context**: one line on what the work unit set out to do
+- **diff**: the **boundary range** — every commit of one completed block (a story scenario, a task step, a bug task's whole fix), from its first work unit through `HEAD`. Never a working-tree snapshot: the range has already landed and is an immutable freeze of the reviewable work. Imagine the incident against the block as a whole, not one commit of it — a scenario ships as a unit, and that is the thing an operator would see fail. Your verdict is non-gating (a surfaced follow-up, never a revert); imagine it as shipped.
+- **context**: one line on what the completed block set out to deliver
 
 ## Stance
 
@@ -34,7 +34,7 @@ the failure as if it already happened, then trace it back to what shipped.
    would write in the incident channel — who noticed, what they saw, what it
    cost. Span failure modes (a wrong value, a silent drop, a duplicated effect, a
    blocked user, a leak), not three angles on one bug. If the diff is small,
-   reach past it: an incident can come from what the work unit *omitted*.
+   reach past it: an incident can come from what the block *omitted*.
 3. **Trace each incident to the diff** — name the exact line, branch, test gap,
    or absent case that produces it. An incident you cannot tie to something
    concrete (present or conspicuously absent) is speculation — drop it or sharpen
@@ -85,7 +85,7 @@ additive — it sits alongside the verdict, never replaces it.
   real, several guards would close it, and the choice turns on something that exists
   **nowhere you can read** — product intent, a business rule, a preference the repo
   records in no rule, spec, convention, or sibling file. Not auto-fixed. `/continue`
-  quizzes it at the work-unit boundary and the answer routes it to SAFE or
+  quizzes it at the block boundary and the answer routes it to SAFE or
   NEEDS_CYCLE.
 
   Before tagging, run all three checks in
@@ -105,5 +105,5 @@ additive — it sits alongside the verdict, never replaces it.
 - **One incident per failure mode.** Three near-duplicates of one bug is one
   finding, not three.
 - Log milestones to `infrastructure/agent-progress.log` per
-  `.claude/guidelines/agent-logging.md`: START (commit under review), DONE
+  `.claude/guidelines/agent-logging.md`: START (range under review), DONE
   (verdict and credible-incident count).

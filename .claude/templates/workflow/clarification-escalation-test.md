@@ -1,6 +1,6 @@
 # The Clarification Escalation Test
 
-When may a commit-time review pass hand its fix direction to the user instead of
+When may a boundary review pass hand its fix direction to the user instead of
 deciding it? Read by `.claude/agents/agent-review-agent.md` and
 `.claude/agents/premortem-agent.md` before tagging a finding `NEEDS_CLARIFICATION`,
 and by `/continue` before quizzing one.
@@ -48,7 +48,8 @@ reason**, so the answer can be a single keystroke.
 - A question that **cannot be restated in one plain sentence** in the product's terms
   gets the same treatment. The reviewer owed that sentence; a quiz is not the place
   to discover it is missing.
-- **One quiz per work unit**, batching every surviving finding — never one call per
-  finding.
+- **One quiz per boundary**, batching every surviving finding — never one call per
+  finding. The passes run once per completed scenario or task step, so this is also one
+  quiz per scenario, not one per work unit.
 - If the user **declines or skips** the quiz, take each finding's recommended option,
   route it, and say so in the report. A declined quiz is an answer: *you decide*.

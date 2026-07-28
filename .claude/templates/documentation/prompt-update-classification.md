@@ -37,7 +37,8 @@ not auto-loaded). Target the file that owns the topic:
 | documentation, prompt, agent, skill, template, layer placement | `.claude/guidelines/prompt-rules.md` |
 | workflow lifecycle, status markers, atomic-unit rule, task types (high-level) | `.claude/rules/workflow.md` |
 | scenario sequences, adapter/steps discovery, bug/QA task detail, resuming/handoff mechanics | `.claude/guidelines/workflow-detail.md` |
-| commit-time review passes, agent-review/premortem rationale, triage SKIP/RUN, SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION partition, why escalation is last-resort, mid-cycle finding tier | `.claude/guidelines/review-passes-detail.md` |
+| boundary review passes, boundary cadence, boundary range, block boundary, agent-review/premortem rationale, triage SKIP/RUN, SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION partition, why escalation is last-resort, mid-cycle finding tier | `.claude/guidelines/review-passes-detail.md` |
+| scenario consolidation, merge eligibility, assertion-preservation invariant, provenance union | `.claude/templates/spec/consolidation-rules.md` |
 | when a review pass may escalate instead of deciding, quiz form and consumer gating | `.claude/templates/workflow/clarification-escalation-test.md` |
 | tech profile, tech binding, technology loading, conventions table | `.claude/guidelines/technology-loading.md` |
 
@@ -168,10 +169,11 @@ After writing, determine whether the update changes **expected behavior** of any
 | `guidelines/review-passes-detail.md` | `/continue` (triage + auto-fix), `/agent-review`, `/premortem` |
 | `skills/qa-run/SKILL.md`, `tech/{browser-testing}/templates/qa-prod-copy-harness.md` | `/qa-run` |
 | `templates/spec/*` | `/interview`, `/continue` (story spec dispatch), `/api-spec`, `/test-spec`, `/design-preview`, `/architecture`, `/harvest` + `/retier` (`tier-ladder.md`) |
-| `agents/tiering-agent.md` | `/test-spec` (Phase 4), `/retier` (both dispatch it), `/design-preview` (inherits its marker rules) |
+| `agents/consolidation-agent.md` | `/test-spec` (Phase 4), `/retier` (explicitly declines to dispatch it), `/design-preview` (mid-cycle scenarios are not retro-merged) |
+| `agents/tiering-agent.md` | `/test-spec` (Phase 5), `/retier` (both dispatch it), `/design-preview` (inherits its marker rules) |
 | `templates/ui/*` | `/mockups` |
 | `templates/task/*` | `/task` |
-| `templates/workflow/*` | `/continue`, `/retier` (`bootstrapping.md`, `progress-format.md`, `stories-md-format.md`, `plan-integrity-check.md`) |
+| `templates/workflow/*` | `/continue` (`continue-report-format.md`, `progress-format.md`, `plan-integrity-check.md`), `/retier` (`bootstrapping.md`, `stories-md-format.md`) |
 | `guidelines/prompt-rules.md`, `templates/documentation/*` | `/prompt-update`, `/prompt-refactor`, `prompt-refactor-agent`, `/framework-sync` |
 | `tech/{browser-testing}/templates/align-design-*` | `/align-design` |
 | `tech/{browser-testing}/templates/design-review-*` | `design-review-agent` |

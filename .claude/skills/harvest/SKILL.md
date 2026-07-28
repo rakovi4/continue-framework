@@ -92,8 +92,11 @@ one where skipping it means nobody ever checked.
 One behavior commit: any kept/deleted test changes, `[S]` marks (each naming what
 implements it), and the `progress.md` advance (`- [x] harvest`, next Tier 2 step to
 `[~]`). Task/story prefix as usual. `/continue` then owns the `/refactor` batch and
-triage: a harvest diff is `acceptance/**` + `progress.md`, which the triage predicate
-may SKIP as test-only — the passes run only if triage says RUN, not automatically.
+triage. `## Harvest — Tier 1 → Tier 2` is a one-checkbox block, so ticking it always
+closes the block: harvest is a **boundary**, and its `acceptance/**` diff is source, so
+triage RUNs the review passes over it. That is deliberate — the batch deletes tests it
+judged inert and resolves whole scenarios to `[S]`, which is exactly the kind of call a
+cold read should see once.
 
 The cost is one backend build and boot, amortized across the entire Tier 2 batch.
 

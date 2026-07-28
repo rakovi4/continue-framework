@@ -74,6 +74,16 @@ already-tiered story and read to the next person as a pass that got skipped. The
 2 because the scenario is being implemented in the cycle it was born in, which is neither
 the Tier 1 demonstrable-feature set nor a bounded degradation nobody builds.
 
+**Consolidation does not reach back.** The pass that merges scenarios sharing one
+execution runs once, at `/test-spec`, over the whole drafted set
+(`.claude/templates/spec/consolidation-rules.md`). A scenario born here arrives after it
+and is **never retro-merged**: re-running a whole-set pass to absorb one newcomer would
+rewrite scenarios already built or in flight, and their `### N.M Title` headings are what
+`progress.md`, the journey summaries and plan-integrity check 4 key on. So the two
+outcomes above stay the only ones — fold the GAP into the design, which costs no cycle at
+all, or write the net-new scenario, which costs a full one. That asymmetry is a reason to
+fold wherever folding is honest, never a reason to call a scenario a design change.
+
 ### 3. Present Options
 
 Show each option as a labelled block: title, summary, pros, cons. Include the recommendation rationale below the recommended option.

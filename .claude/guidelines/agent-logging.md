@@ -26,9 +26,10 @@ Append lines using `echo "..." >> infrastructure/agent-progress.log`. One line p
 | test-review detector clusters (`test-review-assertions-agent`, `test-review-placement-agent`, `test-review-selenium-agent`, `test-review-statements-agent`) | START (cluster + target scope), SCAN (violation count or `none`), DONE |
 | coverage-agent | START (module), RUN (coverage %), DONE (gaps found or clean) |
 | hazard-scan-agent | START (artifact + group id under scan), DONE (group id, verdict, gap count) — the id is what tells a reader of a concurrent fan-out's log which groups actually ran |
+| consolidation-agent | START (story + scenario count), RUN (each merge: survivor + absorbed count), DONE (before/after count) or SKIP (stop condition + what triggered it) |
 | tiering-agent | START (story + scenario count), RUN (floor blocks applied), DONE (the tier split) or SKIP (stop condition + what triggered it) |
-| agent-review-agent | START (commit under review), DONE (verdict + concern count) |
-| premortem-agent | START (commit under review), DONE (verdict + credible-incident count) |
+| agent-review-agent | START (boundary range under review), DONE (verdict + concern count) |
+| premortem-agent | START (boundary range under review), DONE (verdict + credible-incident count) |
 | harvest | START (Tier 2 batch size), RUN (green/red split after the first run), PASS or SKIP (per-test baseline verdict: earned / pre-existing `[S]` / inert-deleted), DONE (kept, `[S]`, deleted counts). Its writer sub-agents log as red-agent. |
 | test-runner | START (module/class), READY (context read, command chosen), INVOKE (immediately before launching the test command), RUN (first test-task output seen), DONE (pass/fail counts) |
 

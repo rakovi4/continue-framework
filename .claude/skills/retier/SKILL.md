@@ -14,7 +14,7 @@ needs a migration at all, and why a story already under way is left alone, is in
 **Run it once, after the merge.** `/framework-sync`'s **Next Steps** routes here when
 the merge brings tiering in; the frontmatter `description` above repeats the run-once
 instruction for a hand-merge that never invoked that skill. Afterwards `/test-spec`
-Phase 4 tiers every new story and nothing calls this skill again.
+Phase 5 tiers every new story and nothing calls this skill again.
 
 **Run it inline in the main agent.** It fans out one `tiering-agent` per story, and
 those must not nest inside a wrapper agent. It is never a `progress.md` checkbox, so
@@ -69,6 +69,15 @@ uniformity.
    by name). That report is the honest outcome. **Never stamp a token** to make the
    floor bite: an invented token is indistinguishable downstream from one a route
    actually emitted.
+
+   **No consolidation either**, for the same reason from the other direction. The pass
+   that merges scenarios sharing one execution
+   (`.claude/templates/spec/consolidation-rules.md`) rewrites scenario bodies and
+   retires headings — authoring, not migration — and every `### N.M Title` it retires
+   is a string journey summaries, decision records and `plan-integrity-check.md` key
+   on. The user invoked this skill to *order* a set, not to redraft it. A **Convertible**
+   story can be consolidated deliberately afterwards if the user asks; nothing here does
+   it on their behalf, and an in-flight story is never consolidated at all.
 3. **A stop is per-story.** On any `tiering-agent` stop condition, report it and
    leave that story exactly as it was — one story stopping never stops the others.
 4. **Resolve `tests/tiering-report.md` before re-bootstrapping.** If the pass
