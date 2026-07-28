@@ -70,7 +70,7 @@ All supplementary information goes here:
 ## Technical Notes
 
 ### Load Considerations
-[Performance concerns based on ExpectedLoad.txt:
+[Performance concerns based on ExpectedLoad.md:
 - Single-user application
 - No more than 100 tasks on the board at any time]
 

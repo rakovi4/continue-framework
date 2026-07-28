@@ -1,6 +1,26 @@
 # Progress File Format
 
+How a `progress.md` with no prior file is derived is in
+[`bootstrapping.md`](bootstrapping.md); this file is the shape it is derived into.
+
 ## Story
+
+Sections are **tier-major**: all of Tier 1, in category order, then the harvest
+boundary, then all of Tier 2 in the same category order. Heading shape is
+`## Tier N — {Category} Scenarios ({file})`, so one category file can produce a
+section under each tier. Tier 3 never appears — it lives in `tests/tier3/` and is
+never implemented (`.claude/templates/spec/tier-ladder.md`).
+
+Tiering changes the *order* of scenarios, never their steps: each scenario runs the
+same TDD cycle wherever its tier puts it.
+
+A scenario heading is the test file's `### N.M Title` **verbatim** — not renumbered,
+not relabelled `Scenario 1`. One category file feeds two tier sections, so
+per-section renumbering would restart both at 1 and a `progress.md` heading would no
+longer map to any test-file scenario; journey summaries and decision records key on
+that exact string (`.claude/agents/tiering-agent.md`, "Moving between `tests/` and
+`tier3/`"). The numbers within a tier's section are therefore sparse — the other
+tier's scenarios are the gaps — and that is correct.
 
 ```markdown
 # Story N: Story Title — Progress
@@ -12,9 +32,9 @@
 - [x] api-spec
 - [x] test-spec
 
-## Backend Scenarios (01_API_Tests.md)
+## Tier 1 — Backend Scenarios (01_API_Tests.md)
 
-### Scenario 1: Scenario title
+### 1.1 A member opens a board they own
 - [x] red-acceptance
 - [~] design               <- MANDATORY for every scenario needing new implementation
 - [ ] red-usecase
@@ -30,19 +50,9 @@
 - [ ] green-adapter rest
 - [ ] green-acceptance
 
-## Integration Scenarios (06_Integration_Tests.md)
+## Tier 1 — Frontend Scenarios (02_UI_Tests.md)
 
-### Scenario title
-- [ ] red-acceptance
-- [ ] design
-- [ ] red-usecase
-- [ ] green-usecase
-- [ ] adapters-discovery
-- [ ] green-acceptance
-
-## Frontend Scenarios (02_UI_Tests.md)
-
-### Scenario 1: Scenario title
+### 1.1 The board renders its columns
 - [ ] red-selenium
 - [ ] red-frontend
 - [ ] green-frontend
@@ -52,9 +62,13 @@
 - [ ] green-selenium
 - [ ] demo
 
-## Security Scenarios (05_Security_Tests.md)
+## Harvest — Tier 1 → Tier 2
 
-### Scenario title
+- [ ] harvest
+
+## Tier 2 — Backend Scenarios (01_API_Tests.md)
+
+### 1.4 A duplicate move request is rejected
 - [ ] red-acceptance
 - [ ] design
 - [ ] red-usecase
@@ -62,19 +76,9 @@
 - [ ] adapters-discovery
 - [ ] green-acceptance
 
-## Load Scenarios (03_Load_Tests.md)
+## Tier 2 — Security Scenarios (05_Security_Tests.md)
 
-### Scenario title
-- [ ] red-acceptance
-- [ ] design
-- [ ] red-usecase
-- [ ] green-usecase
-- [ ] adapters-discovery
-- [ ] green-acceptance
-
-## Infrastructure Scenarios (04_Infrastructure_Tests.md)
-
-### Scenario title
+### 2.1 A member cannot open another member's board
 - [ ] red-acceptance
 - [ ] design
 - [ ] red-usecase
@@ -82,6 +86,32 @@
 - [ ] adapters-discovery
 - [ ] green-acceptance
 ```
+
+Integration (`06_Integration_Tests.md`), Load (`03_Load_Tests.md`) and
+Infrastructure (`04_Infrastructure_Tests.md`) sections take the same six-step
+backend shape, under whichever tier their scenarios landed in.
+
+### The harvest boundary
+
+One `- [ ] harvest` checkbox sits between the last Tier 1 section and the first
+Tier 2 one, in its own `## Harvest — Tier 1 → Tier 2` section. It is a work-unit
+checkbox, not a scenario: it carries no `### ` heading, so it never counts toward
+the scenario totals in `stories.md`. What it dispatches is in
+`.claude/skills/harvest/SKILL.md`.
+
+A story with no Tier 2 scenarios still gets the boundary. Harvest's baseline check
+is what confirms Tier 1 actually delivered the feature, and a story that skipped it
+because nothing followed would be the one story where nobody checked.
+
+### Untiered stories
+
+A `progress.md` whose sections carry no `Tier N —` prefix is **untiered**: flat
+category sections, no harvest checkbox, today's ordering. This shape stays valid
+indefinitely — it is a permanent branch, not a transitional one. Stories specced
+before tiering existed are never re-bootstrapped into the tier-major shape by
+`/continue`; `/retier` is the only thing that converts one, and only while **no
+checkbox below its `## Spec` section is `[x]`** (`.claude/skills/retier/SKILL.md`).
+Reordering a story underneath its own in-flight work unit would strand it.
 
 ## Task (bug)
 

@@ -41,42 +41,44 @@ Integration, security, load, and infrastructure scenarios each run the **same TD
 | Load | `tests/03_Load_Tests.md` | response-time baselines, concurrent request handling, large data-set behavior |
 | Infrastructure | `tests/04_Infrastructure_Tests.md` | database failure handling, recovery after outages, external-service unavailability |
 
+**Harvest — Tier 1 → Tier 2 boundary.** In a tier-major story, after the last Tier 1 scenario and before the first Tier 2 one, the `- [ ] harvest` work unit runs once: batch-write every remaining Tier 2 acceptance test concurrently, partition red (deleted) from green (kept), and baseline the green set against the pre-Tier-1 build to earn its red→green transition. Full procedure: `.claude/skills/harvest/SKILL.md`.
+
+## Why Delivery Is Ordered by Tier
+
+**The ratchet, and what it cost.** Before tiering, every authoring route pointed one way: a hazard GAP folded in as critical-path, a security checklist row produced a critical-path scenario, and the only place below critical path — `extended/` — was reachable by an explicit authoring decision nobody was ever instructed to make. Each route was individually right, and none could ever move a scenario down. Ratchets accumulate: the routes fire on every story, so the critical path grew monotonically until a single story carried 100 cases and nobody could say which of them had to work for the feature to work at all. The failure was not over-thoroughness — the scenarios were real — but the absence of a **destination**: with only one place to put a forced guard, "this must be tested" and "this must be tested first" collapse into the same statement. Tier 2 is that destination, and the pinned floor is what keeps the fix from becoming the opposite ratchet: the classes whose failure is catastrophic can be ordered second, never dropped to Tier 3.
+
+**Tier outranks category, deliberately.** The ordering axis is tier first, category second — all of Tier 1 in category order, then all of Tier 2 in the same order — which means one category file feeds two sections and the plan no longer reads top-to-bottom as `01_API`, `02_UI`, `03_Load`. That is intentional and is not a bug to be tidied later. Category is a property of how a scenario is *written* (which harness, which spec file); tier is a property of what its failure *costs*. Only the second one answers "what do we build next", so only the second one can be the outer axis. Category-major with a tier column would leave the reader deriving the delivery order themselves on every resume, and a derived order is one nobody can be held to. The one thing tiering never changes is a scenario's steps: it reorders work, it does not redefine it.
+
+**The commit-time passes do not review tier assignment, and the floor is why that is safe.** `agent-review-agent` and `premortem-agent` read one work unit's diff. A tier call is *comparative* — it only means anything against the whole set (`.claude/agents/tiering-agent.md` is a single pass over all of it, for exactly this reason) — so a pass reading one commit has no comparand and would be guessing, and a guess that fires from inside the work always runs toward the scenario in front of it being essential. That is the ratchet again, rebuilt one commit at a time. So the passes are silent on tiering, and the guard against a bad call is structural instead: the pinned floor forbids the one irreversible mistake (a catastrophic class landing in Tier 3, where nothing downstream revisits it), while a wrong 1-vs-2 call costs ordering only and self-corrects at the harvest boundary or the demo. Where a pass *does* touch tiers is the newcomer it creates, not the calls already made — `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
+
 ## Net-New Scenarios Introduced Mid-Cycle
 
 The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the bug-task `steps discovery` gate; both are the seams where net-new, never-scanned behaviour enters a spec-skipping path, and both reuse the existing per-group fan-out rather than adding a new scan mechanism.
 
+A scenario a `NEEDS_CYCLE` review finding turns into new work is one of these, whatever surfaced it — so it enters through the same gate, and in a tier-major story it is written with a **resolved `Tier: 2`** marker rather than left untiered. The reasoning and the two ways out of that default are in `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
+
+**When its position is above the cursor, the plan write waits for a scenario boundary.** `/continue`'s two placement rules — append at the end of the matching `## Tier N — {Category} Scenarios ({file})` section for the newcomer's own tier, and never above the current `[~]` — are jointly unsatisfiable exactly when that section precedes the cursor. Two shapes reach it: a `BLOCK`-promoted **Tier 1** scenario found during Tier 2 work (the whole Tier 1 region is above the cursor), and a Tier 2 newcomer whose category sorts earlier than the cursor's. If the matching section does not exist, create it in `bootstrapping.md`'s category order (`01_API`, `06_Integration`, `02_UI`, `05_Security`, `03_Load`, `04_Infrastructure`), a new Tier 2 section after `## Harvest — Tier 1 → Tier 2` — and judge "precedes the cursor" by where that order puts it. In these shapes the `review-fix:` commit still writes the **test file** with its resolved marker; only the `progress.md` block waits, for the next **scenario boundary** — the moment the in-flight scenario's last step is `[x]` and no red or disabled test of its is left in the tree. Below the cursor, the common case (a Tier 2 newcomer found during Tier 1 work), nothing waits and the block lands in the `review-fix:` commit as before.
+
+**Three clauses make the wait reachable; without them it deadlocks.** Deferring is only coherent if work can continue *to* the boundary and the block can be placed *at* it, and neither is free:
+
+1. **Deferral requires an in-flight cycle.** It is sanctioned only while some `[~]` sits inside a scenario block. With no in-flight cycle there is nothing to strand, so the block goes in immediately, in the same `review-fix:` commit — and the `stories.md` recount happens there too. This is what keeps a story from reading `100%` with all-left-`✅` while an unbuilt `Tier: 1` scenario sits in `tests/`: the counts derive from `progress.md`, so a deferred block is invisible to them, and a story on its *last* work unit has no later boundary to wait for.
+2. **Check 4 must not stop dispatch on this state.** A `tests/*.md` heading absent from the plan whose section precedes the current `[~]` is reported as a **pending deferred placement** and does not block; it becomes blocking again once no `[~]` remains inside a scenario block. Otherwise the very first resume after the `review-fix:` commit stops at step 4, the in-flight scenario can never finish, and the boundary the block is waiting for is never reached — waiting unreachable, placing illegal.
+3. **At the boundary the cursor moves onto the newcomer.** Insert the block, mark its first step `[~]`, and return the previously-`[~]` step to `[ ]`. Check 3 is purely syntactic — no `[ ]` above the file's first `[~]` — so a `[ ]` block dropped into an earlier section fails it even at a boundary, where the *harm* is gone but the check cannot tell. Moving the cursor satisfies the check as written, needs no exemption, and is the right sequencing anyway: a promoted Tier 1 scenario genuinely is the next work unit, and everything above it is already `[x]`/`[S]`.
+
+No separate record of the deferral is written into `progress.md`. Clause 2's predicate is computed from the files themselves, and the treatment is the same whether the gap was deliberate or an actor wrote a test file and stopped — place the block at the boundary — so a bespoke marker would add a syntax every reader must learn to distinguish two states that resolve identically.
+
+The remaining cost is one report, not a stop, and it is the right price. The alternatives fail in kind, not degree: appending above the cursor abandons an in-flight cycle with its red test committed, and appending below it either files a scenario under a category section it does not belong to (falsifying the `stories.md` per-category cells) or puts a Tier 1 section under the harvest boundary (falsifying tier-major order for every later resume, which then fails check 2 forever).
+
 ## Pre-Commit Review Passes
 
-Every work-unit commit — in any sequence above (backend, frontend, integration,
-security, load, infra) and in task work — is preceded by two **fresh-context**
-review passes that differ *in kind* from the in-loop `/test-review` and `/refactor`.
-Those read the work as it is built and within the author's framing; these read the
-finished diff cold:
-
-- `agent-review-agent` — surfaces any problem the diff *contains*, deliberately
-  unnarrowed (not bound to a checklist).
-- `premortem-agent` — assumes the work shipped and caused an incident, then works
-  back to the *missing* guard.
-
-They are independent reads of the same diff, so they run **concurrently with each other
-and in the same batch as `/refactor`** — overlapping it rather than adding a serial tail
-to every work unit. The behavior commit lands first; the passes read that **immutable
-commit** while `/refactor` mutates the tree toward a separate refactor commit, so there is
-no read/write race. The cost is that they do not see `/refactor`'s behavior-preserving
-delta, which its own green test run already gates.
-
-They run **before the refactor commit** but are **not a gate**: a CONCERNS or BLOCK
-verdict surfaces as a follow-up and never blocks, reverts, or amends either commit — the
-work always lands. This layer exists so a defect that every same-kind gate read past still
-meets one reader who did not — the gap that defense-in-depth-by-kind closes. Overlapping
-them with `/refactor` is a pure latency win and costs no fidelity: both passes read at the
-behavior/correctness altitude, and `/refactor` preserves behavior, so a cold read of the
-behavior commit is identical whether it lands a second before or a second after the
-refactor commit — we take the second that overlaps `/refactor`.
-
-`/continue` owns the dispatch mechanics — reading the behavior commit, the
-surface-don't-block handling, and the skip rule — in its "Pre-Commit Review Passes" and
-"Sub-Skill Dispatch" sections. This file does not restate them.
+Every work-unit commit — in any sequence above and in task work — is preceded by two
+**fresh-context** passes over the behavior commit (`agent-review-agent`, `premortem-agent`),
+a deterministic triage predicate that may SKIP them, and a three-way partition of their
+findings into SAFE / NEEDS_CYCLE / NEEDS_CLARIFICATION. The *why* — why this layer differs
+*in kind* from the in-loop `/test-review` and `/refactor`, why the passes overlap
+`/refactor` and are non-gating, why triage exists, and why a scenario introduced by a
+`NEEDS_CYCLE` finding defaults to Tier 2 — is in
+`.claude/guidelines/review-passes-detail.md`. `/continue` owns the dispatch mechanics.
 
 ## Infrastructure & Port Configuration
 
@@ -100,19 +102,9 @@ After completing a work unit:
 
 ### Bootstrapping
 
-If no `progress.md` exists, create one by:
-1. Detecting spec artifacts in the story directory:
-   - `interview`: check if `interview.md` exists
-   - `story`: check if `NN_StoryName.md` exists
-   - `mockups`: check if `mockups/` has files
-   - `api-spec`: check if `endpoints.md` exists
-   - `test-spec`: check if `tests/01_API_Tests.md` exists
-   - **Edge case**: if all spec items exist EXCEPT `interview.md`, mark `[S] interview (spec completed without interview)` — don't force retroactive interviews on old stories
-2. Reading the story's test specs (`tests/01_API_Tests.md`, `tests/06_Integration_Tests.md` if exists, `tests/02_UI_Tests.md`, `tests/05_Security_Tests.md` if exists, `tests/03_Load_Tests.md` if exists, `tests/04_Infrastructure_Tests.md` if exists)
-3. Scanning existing test classes and production code for completed steps
-4. Marking completed steps as `[x]`, next step as `[~]`, rest as `[ ]`
-5. For backend/integration/security scenarios, **always include `design` after `red-acceptance`** — it is mandatory for every scenario that needs new implementation. Only omit it when the entire scenario is `[S]` (existing implementation covers everything). Include `[ ] adapters-discovery` after `green-usecase` — adapter discovery runs when this step is reached.
-6. For frontend scenarios, include `demo` as the final step per scenario
+If no `progress.md` exists, `/continue` derives one from the story's spec artifacts and test files. The full procedure — artifact detection, tier-major emission from the `Tier:` markers, the `tests/tier3/` exclusion, and how a precondition inversion is resolved before bootstrapping rather than annotated in it — is in `.claude/templates/workflow/bootstrapping.md`.
+
+**Migrating a pre-tiering repo.** The prompt changes that introduced tiering ride a framework merge; the per-repo data they read — `Tier:` markers on existing `tests/*.md`, and a tier-major re-derivation — cannot, because those files are content-dependent and no diff can author them. That ships as `/retier` (`.claude/skills/retier/SKILL.md`), routed from `/framework-sync`'s Next Steps and run **once** after the merge: it converts only the stories where implementation has not started, and leaves every other story — in flight, or already delivered — untiered, permanently. Tagging an in-flight story was considered and rejected: the tiering pass writes markers *and* moves scenarios between `tests/` and `tier3/`, so under a plan that is frozen against reordering a move orphans steps, while markers-without-moves produces a markered-but-flat story that `bootstrapping.md` and the plan-integrity check both treat as impossible. The ordering gain a tier split buys is already spent once delivery has begun, so there is nothing on the other side of the trade.
 
 ## Resuming Across Conversations
 
@@ -143,9 +135,11 @@ The `[ ] steps-discovery` checkbox is a gate -- it must be resolved before any s
 
 **Acceptance red when application behavior changes:** at steps discovery, ask: does the fix change externally observable application behavior — a response body, a status code, an error surface, an end-to-end flow — or invalidate acceptance-level test infrastructure (e.g., an external-service mock that must be tightened to mirror the real service)? If yes, the discovered steps MUST include a `red-acceptance` + `green-acceptance` pair surrounding the layer-level steps — a single-layer red/green is only sufficient when the change is invisible at the black-box level (pure internal restructuring, logging, performance). Ordering: all `red-*` steps (layer + acceptance) land before the first `green-*` step when one production fix resolves every red surface. In that shape `green-acceptance` is verification-only — there is no disabled test to enable because `red-acceptance` made existing tests fail via tightened infrastructure rather than adding a disabled test; state "verification only; no production or test changes" in the step description so the remove-marker-only rule is visibly satisfied. See the bug example in `.claude/templates/workflow/progress-format.md`.
 
-**Hazard scan at steps discovery:** bug tasks skip `/story` and `/test-spec`, so the fix's guard set is decided *here* — never at a spec-time catalogue gate. Before locking the TDD steps, scan the planned fix against the hazard catalogue exactly as the spec-time skills do: per `.claude/guidelines/hazard-catalogue/_index.md` ("How to apply it"), fan out one `hazard-scan-agent` per group in its **Groups** list — iterate that list, never a hand-copied set — each carrying the root cause plus the intended change, `_index.md`, and its one group file; dispatch them concurrently, then run one synthesis pass over the seams. The artifact under scan is the fix's intended behaviour, not the whole codebase. Fold every fired-trigger GAP in as a discovered red step (its forced guard is a test that goes red on the hazard), or dismiss it with a reason — an unresolved GAP blocks step insertion the way it blocks a spec-time Phase. This is the gate that catches the bug-89 shape: a fix that guards one direction of a hazard (inbound duplicate) while leaving its twin (outbound re-attempt) open. It is wired here and **not** at the `red-usecase`/`red-acceptance` entry: story scenarios already crossed the `/test-spec` gate, so scanning every red phase would re-scan scanned work — the spec-skipping production path that introduces a net-new, never-scanned hazard surface is the bug-task fix, which this gate covers.
+**Hazard scan at steps discovery:** bug tasks skip the story-spec step and `/test-spec`, so the fix's guard set is decided *here* — never at a spec-time catalogue gate. Before locking the TDD steps, dispatch the scan exactly as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read its "How to apply it", "The dispatch shape"); the artifact under scan is the **root cause plus the fix's intended behaviour**, not the whole codebase. Fold every fired-trigger GAP in as a discovered red step (its forced guard is a test that goes red on the hazard), or dismiss it with a reason — an unresolved GAP blocks step insertion the way it blocks a spec-time Phase. This is the gate that catches the one-directional fix: a change that guards one side of a hazard (the inbound duplicate) while leaving its twin (the outbound re-attempt) open. It is wired here and **not** at the `red-usecase`/`red-acceptance` entry: story scenarios already crossed the `/test-spec` gate, so scanning every red phase would re-scan scanned work — the spec-skipping production path that introduces a net-new, never-scanned hazard surface is the bug-task fix, which this gate covers.
 
-**Record the scan in the gate marker.** The resolved gate must read `[x] steps discovery (scope: <layers>; scanned all _index.md groups; GAPs: <folded as red-* / dismissed: reason / none fired>)`. The `scanned`/`GAPs` clause is the proof the fan-out ran: it is the bug-task analog of `adapters-discovery (storage, rest)`, which records which adapters that gate found. A bare `[x] steps discovery` — or a marker carrying only the scope, no scan record — is indistinguishable from a skipped scan and is not a valid resolution. The marker is the audit trail; without it, "scan ran" and "scan silently skipped" produce identical progress diffs, which is exactly the hole this gate exists to close.
+**Record the scan in the gate marker, group id included.** The resolved gate must read `[x] steps discovery (scope: <layers>; scanned all _index.md groups; GAPs: <hz-NN folded as red-* / hz-NN dismissed: reason / none fired>)`. The `scanned`/`GAPs` clause is the proof the fan-out ran: it is the bug-task analog of `adapters-discovery (storage, rest)`, which records which adapters that gate found. A bare `[x] steps discovery` — or a marker carrying only the scope, no scan record — is indistinguishable from a skipped scan and is not a valid resolution. The marker is the audit trail; without it, "scan ran" and "scan silently skipped" produce identical progress diffs, which is exactly the hole this gate exists to close.
+
+**Why the id and not just the disposition.** A bug task never reaches `/test-spec`, so it has no `tests/*.md` scenario and no `Tier:` marker — the two places a story's provenance token lives. The gate marker is therefore the *only* place a bug task can record which hazard class a discovered red step was forced by, and `hazard-scan-agent` stamps that id on every GAP precisely so whatever the caller turns the finding into carries it onward. Dropped here, it is unrecoverable: a `red-usecase` step forced by an idempotency GAP becomes indistinguishable from one the root-cause analysis produced, and a later reader asking "was this class ever guarded, or merely never scanned" has nothing to read. Tasks are not tiered, so no pinned floor consumes the token — the audit trail is the whole return, and it costs four characters per GAP.
 
 **Why `reproduce in prod-copy` is a separate step:** prod-copy reproduction often surfaces details the original reporter omitted (exact field length, browser, sequence of actions, network response). Doing it before root-cause analysis prevents wasted investigation on the wrong code path.
 

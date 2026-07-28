@@ -24,7 +24,7 @@ This is also the reuse gate for a scenario invented mid-cycle (see `.claude/guid
 
 1. **Read the story spec** — full story document for business context, requirements, constraints, business rules
 2. **Read the scenario** from `tests/01_API_Tests.md`
-3. **Read `ProductSpecification/ExpectedLoad.txt`** — for scale assumptions (use real numbers, never guess)
+3. **Read `ProductSpecification/ExpectedLoad.md`** — for scale assumptions (use real numbers, never guess)
 4. **Read existing code** — domain entities, usecases, ports, request/response DTOs
 5. **Read ADRs** — check `decisions/*-decision.md` files in the story directory that may constrain the design
 6. **Read the acceptance test** (if `red-acceptance` is done) — understand expected API behavior
@@ -41,22 +41,38 @@ Mark one option as **Recommended** with a one-line rationale ("why this over the
 ### 2a. Hazard Catalogue Scan (before presenting)
 
 Before presenting the options, scan the drafted design against the hazard catalogue —
-the spec-time, closed-list complement to the open-ended commit-time review passes. Per
-`.claude/guidelines/hazard-catalogue/_index.md` (read its "How to apply it"), fan out one
-`hazard-scan-agent` per group in the index's **Groups** list — iterate that list, never a
-hand-copied set, or a newly-added group goes unchecked — each carrying the drafted design,
-`_index.md`, and its one group file; dispatch them concurrently, collect each pass's GAPs
-and seam flags, then run one synthesis pass (per `_index.md`'s "Reason across the seams")
-over the index-named seams and every flagged seam. Fold every GAP back into the design
-before presenting: the option the user approves must already carry the forced guard (a
-domain method, a port contract, a specific check), not a vague mitigation. Do not proceed
-to step 3 with an open GAP — a hazard the design can't yet guard is a reason to widen the
-options or escalate to `/architecture`, not to present anyway. Groups whose triggers can't
-fire at this usecase altitude — the client/frontend group above all — are dismissed as a
-block with one explicit "out of altitude here" line (per `_index.md`'s "A dead group is
-dismissed as a block"), never silently passed. When you present, surface the scan outcome —
-the group set scanned, each fired-trigger GAP, and the guard the chosen option carries for
-it — so the user approves a design whose hazards are visible, not hidden.
+the spec-time, closed-list complement to the open-ended commit-time review passes.
+Dispatch it exactly as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read
+its "How to apply it", "The dispatch shape"); the artifact under scan is the **drafted
+design**. At this altitude an entire group's triggers often cannot fire — `hz-08` (client
+/ frontend) above all — which is a block dismissal, never a silent pass (`_index.md`, "A
+dead group is dismissed as a block").
+
+Fold every GAP back into the design before presenting: the option the user approves must
+already carry the forced guard (a domain method, a port contract, a specific check), not a
+vague mitigation. Do not proceed to step 3 with an open GAP — a hazard the design can't
+yet guard is a reason to widen the options or escalate to `/architecture`, not to present
+anyway. When you present, surface the scan outcome — the group set scanned, each
+fired-trigger GAP, and the guard the chosen option carries for it — so the user approves a
+design whose hazards are visible, not hidden.
+
+When a GAP folds in as a **net-new scenario** rather than as a change to the design, write
+that scenario into its category file under `tests/` with a resolved marker —
+`Tier: 2 (hz-NN)` — carrying the scan's group id. This is the only place on the mid-cycle
+path where that id is still known, and the pinned floor can only keep a pinned group out
+of Tier 3 if the token reached the scenario (`.claude/templates/spec/tier-ladder.md`,
+"Provenance").
+
+A scenario that reaches this gate from a `NEEDS_CYCLE` review finding rather than from a
+GAP is written the same way — resolved `Tier: 2`, carrying whatever tokens this scan
+stamped and a bare `Tier: 2` when it stamped none. A review pass is not a provenance
+route, so there is nothing else to record; never invent a token to make the floor bite.
+
+Resolved, not `Tier: ?`. The `?` form means "drafted, awaiting the comparative pass", and
+`tiering-agent` runs at spec time only — a `?` written here would sit unresolved on an
+already-tiered story and read to the next person as a pass that got skipped. The tier is
+2 because the scenario is being implemented in the cycle it was born in, which is neither
+the Tier 1 demonstrable-feature set nor a bounded degradation nobody builds.
 
 ### 3. Present Options
 
@@ -95,7 +111,7 @@ Pick which option to mark "(Recommended)" based on the choice the user just made
 ## Rules
 
 - Never write code — this is a design step
-- Never create files — design lives in the conversation (unless escalated to `/architecture`)
+- Never create files — design lives in the conversation. Two exceptions: an escalation to `/architecture`, and step 2a's write of a net-new mid-cycle scenario (with its resolved marker) into its `tests/` category file
 - Keep it concise — the goal is alignment, not a design document
 - If trivially similar to a previous scenario, say so and ask to approve
 - **Scope of progress.md changes:** design-preview may ONLY mark the `design` checkbox as `[x]`. It must NOT modify, skip, or rewrite any other steps (usecase, adapter, green-acceptance). Skip recommendations go in the design output text only — `/continue` applies approved skips to progress.md after the design work unit completes, validating each skip against the "zero production files modified" rule in `.claude/guidelines/tdd-rules.md`.

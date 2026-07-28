@@ -32,5 +32,11 @@ agent runs **concurrently** with `premortem` — two independent fresh-context r
 of the same diff. The timing and the diff it reads in that path (the pre-refactor
 behavior commit — `HEAD` or `HEAD~N..HEAD` — dispatched in the `/refactor` batch)
 are owned by `/continue`; see its
-"Pre-Commit Review Passes" section. Run standalone, this skill reviews `HEAD` (or
+"Pre-Commit Review Passes" section. A deterministic triage predicate runs *before*
+that dispatch and may skip both passes for a low-consequence unit. When they do run,
+`/continue` reads each finding's fixability tag and consumes the SAFE subset in an
+inline auto-fix (a separate `review-fix:` commit), while a NEEDS_CLARIFICATION
+finding — the last resort, gated by
+`.claude/templates/workflow/clarification-escalation-test.md` — is resolved by a
+single batched boundary quiz; see its "Triage & Auto-Fix" section. Run standalone, this skill reviews `HEAD` (or
 `<ref>`) on demand. The agent is read-only; it reports, it does not edit.

@@ -5,7 +5,7 @@ description: Interactive interview to create interview.md for a story. Asks stru
 
 # Generate interview.md via Interactive Interview
 
-Conduct a structured interview with the user to gather all context needed for a story, then generate the `interview.md` file that feeds into `/story`, `/mockups`, `/api-spec`, `/test-spec`.
+Conduct a structured interview with the user to gather all context needed for a story, then generate the `interview.md` file that feeds into the story spec step (dispatched by `/continue`), `/mockups`, `/api-spec`, `/test-spec`.
 
 ## Usage
 ```
@@ -21,8 +21,8 @@ Conduct a structured interview with the user to gather all context needed for a 
 Before asking any questions, silently read:
 
 1. **Story mapping**: `ProductSpecification/stories.md`
-2. **Product description**: `ProductSpecification/BriefProductDescription.txt`
-3. **Expected load**: `ProductSpecification/ExpectedLoad.txt`
+2. **Product description**: `ProductSpecification/BriefProductDescription.md`
+3. **Expected load**: `ProductSpecification/ExpectedLoad.md`
 4. **Existing story spec** (if any): `ProductSpecification/stories/NN-story-name/NN_StoryName.md`
 5. **Archived drafts**: `ProductSpecification/Archived/DraftStories/1st-iteration/` (scan for relevant files)
 6. **Existing interviews**: ALL existing `ProductSpecification/stories/*/interview.md` files
@@ -33,7 +33,7 @@ Before asking any questions, silently read:
 
 ### Phase 2: Story Selection
 
-Parse user input to determine target story (same as `/story` skill).
+Parse user input to determine target story: match by name or number via `ProductSpecification/stories.md`, or list available stories for interactive selection.
 If `interview.md` already exists, warn and ask whether to regenerate or skip.
 
 ### Phase 3: Interview
@@ -49,7 +49,7 @@ Compile all answers into `interview.md` using the format rules from the template
 1. Show the full content of the generated file
 2. Ask: "Does this look complete? Any corrections or additions?"
 3. If corrections, update the file
-4. Report the file path and suggest running `/story NN` next
+4. Report the file path and suggest running `/continue NN` next (it dispatches the story spec step)
 
 ## Rules
 

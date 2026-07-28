@@ -20,7 +20,7 @@ Read these files before generating anything:
 
 1. **Conventions**: `ProductSpecification/ui/ui-conventions.md` (the single authority for all design rules)
 2. **Templates**: `ProductSpecification/ui/templates/` (browse what's available)
-3. `ProductSpecification/BriefProductDescription.txt`
+3. `ProductSpecification/BriefProductDescription.md`
 4. `ProductSpecification/stories.md` (story number lookup)
 5. Story spec: `ProductSpecification/stories/NN-story-name/NN_StoryName.md`
 6. Landing page: `Landing/index.html` (brand reference)

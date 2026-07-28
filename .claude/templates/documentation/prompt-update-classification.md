@@ -37,6 +37,8 @@ not auto-loaded). Target the file that owns the topic:
 | documentation, prompt, agent, skill, template, layer placement | `.claude/guidelines/prompt-rules.md` |
 | workflow lifecycle, status markers, atomic-unit rule, task types (high-level) | `.claude/rules/workflow.md` |
 | scenario sequences, adapter/steps discovery, bug/QA task detail, resuming/handoff mechanics | `.claude/guidelines/workflow-detail.md` |
+| commit-time review passes, agent-review/premortem rationale, triage SKIP/RUN, SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION partition, why escalation is last-resort, mid-cycle finding tier | `.claude/guidelines/review-passes-detail.md` |
+| when a review pass may escalate instead of deciding, quiz form and consumer gating | `.claude/templates/workflow/clarification-escalation-test.md` |
 | tech profile, tech binding, technology loading, conventions table | `.claude/guidelines/technology-loading.md` |
 
 Tech bindings (`.claude/tech/{concern-value}/`) — framework-specific idioms:
@@ -88,7 +90,7 @@ Templates often have multiple distinct sections that need coordinated updates:
 
 **Input:** "test-review should catch Statements that assert via Fake storage instead of through usecases"
 **Classification:**
-- Principle exists in `.claude/guidelines/tdd-rules.md` ("NEVER inject storage adapters into Statements") — check if already there
+- Principle exists in `.claude/guidelines/tdd-rules.md` ("NEVER inject storage ports into Statements classes") — check if already there
 - Detection pattern needed → `test-review-agent.md` checklist (new row)
 - Anti-pattern description + assertion rule → `.claude/templates/testing/test-review-patterns.md` (universal)
 - Anti-pattern code examples + syntax table row → `.claude/tech/{backend}/templates/testing/test-review-patterns.md` (per tech profile)
@@ -162,12 +164,15 @@ After writing, determine whether the update changes **expected behavior** of any
 | `guidelines/tdd-rules.md` | `/test-acceptance`, `/design-preview` |
 | `agents/green-agent.md`, `tech/{concern-value}/templates/*` | `green-agent` |
 | `guidelines/frontend-rules.md`, `tech/{concern-value}/templates/frontend/*` | `red-agent`, `green-agent` (frontend layers), `/mockups` |
-| `rules/workflow.md`, `guidelines/workflow-detail.md`, `guidelines/technology-loading.md` | `/continue`, `/task`, `/qa-run` |
+| `rules/workflow.md`, `guidelines/workflow-detail.md`, `guidelines/technology-loading.md` | `/continue`, `/task`, `/qa-run`, `/story` (Backlog-table lifecycle rules) |
+| `guidelines/review-passes-detail.md` | `/continue` (triage + auto-fix), `/agent-review`, `/premortem` |
 | `skills/qa-run/SKILL.md`, `tech/{browser-testing}/templates/qa-prod-copy-harness.md` | `/qa-run` |
-| `templates/spec/*` | `/interview`, `/story`, `/api-spec`, `/test-spec`, `/design-preview`, `/architecture` |
+| `templates/spec/*` | `/interview`, `/continue` (story spec dispatch), `/api-spec`, `/test-spec`, `/design-preview`, `/architecture`, `/harvest` + `/retier` (`tier-ladder.md`) |
+| `agents/tiering-agent.md` | `/test-spec` (Phase 4), `/retier` (both dispatch it), `/design-preview` (inherits its marker rules) |
 | `templates/ui/*` | `/mockups` |
 | `templates/task/*` | `/task` |
-| `templates/workflow/*` | `/continue` |
+| `templates/workflow/*` | `/continue`, `/retier` (`bootstrapping.md`, `progress-format.md`, `stories-md-format.md`, `plan-integrity-check.md`) |
+| `guidelines/prompt-rules.md`, `templates/documentation/*` | `/prompt-update`, `/prompt-refactor`, `prompt-refactor-agent`, `/framework-sync` |
 | `tech/{browser-testing}/templates/align-design-*` | `/align-design` |
 | `tech/{browser-testing}/templates/design-review-*` | `design-review-agent` |
 | `technology.md`, `infrastructure/.env` | `/demo`, `/test-acceptance`, `/align-design` |

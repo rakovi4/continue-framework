@@ -62,4 +62,12 @@ Use the Skill tool:
 
 ## Progress Logging
 
-Read `.claude/guidelines/agent-logging.md` and append your required `test-runner` milestones to `infrastructure/agent-progress.log` as you work.
+Read `.claude/guidelines/agent-logging.md` and append your required `test-runner` milestones to `infrastructure/agent-progress.log` as you work. Stamp each at the moment it happens (`date '+%H:%M:%S'`), never batched at the end. Map them to your flow exactly:
+
+1. `START` — first thing, before reading anything (module/class under test).
+2. `READY` — after you have read your context and chosen the test command, immediately before the Pre-Checks.
+3. `INVOKE` — immediately before the Bash/Skill call that launches the tests (the `test-acceptance.sh` / `gradlew` invocation). If Pre-Checks have to start a backend first, `INVOKE` still marks the test-launch, not the backend start.
+4. `RUN` — the first poll where you see test-task output (`> Task`, a suite line, or the first PASSED/FAILED).
+5. `DONE` — final pass/fail/skip counts.
+
+These five stamps exist to decompose the pre-execution window; the gaps between them are the measurement. Emit all five even when adjacent ones are seconds apart.

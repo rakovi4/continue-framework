@@ -25,13 +25,21 @@ index is the authoritative enumeration of groups.
   of the others. The cost is that completeness is now *enumerated, not visual* —
   dispatch one pass per group in the list below; skip none. Adding a future group
   means a new file **and** a line here, or it goes un-dispatched silently.
+- **The dispatch shape, identical at every call site.** One `hazard-scan-agent` per
+  group in the **Groups** list — iterate that list, never a hand-copied set, or a
+  newly-added group goes unchecked — dispatched **concurrently**, each carrying three
+  inputs and no others: the artifact under scan, this index, and its one group file.
+  Then one synthesis pass over the seams ("Reason across the seams", below). A call
+  site supplies only the artifact — a drafted spec, drafted test files, a drafted
+  design, a bug fix's intended change — and points here for the rest rather than
+  restating it; four copies of a dispatch shape are four things to drift apart.
 - **It is a lens, not a checklist to clear.** For each class, ask "does the work in
   front of me touch this trigger?" — not "can I tick this box?". A class that does
   not apply costs one sentence to dismiss. A class that applies but is awkward to
   test is the one that ships the incident.
 - **A dead group is dismissed as a block, not skipped silently.** When the artifact's
   altitude means an entire group's triggers cannot fire — a usecase-level design
-  against the client/frontend group, say — dismiss that whole group with one explicit
+  against `hz-08` (client / frontend), say — dismiss that whole group with one explicit
   "out of altitude here" line, exactly as a single non-applying class is dismissed. A
   group that was genuinely checked and returned nothing and a group that was never
   dispatched look identical in the result; the explicit block dismissal is the only
@@ -44,6 +52,18 @@ index is the authoritative enumeration of groups.
 - **Triggers are deliberately broad.** When unsure whether a trigger fires, treat it
   as firing and check the forced guard. False positives cost a scenario; false
   negatives cost an incident.
+- **A fired GAP is tiered, not automatically critical-path.** The forced guard stays
+  mandatory — a named test that would go red. *When* it is delivered is then decided
+  by the ladder in `.claude/templates/spec/tier-ladder.md`, which can place a guard
+  in Tier 2, or in Tier 3 when the impact is a bounded, acceptable degradation.
+  Some groups are pinned above Tier 3 by that file's floor and can never take the
+  Tier 3 exit; `tier-ladder.md` holds the authoritative list. This is a **destination** rule, never a *strictness*
+  rule: a group pass does not soften a verdict, drop a class, or pre-assign a tier
+  because a lower tier now exists — it reports the GAP, the fired trigger, and the
+  guard, tagged with its group id, and tiering happens afterwards in a separate pass
+  that reads the whole scenario set at once. A pass that starts triaging its own
+  findings by importance is re-introducing the blind spot the catalogue exists to
+  close.
 - **Reason across the seams.** A few classes share a setup and differ only in the
   assertion — Concurrency vs. Lost update (same group), and Transaction boundary
   vs. Idempotency vs. Async delivery (the last spanning groups 2 and 3). Where group
@@ -73,11 +93,19 @@ must exist and would fail on the hazard before the work is considered covered).
 
 ## Groups
 
-1. [Money, numbers & representation](01-money-numbers-representation.md) — mixed units, numeric edges & precision in transit, text encoding/normalization/locale
-2. [Re-run safety, ordering & atomicity](02-rerun-safety-ordering-atomicity.md) — idempotency (both directions), compute-then-commit, transaction boundary, external-call failure, deadline budgets
-3. [Concurrency, consistency & distribution](03-concurrency-consistency-distribution.md) — multi-instance races, lost update, read-after-write, async delivery
-4. [Data lifecycle & schema](04-data-lifecycle-schema.md) — state-machine correctness, schema/contract evolution, destructive ops
-5. [Request boundary & input](05-request-boundary-input.md) — authorization/IDOR, mass assignment, absent-vs-null, output encoding/injection, fail-open defaults
-6. [Scale & resource limits](06-scale-resource-limits.md) — unbounded size, work amplification, resource exhaustion, retry storms, pagination stability
-7. [Time, operability & disclosure](07-time-operability-disclosure.md) — time/timezone/expiry, partial-failure visibility, config drift, secret/PII disclosure
-8. [Client / frontend](08-client-frontend.md) — client-side action safety, client-as-untrusted & unsaved state
+Every group has a stable **id** matching its file prefix. The id is the group's
+name in prose *and* the provenance token a scan carries onto whatever its GAP
+becomes (`.claude/templates/spec/tier-ladder.md`). Ids are permanent: a retired
+group's id is never reused, or tokens already written into frozen test files would
+silently change meaning.
+
+| Id | Group | Classes |
+|---|---|---|
+| `hz-01` | [Money, numbers & representation](01-money-numbers-representation.md) | mixed units, numeric edges & precision in transit, text encoding/normalization/locale |
+| `hz-02` | [Re-run safety, ordering & atomicity](02-rerun-safety-ordering-atomicity.md) | idempotency (both directions), compute-then-commit, transaction boundary, external-call failure, deadline budgets |
+| `hz-03` | [Concurrency, consistency & distribution](03-concurrency-consistency-distribution.md) | multi-instance races, lost update, read-after-write, async delivery |
+| `hz-04` | [Data lifecycle & schema](04-data-lifecycle-schema.md) | state-machine correctness, schema/contract evolution, destructive ops |
+| `hz-05` | [Request boundary & input](05-request-boundary-input.md) | authorization/IDOR, mass assignment, absent-vs-null, output encoding/injection, fail-open defaults |
+| `hz-06` | [Scale & resource limits](06-scale-resource-limits.md) | unbounded size, work amplification, resource exhaustion, retry storms, pagination stability |
+| `hz-07` | [Time, operability & disclosure](07-time-operability-disclosure.md) | time/timezone/expiry, partial-failure visibility, config drift, secret/PII disclosure |
+| `hz-08` | [Client / frontend](08-client-frontend.md) | client-side action safety, client-as-untrusted & unsaved state |

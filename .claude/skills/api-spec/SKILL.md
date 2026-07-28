@@ -29,7 +29,7 @@ Generate OpenAPI 3.0.3 specifications for frontend endpoints in a story.
 ### Phase 1: Context & Story Selection
 
 1. Read context files:
-   - `ProductSpecification/BriefProductDescription.txt`
+   - `ProductSpecification/BriefProductDescription.md`
    - `ProductSpecification/stories.md`
    - `ProductSpecification/stories/*/mockups/` (UI mockups)
    - `ProductSpecification/stories/*/interview.md` (if exists — authoritative source for API details)

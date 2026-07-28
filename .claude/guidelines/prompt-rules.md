@@ -41,6 +41,18 @@ The prompt library — every file under `.claude/` (rules, agents, skills, templ
 
 **Boundary test:** if content names *this* product rather than the structural role it plays, replace it with the generic concept (`{Entity}`, `{Feature}`, "the external API", "the domain aggregate"). A rule welded to a product instance cannot be reused; the same rule stated structurally can. Product instances live only in `ProductSpecification/`, never in `.claude/`.
 
+## Upstream Framework Sync
+
+The prompt library is a **vendored copy of an upstream framework template**, not an original. It is expected to diverge: every `/prompt-update`, every `/prompt-refactor`, every prompt task edits files that also exist upstream, while upstream keeps moving on its own. Both sides change, so pulling upstream is a merge, never a copy.
+
+- **Sync is one-way and non-destructive.** Upstream changes flow in; local changes never flow out through this path. A sync must never revert a local change merely because upstream has not made it yet — the local copy is routinely *ahead* of upstream, and overwriting is data loss, not an update.
+- **A recorded baseline is what makes the merge safe.** Store the upstream revision the library was last reconciled against, and apply only the upstream changes made *since* that revision. Without a baseline, a whole-tree comparison cannot distinguish "upstream added this" from "local deleted this" and will silently drag local work backwards.
+- **The sync surface is the prompt library only** — the `.claude/` tree and the always-on project instruction file. Product specification, product code, infrastructure, and repo-level docs are never synced: upstream's copies of those are template placeholders, and overwriting them destroys the product.
+- **Checkout-local configuration is merged key by key, never replaced.** The settings file wires hooks, plugins, and paths for *this* checkout; an upstream key that does not exist locally may be offered, but no local key is rewritten or removed by a sync.
+- **Contradictions stop the sync.** When upstream and local state opposing rules for the same decision, no automatic resolution is correct — surface both versions and let the user choose.
+
+Run it with `/framework-sync`.
+
 ## Brevity: constrain artifacts, never reasoning
 
 A length limit in a prompt must target a **produced artifact** — a file, a field, or a message shown to the user — never the model's own reasoning. Telling a model to "be brief," "be concise," or "don't overthink" *its analysis* degrades output quality on any non-trivial task; capping the size of a slug, an ADR, or a summary entry does not. The two read alike but do opposite things.
@@ -72,3 +84,4 @@ Before adding content, check whether it already exists in a higher layer:
 Automated tools:
 - `/prompt-update` — classify new content and write it to the correct layer
 - `/prompt-refactor` — scan a file for layer violations and structural drift, then fix
+- `/framework-sync` — pull upstream framework changes and merge them into the local library

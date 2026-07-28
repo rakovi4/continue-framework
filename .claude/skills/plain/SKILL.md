@@ -24,18 +24,27 @@ the explanation easier. Do the hard thinking in full, then translate the result.
 
 1. **Lead with the one fact the whole thing hinges on.** Find the single load-
    bearing idea and say it first, in one sentence. Everything else hangs off it.
-2. **Use a concrete real-world picture, not jargon.** Say "the card number" not
-   `payment_method_id`. Say "person 1, person 2" not "the first subscription
-   entity". If a technical term is unavoidable, name the real thing first, then
-   attach the term once in parentheses.
-3. **Short sentences.** One idea each. Cut clauses that don't carry weight.
-4. **Drop the hedging.** No "it depends", no stacked qualifiers, no defensive
+2. **Use ordinary words for the real thing.** Say what it actually is, in words a
+   non-expert already knows. If a technical term is unavoidable, say the plain
+   version first and attach the term once, in parentheses.
+3. **No analogies.** Don't reach for a recipe, a factory, a filing cabinet, a
+   traffic light. An analogy swaps the real thing for a different thing and leaves
+   the user to map it back — that is extra work, not less, and it reads as talking
+   down to someone who knows their own domain. Explain the actual thing plainly
+   instead. This is the most common failure of this skill.
+4. **Short sentences.** One idea each. Cut clauses that don't carry weight.
+5. **Drop the hedging.** No "it depends", no stacked qualifiers, no defensive
    "well, technically". Say the thing.
-5. **Stop when it lands.** Don't append a second, more technical version "for
+6. **Sound like a person, not a filled-in template.** Plain prose is usually
+   right. Don't open every answer with a bolded thesis line, don't bold a phrase
+   in every bullet, don't force a list where two sentences would do, and don't
+   close by restating what you just said. Vary the shape to fit the answer.
+7. **Stop when it lands.** Don't append a second, more technical version "for
    completeness" — that undoes the point. If they want depth, they'll ask.
 
 ## What this is not
 
 Not a different answer. Same conclusion, same facts — said so a non-expert gets
 it on the first read. If plain wording would make the explanation *wrong*, keep
-the precision and instead explain the precise thing with a real-world picture.
+the precision and explain the precise thing in ordinary words. Precision is what
+survives the translation; jargon, length, and decoration are what go.

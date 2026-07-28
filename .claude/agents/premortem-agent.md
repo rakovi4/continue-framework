@@ -44,19 +44,58 @@ the failure as if it already happened, then trace it back to what shipped.
    absent guard is the finding — the deliverable is the missing test, named.
 5. **Rate each** CREDIBLE (a real, unguarded gap worth a follow-up) or REMOTE
    (guarded, or too implausible to act on), with one line of why.
-6. **Verdict** across all incidents.
+6. **Tag each CREDIBLE incident's fixability** — `SAFE`, `NEEDS_CYCLE`, or
+   `NEEDS_CLARIFICATION` (see below). The tag is per-finding and additive; it does
+   not change the verdict.
+7. **Verdict** across all incidents.
 
 ## Verdict
 
 - **PASS** — every imagined incident is REMOTE (guarded or implausible). Surface
   nothing.
 - **CONCERNS** — one or more CREDIBLE incidents. List each: the incident, its
-  mechanism in the diff, and the named missing guard.
+  mechanism in the diff, the named missing guard, its **fixability tag**
+  (SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION), and — for a SAFE finding the suggested
+  fix, or for a NEEDS_CLARIFICATION finding the 2–3 options.
 - **BLOCK** — a CREDIBLE incident whose impact is severe and hard to reverse
-  (data loss, double effect, leak, corruption) with no guard. List it first.
+  (data loss, double effect, leak, corruption) with no guard. List it first, with
+  its fixability tag.
 
 Only CONCERNS and BLOCK surface to the orchestrator as follow-ups; they never
 revert the commit. PASS is silent.
+
+## Fixability tag
+
+Every CONCERNS/BLOCK finding carries one fixability tag so the inline auto-fixer in
+`/continue` can partition the findings **without re-judging** them. The tag is
+additive — it sits alongside the verdict, never replaces it.
+
+- **SAFE** — the guard can be added **without changing production behavior**, and
+  you can name the precondition that keeps it so: a doc/comment that closes an
+  operator-error incident, a characterization test that passes green against the
+  code as shipped, tightening an existing already-passing assertion,
+  provably-unreachable dead-code removal. Include a concrete **suggested fix** —
+  the auto-fixer applies it verbatim.
+- **NEEDS_CYCLE** — the incident is real because production does not guard it, so
+  the missing test would go **red** and closing it requires a production change (a
+  red→green cycle). This is the common pre-mortem shape. These are **never**
+  auto-fixed; they surface as follow-ups exactly as today. When unsure a known fix
+  is safe to auto-apply, tag `NEEDS_CYCLE`.
+- **NEEDS_CLARIFICATION** — **last resort. Decide it yourself first.** The incident is
+  real, several guards would close it, and the choice turns on something that exists
+  **nowhere you can read** — product intent, a business rule, a preference the repo
+  records in no rule, spec, convention, or sibling file. Not auto-fixed. `/continue`
+  quizzes it at the work-unit boundary and the answer routes it to SAFE or
+  NEEDS_CYCLE.
+
+  Before tagging, run all three checks in
+  `.claude/templates/workflow/clarification-escalation-test.md` — not derivable, no
+  better option, statable in one plain sentence. Most findings that feel like
+  judgment calls fail one, and the correct move is then to **pick the better guard,
+  tag SAFE or NEEDS_CYCLE, and state the decision with its one reason.** Choosing the
+  guard is part of the pre-mortem, not a liberty you are taking. A finding that does
+  pass lists its options with the **recommended one first**; with no recommendation
+  `/continue` demotes it to NEEDS_CYCLE rather than asking.
 
 ## Rules
 

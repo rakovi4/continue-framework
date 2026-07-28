@@ -47,19 +47,60 @@ every other gate are the ones nobody predicted.
    of the finding.
 5. **Rate each** finding by whether it warrants a follow-up now, with one line of
    why.
-6. **Verdict** across all findings.
+6. **Tag each finding's fixability** — `SAFE`, `NEEDS_CYCLE`, or
+   `NEEDS_CLARIFICATION` (see below). The tag is per-finding and additive; it does
+   not change the verdict.
+7. **Verdict** across all findings.
 
 ## Verdict
 
 - **PASS** — nothing of concern; the work holds up to a cold read. Surface
   nothing.
 - **CONCERNS** — one or more real problems worth a follow-up. List each: the
-  problem, its exact place in the diff, and the named missing guard (if any).
+  problem, its exact place in the diff, the named missing guard (if any), its
+  **fixability tag** (SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION), and — for a SAFE
+  finding the suggested fix, or for a NEEDS_CLARIFICATION finding the 2–3 options.
 - **BLOCK** — a problem severe and hard to reverse (data loss, double effect,
-  leak, corruption, a broken core invariant) with no guard. List it first.
+  leak, corruption, a broken core invariant) with no guard. List it first, with
+  its fixability tag.
 
 Only CONCERNS and BLOCK surface to the orchestrator as follow-ups; they never
 revert the commit. PASS is silent.
+
+## Fixability tag
+
+Every CONCERNS/BLOCK finding carries one fixability tag so the inline auto-fixer in
+`/continue` can partition the findings **without re-judging** them. The tag is
+additive — it sits alongside the verdict (PASS/CONCERNS/BLOCK), never replaces it.
+
+- **SAFE** — the fix is **behavior-preserving**: it changes no production behavior,
+  so it needs no failing test first, and you can name the precondition that keeps
+  it so. Docs/comments, provably-unreachable dead-code removal, a missing
+  characterization test or spec assertion that **passes green against the code as
+  shipped**, a rename whose edit updates every reference, tightening an existing
+  already-passing assertion. A missing test that would go **red** — a real fault in
+  shipped code — is NEEDS_CYCLE, not SAFE. For a SAFE finding, include a concrete
+  **suggested fix** (the exact edit) — the auto-fixer applies it verbatim, it does
+  not re-derive it.
+- **NEEDS_CYCLE** — the fix would change production behavior and therefore requires
+  a red→green cycle (a failing test first). These are **never** auto-fixed; they
+  surface as follow-ups exactly as today. When unsure whether a fix is safe to
+  auto-apply, tag it `NEEDS_CYCLE` — the safe default never lets the auto-fixer
+  touch production behavior.
+- **NEEDS_CLARIFICATION** — **last resort. Decide it yourself first.** The concern is
+  real, several fix directions exist, and the choice turns on something that exists
+  **nowhere you can read** — product intent, a business rule, a preference the repo
+  records in no rule, spec, convention, or sibling file. Not auto-fixed. `/continue`
+  quizzes it at the work-unit boundary and the answer routes it to SAFE or
+  NEEDS_CYCLE.
+
+  Before tagging, run all three checks in
+  `.claude/templates/workflow/clarification-escalation-test.md` — not derivable, no
+  better option, statable in one plain sentence. Most findings that feel like
+  judgment calls fail one, and the correct move is then to **pick the better
+  direction, tag SAFE or NEEDS_CYCLE, and state the decision with its one reason.**
+  A finding that does pass lists its options with the **recommended one first**; with
+  no recommendation `/continue` demotes it to NEEDS_CYCLE rather than asking.
 
 ## Rules
 
