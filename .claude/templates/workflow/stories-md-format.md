@@ -97,6 +97,14 @@ archived folder whose row still reads In Progress, is a half-closed story that n
 reports as wrong. A mid-cycle review finding that reopens the story reverses both in its
 `review-fix:` commit.
 
+**Backfilling an adopting repo.** The move above fires only on a completion commit, so every
+story already in **Done** when a repo adopts the rule predates it and keeps its folder under
+`stories/`. The one-time fix is a sweep, not a mechanism: for each **Done** row whose folder is
+still under `stories/`, `git mv` it into `stories/done/` — re-pointing its mockups' `<script src>`
+prefixes for the added depth (`.claude/templates/ui/mockup-generation-rules.md`, "Script import
+path") — in a single commit. Run it once, when adopting; after that the completion commit above
+keeps the invariant true on its own.
+
 ## When to update
 
 After every `progress.md` commit for a story, in the same commit. Recount Tests and % from
