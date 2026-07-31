@@ -32,7 +32,7 @@ Before generating any specification, read and understand:
    explicitly and fall back to the story folders. Open an earlier story's spec only for
    a **named** precedent: the deliberate non-goal or the decision this story extends or
    contradicts
-6. **Story-specific context** (optional): `ProductSpecification/stories/NN-story-name/interview.md`
+6. **Story-specific context** (optional): `interview.md` in the story folder resolved above
    - If present, read it for additional context, external documentation, and special instructions
 
 ## Phase 2: Generate Specifications

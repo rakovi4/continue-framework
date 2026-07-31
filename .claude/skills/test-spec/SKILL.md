@@ -33,7 +33,7 @@ If `interview.md` exists, extract:
 - External API error modes → map to integration tests
 - Rate limits and performance constraints → map to load tests when they exercise the project's declared **Load Challenge Profile** (read `ExpectedLoad.md` to identify it); skip constraints that don't match the project's profile
 
-**Prerequisite analysis** (mandatory): Read the story's Prerequisites section and Validation Rules table. For each prerequisite, generate guard scenarios in BOTH API and UI tests following the Prerequisite Guard Checklist in `test-spec-format.md` — its rules cover extraction, per-endpoint coverage, and cross-referencing existing stories for established blocker patterns.
+**Prerequisite analysis** (mandatory): Read the story's Prerequisites section and Validation Rules table. For each prerequisite, generate guard scenarios in BOTH API and UI tests following the Prerequisite Guard Checklist in `test-spec-format.md` — its rules cover extraction, per-endpoint coverage, and where an established blocker pattern is read from — the acceptance suite's existing scenarios for the same prerequisite, or a precedent this story's `interview.md` names, never a sweep of the other story folders.
 
 **Side-effect & idempotency analysis** (mandatory): Scan the story spec and `interview.md` for operations that move money, call an external system, send email, or mutate persisted state in a batch. For each one that can be re-run (scheduled job, webhook, user retry), generate re-run-safety scenarios in BOTH directions — inbound duplicate-event and outbound re-attempt-after-partial-failure — following the Side-Effect & Idempotency Guard Checklist in `test-spec-format.md`. Phase 2 stamps their `hz-02` provenance; the tier itself is Phase 5's call.
 

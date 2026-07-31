@@ -74,7 +74,7 @@ deeper prefix from the start.
 - Always show all 4 stat cards. Use `0` for unavailable values, descriptive sub-text for context.
 - Read each component's doc comment (top of `.js` file) for the full attribute API.
 - Never duplicate component CSS inline — it will drift.
-- After generating mockups, if a new structural pattern appears in 2+ places, extract it into a new component and backport to existing stories.
+- After generating mockups, if a new structural pattern appears in 2+ places, extract it into a new component and backport to existing stories — `stories/*/mockups/` **and** `stories/done/*/mockups/`, since a closed story's mockups are still the design reference for its screens and a single `stories/*` glob silently skips every archived one. Write each backport at the prefix depth of the folder it lands in (see "Script import path").
 
 ## Format
 
