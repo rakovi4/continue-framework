@@ -50,14 +50,16 @@ prose, append the Delivered-by row, commit. It is a non-scenario checkbox — li
 Placing it last means the doc is written while the delta is still fresh, and it
 is the checkbox that keeps a story open until the fold happens.
 
-**Archive on completion.** Once that last checkbox is `[x]`, the same behavior
-commit moves `ProductSpecification/stories/NN-story-name/` →
-`ProductSpecification/stories/done/NN-story-name/` and moves the `stories.md`
-row to the **Done** table — under the same staged-`progress.md` gate the task
-move already uses (verify from `git show :`, never from recollection of the
-edit). The mid-cycle reopen path in `/continue`'s Triage section, which already
-handles "flipped the item to `done/` or the Done table", moves the folder back
-out in the `review-fix:` commit.
+**Archive on completion.** The trigger is the completion fact the framework
+already records: the moment a story's row moves to the **Done** table in
+`stories.md`, the same behavior commit moves
+`ProductSpecification/stories/NN-story-name/` →
+`ProductSpecification/stories/done/NN-story-name/`. Row and folder move
+together, under the same staged-`progress.md` gate the task move already uses
+(verify from `git show :`, never from recollection of the edit). The mid-cycle
+reopen path in `/continue`'s Triage section, which already handles "flipped the
+item to `done/` or the Done table", moves the folder back out in the
+`review-fix:` commit. Nothing else about completion changes.
 
 Because the archive move relocates story folders, every consumer that resolves
 `ProductSpecification/stories/NN-*/` — `/continue`'s argument resolution, and
@@ -66,9 +68,21 @@ the glob readers in `/interview`, `/api-spec`, `/screenshot`, `/handoff`,
 `red-agent` and the spec templates — must look in `stories/done/` too, or
 explicitly exclude it (`/retier`, which must not classify archived stories).
 
-Out of scope: retroactively writing feature docs for stories completed before
-this task (there are none in this repo); changing how tasks archive; any change
-to the six test categories or the tier ladder.
+**Backfill is a task, not a framework mechanism.** A project adopting the
+framework after years of development carries three kinds of debt: completed
+stories still sitting in `stories/`, stories with no feature doc, and
+functionality that never had a story at all. None of it gets a dedicated skill
+or a one-shot migration here — it is ordinary work with an ordinary
+`progress.md`: the adopting repo creates a refactoring task (`/task refactoring
+"backfill feature docs"`) with one step per feature area and runs it through
+`/continue`. The framework's job is to make the steady state correct; catching a
+legacy repo up to that steady state is that repo's task. Stories specced before
+this change carry no `feature-doc` checkbox and close without one — that is the
+same backfill debt, handled the same way.
+
+Out of scope: a backfill/migration skill of any shape; retroactively writing
+feature docs in this repo (it has no stories); changing how tasks archive; any
+change to the six test categories or the tier ladder.
 
 ## Key Files
 
