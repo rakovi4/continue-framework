@@ -18,17 +18,20 @@ Spec phase: `/interview` → story spec (dispatched by `/continue` via its inter
 
 ## Where the Current State Lives
 
-**The acceptance suite is the current-state documentation of what the product does.** It is grouped by functionality rather than by story, each test carries its Gherkin scenario in its display annotation, it is black-box (HTTP and browser only, so it describes externally observable behavior), and it is self-correcting: when a later increment changes a behavior, the earlier test is rewritten or the build goes red — an outdated behavior makes the build red, never a document quietly stale. So a reader asking *what does this area do today* reads the acceptance tests **of the area it is about to touch** — test class names, scenario descriptions, Statements — and never sweeps story folders to reconstruct the present.
+**The acceptance suite is the current-state documentation of what the product does.** It is grouped by functionality rather than by story, each test carries its Gherkin scenario in its scenario description (a display annotation, a subtest name, or a docstring — per the tech binding), it is black-box (HTTP and browser only, so it describes externally observable behavior), and it is self-correcting: when a later increment changes a behavior, the earlier test is rewritten or the build goes red — an outdated behavior makes the build red, never a document quietly stale. So a reader asking *what does this area do today* reads the acceptance tests **of the area it is about to touch** — test class names, scenario descriptions, Statements — and never sweeps story folders to reconstruct the present.
 
-**A story folder is a delta plus its rationale**, not a description of the present. It holds one increment: the story spec, `interview.md`, `decisions/*-decision.md`, and `tests/tier3/`. When the same functionality is extended by a later story, no single folder answers "what does this do now" — the later delta supersedes the earlier one and neither says so. Read a story folder for a **named** precedent (the decision behind a specific rule, the interview behind a specific constraint), never as a sweep.
+**Read only the enabled tests.** A test still carrying its disable/skip marker is a pending increment — a `red-acceptance` awaiting its green, or an unharvested Tier 2 scenario — not shipped behavior. It is the one part of the suite that *can* go quietly stale, because a disabled test never makes the build red. And in a repo with no acceptance suite yet, say so explicitly and fall back to the story folders — never degrade to a silent sweep.
 
-Three things the suite genuinely cannot hold, each with an existing home:
+**A story folder is a delta plus its rationale**, not a description of the present. It holds one increment: the story spec, `interview.md`, `mockups/`, `endpoints.md`, `decisions/*-decision.md`, and `tests/` (including `tier3/`). When the same functionality is extended by a later story, no single folder answers "what does this do now" — the later delta supersedes the earlier one and neither says so. Read a story folder for a **named** precedent (the decision behind a specific rule, the interview behind a specific constraint), never as a sweep. The one artifact in there that is *not* frozen at story close is `mockups/`, which later work backports into — see the table below.
+
+What the suite genuinely cannot hold, each with an existing home:
 
 | Not in the suite | Why | Where it lives |
 |---|---|---|
 | Deliberate non-goals ("we do not do X") | No test asserts the absence of something unbuilt | The story spec — correctly historical, a decision of that moment |
 | Rationale (why a limit is *that* number) | A test states the rule, not the argument for it | `decisions/*-decision.md` and `interview.md` in the story folder |
 | Tier 3 scenarios | Recorded and never built, so absent from the code by definition | `tests/tier3/` |
+| The UI's visual design (layout, spacing, color) | A browser test asserts behavior and content, never pixels | `ProductSpecification/ui/ui-conventions.md`, the cross-story design authority, plus the owning story's `mockups/` — read as the current design reference, kept current by backporting |
 
 **Rejected, on purpose:** a consolidated `ProductSpecification/features/{slug}.md` layer, folded in by a `feature-doc` work unit at story close — dropped because prose duplicating executable behavior is a second, unchecked surface that drifts the moment someone edits a test and not the doc.
 
