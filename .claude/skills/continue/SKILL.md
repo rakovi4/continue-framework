@@ -27,7 +27,7 @@ The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/r
 
 | Argument | Resolution |
 |----------|------------|
-| `task N` | Find `ProductSpecification/tasks/N-*/progress.md`, then `ProductSpecification/tasks/done/N-*/progress.md` (a QA task is revived from the archive to run a new session) |
+| `task N` | Find `ProductSpecification/tasks/N-*/progress.md`, then `ProductSpecification/tasks/done/N-*/progress.md`. A **QA** task resolved from the archive is a *revival*, not a resume: move its folder back out of `tasks/done/` and reset its checkboxes before dispatching (`.claude/guidelines/workflow-detail.md`, "QA Task Sequence"). Any other work item that resolves with no `[ ]`/`[~]` left is complete -- report that and STOP without dispatching |
 | Bare number or name | Resolve story via `ProductSpecification/stories.md`, then `ProductSpecification/stories/NN-story-name/progress.md`, then `ProductSpecification/stories/done/NN-story-name/progress.md` |
 | No argument | Scan recent git log for `Story N` or `Task N` references; most recent wins |
 
@@ -127,7 +127,10 @@ unit already archived the item, reopen it in the same `review-fix:` commit — m
 out of `done/` (`stories/done/NN-story-name/` → `stories/NN-story-name/`, or `tasks/done/{N}-…/` →
 `tasks/{N}-…/`) **and**, for a story, move its row back from the **Done** table to **In Progress**.
 Both halves of the completion fact reverse together, exactly as step 11 landed them together;
-reversing only the row leaves a folder in `done/` that the plan says is still open.
+reversing only the row leaves a folder in `done/` that the plan says is still open. The reverse
+move also reverses the depth: re-point the story's mockups' `<script src>` prefixes back to the
+shallower level in the same commit (`.claude/templates/ui/mockup-generation-rules.md`, "Script
+import path") — the reopen breaks them in the opposite direction, and just as silently.
 Untiered stories are unchanged. Why, and the `tier3/` exit:
 `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
 
@@ -152,7 +155,7 @@ discarding an un-committed fix is not a revert; a landed commit is never reverte
 
 ## Pre-Commit Checklist
 
-Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the boundary test was evaluated against the **staged** progress.md, and in a boundary unit the triage predicate was evaluated and — on RUN — the two passes ran over the boundary range, (6) in a boundary unit, any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit archives the work item's folder to `done/` -- a task to `ProductSpecification/tasks/done/`, a story to `ProductSpecification/stories/done/` in the same commit as its **Done**-table row move -- verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit. If `/refactor` was skipped, or a boundary's triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
+Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the boundary test was evaluated against the **staged** progress.md, and in a boundary unit the triage predicate was evaluated and — on RUN — the two passes ran over the boundary range, (6) in a boundary unit, any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit archives the work item's folder to `done/` -- a task to `ProductSpecification/tasks/done/`, a story to `ProductSpecification/stories/done/` in the same commit as its **Done**-table row move -- verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit -- and, when the moved folder contains `mockups/`, that no `<script src>` still carries the pre-move depth. If `/refactor` was skipped, or a boundary's triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
 
 ## Sub-Skill Dispatch
 

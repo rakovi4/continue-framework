@@ -34,7 +34,7 @@ Generate OpenAPI 3.0.3 specifications for frontend endpoints in a story.
 
 2. Parse user input to find target story (by name, number, or interactive)
 
-3. Read the **target** story's folder: `NN_StoryName.md` (specification), `mockups/` (UI mockups — the fields each screen needs), `interview.md` if it exists (authoritative source for API details)
+3. Read the **target** story's folder — `stories/NN-story-name/` first, then `stories/done/NN-story-name/` (`.claude/rules/workflow.md`, "Resolving a story folder"), since an unresolved archived folder reads exactly like a story with no interview: `NN_StoryName.md` (specification), `mockups/` (UI mockups — the fields each screen needs), `interview.md` if it exists (authoritative source for API details)
 
 4. Read what the areas this story touches already expose — the **acceptance tests of those areas**, for their request/response shapes, status codes and Statements. Never sweep `stories/*/mockups/` or `stories/*/interview.md` to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not a live endpoint. Where the suite is silent about an area, read that area's controllers and say what you found — silence is not evidence that no endpoint exists. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's `interview.md` or `decisions/*-decision.md` only for a **named** precedent — the rule behind an existing response shape — resolving it under `stories/` or `stories/done/`, since the story that set the shape has usually closed (`.claude/rules/workflow.md`, "Resolving a story folder")
 

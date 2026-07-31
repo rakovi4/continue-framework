@@ -61,9 +61,14 @@ From `stories/done/NN-story-name/mockups/desktop/`, one level deeper, it is
 (`.claude/rules/workflow.md`, "Resolving a story folder") therefore invalidates every
 prefix in its mockups: the old path resolves to `ProductSpecification/stories/ui/…`,
 which does not exist, and the components silently fail to render — under `file://`
-there is no error anyone sees, only an unstyled page. `/continue` re-points them in the
-same commit as the archive move; a mockup backported into an already-archived story is
-written at the deeper prefix from the start.
+there is no error anyone sees, only an unstyled page. The reverse move breaks it
+symmetrically — coming back out of `done/`, the deeper prefix resolves above
+`ProductSpecification/`. **The depth follows the folder in both directions**: `/continue`
+re-points the prefixes in the same commit as the archive move, and back again in the
+`review-fix:` commit that reopens a story out of `done/`. After either move, grep the
+moved `mockups/` for `src="../../../../ui/` and confirm the depth matches where the
+folder now sits. A mockup backported into an already-archived story is written at the
+deeper prefix from the start.
 
 **Rules:**
 - Always show all 4 stat cards. Use `0` for unavailable values, descriptive sub-text for context.
