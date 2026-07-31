@@ -24,9 +24,11 @@ Before generating any specification, read and understand:
 5. **What the areas this story touches already do**: the acceptance tests **of those
    areas** — test class names, scenario descriptions, Statements — never a sweep of
    `stories/*/NN_StoryName.md`, which reconstructs the present from a pile of deltas
-   (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is
-   silent about an area, read that area's production code and record what you found —
-   silence is not evidence of absence. In a repo with no acceptance suite yet, say so
+   (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests
+   count as shipped — one still carrying its disable/skip marker is a pending increment,
+   not shipped behavior. Where the suite is silent about an area, read that area's
+   production code and note what you found in the Notes file, never as current-state prose
+   in the spec itself — silence is not evidence of absence. In a repo with no acceptance suite yet, say so
    explicitly and fall back to the story folders. Open an earlier story's spec only for
    a **named** precedent: the deliberate non-goal or the decision this story extends or
    contradicts

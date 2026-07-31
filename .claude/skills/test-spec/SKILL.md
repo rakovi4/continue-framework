@@ -21,11 +21,11 @@ are implemented in that order, Tier 3 is recorded in `tests/tier3/` and never bu
 
 ### Phase 1: Context & Story Selection
 
+Parse input first — by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask) — since the reads below are scoped to the resolved story and the areas it touches.
+
 Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, and the **target** story's folder: `mockups/`, its spec `*.md`, `endpoints.md`, `interview.md`.
 
-For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends.
-
-Parse input: by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask).
+For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not shipped behavior. Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends.
 
 If `interview.md` exists, extract:
 - Business rules and constraints → map to API test scenarios

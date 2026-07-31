@@ -18,7 +18,7 @@ Conduct a structured interview with the user to gather all context needed for a 
 
 ### Phase 1: Context Gathering (Silent)
 
-Before asking any questions, silently read:
+Before asking any questions, silently read. **Resolve the target story first** (Phase 2's parse step) — items 4, 6, 9 and 10 are scoped to it and cannot be read before it is known:
 
 1. **Story mapping**: `ProductSpecification/stories.md`
 2. **Product description**: `ProductSpecification/BriefProductDescription.md`
@@ -28,7 +28,7 @@ Before asking any questions, silently read:
 6. **A named precedent, if this story has one**: the `interview.md` or `decisions/*-decision.md` of the *specific* earlier story whose decision this one extends or contradicts. Never all `stories/*/interview.md` — that sweep reconstructs the present from a pile of deltas; item 9 answers that question instead
 7. **Existing domain code**: Scan `backend/domain/src/` and `backend/usecase/src/`
 8. **Existing adapters**: Scan `backend/adapters/*/src/`
-9. **What the areas this story touches already do**: the acceptance tests **of those areas** — test class names, scenario descriptions, Statements. This is the current state, not the story folders (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is silent about an area, read that area's production code (items 7-8) and say so in the interview — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders
+9. **What the areas this story touches already do**: the acceptance tests **of those areas** — test class names, scenario descriptions, Statements. This is the current state, not the story folders (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not shipped behavior. Where the suite is silent about an area, read that area's production code and say so in the interview — items 7-8 for a backend behavior, the frontend source for a UI-only one, which Phase 1 does not otherwise scan; silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders
 10. **Existing test cases doc** (if any): `ProductSpecification/stories/NN-story-name/tests/01_API_Tests.md`
 
 ### Phase 2: Story Selection
