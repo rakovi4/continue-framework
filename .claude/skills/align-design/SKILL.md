@@ -18,7 +18,7 @@ Update a frontend component's appearance to match its HTML mockup exactly.
 ## Workflow
 
 1. Load `.claude/tech/{browser-testing}/templates/align-design-checklist.md`
-2. **Locate files**: find mockup in `ProductSpecification/stories/NN-story-name/mockups/desktop/` and component in `frontend/src/features/`
+2. **Locate files**: find mockup in `ProductSpecification/stories/NN-story-name/mockups/desktop/` — or `ProductSpecification/stories/done/NN-story-name/mockups/desktop/` when that story has closed (`.claude/rules/workflow.md`, "Resolving a story folder") — and component in `frontend/src/features/`
 3. **Extract design tokens**: work through every checklist item from the template
 4. **Compare and fix**: for each token, compare mockup value vs component value. Fix mismatches using the template's Common Mismatches table and Styling Approach.
 5. **Verify**: frontend build command, frontend test command (from `technology.md` Conventions), Selenium test if exists, visual check

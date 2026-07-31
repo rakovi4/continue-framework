@@ -25,6 +25,8 @@ Run this to persist what a future session would otherwise lose. `/handoff` runs 
 
 `{scenario-slug}` derives from the scenario heading in `progress.md`. Files are created lazily -- only on first append.
 
+**Resolve the story root before writing**: `stories/NN-story-name/` first, then `stories/done/NN-story-name/` (`.claude/rules/workflow.md`, "Resolving a story folder"). Write into the folder that resolved -- a work unit reopened after a boundary finding is under `stories/` again, and one recording a moment about an archived story writes beside that story's own summaries, never into a second folder re-created under `stories/`.
+
 ## Constraints
 
 The append-only, lazy-creation, idempotent, strict-format, and no-forward-looking-instructions rules are defined in `.claude/templates/workflow/summary-format.md` and `.claude/guidelines/workflow-detail.md` (Resuming Across Conversations). Apply them — do not restate them. `/handoff` is the sole writer of journey summaries and carryover; `/continue` only reads them.

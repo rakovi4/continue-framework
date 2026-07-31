@@ -10,7 +10,7 @@ table and generates no spec.
 ## Input (provided by the caller)
 
 - Story number and name, resolved via `ProductSpecification/stories.md`
-- Story folder: `ProductSpecification/stories/NN-story-name/`
+- Story folder: `ProductSpecification/stories/NN-story-name/` — the folder the story resolved to, which is `stories/done/NN-story-name/` for a story that has closed (`.claude/rules/workflow.md`, "Resolving a story folder"). Confirm both are empty before creating one: a spec generated into a second folder beside an archived original re-specs shipped behavior
 
 ## Phase 1: Context Gathering
 

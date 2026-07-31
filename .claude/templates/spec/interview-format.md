@@ -79,4 +79,9 @@ After each round, if the user's answers reveal topics not covered by the standar
 
 **Save to:** `ProductSpecification/stories/NN-story-name/interview.md`
 
-Create the story directory if it doesn't exist.
+Create the story directory if it doesn't exist — but only after confirming the story has
+no folder under `ProductSpecification/stories/done/` either (`.claude/rules/workflow.md`,
+"Resolving a story folder"). A completed story is archived, so a missing folder under
+`stories/` is not evidence of a new story; interviewing one that already shipped, in a
+second folder beside its archived original, splits its rationale across two places.
+**Reading** an earlier story's `interview.md` spans both locations.

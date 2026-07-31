@@ -42,7 +42,7 @@ Start every generated file with this header:
 ## 6. Additional Operations (PUT/DELETE)
 ```
 
-Reference: `ProductSpecification/stories/01-create-task/tests/01_API_Tests.md`
+Reference: `ProductSpecification/stories/01-create-task/tests/01_API_Tests.md` — an early story like this one is usually closed, so resolve it under `stories/done/01-create-task/` too (`.claude/rules/workflow.md`, "Resolving a story folder")
 
 ### Prerequisite Guard Checklist
 

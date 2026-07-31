@@ -1,6 +1,6 @@
 # ADR Format Template
 
-Save to `ProductSpecification/stories/NN-story-name/decisions/{slug}-decision.md`.
+Save to `ProductSpecification/stories/NN-story-name/decisions/{slug}-decision.md` — the folder the story resolved to, which is `stories/done/NN-story-name/` for a story reopened after it closed (`.claude/rules/workflow.md`, "Resolving a story folder"). **Reading** an earlier story's decision record spans both locations: a closed story is exactly where the rationale for live behavior lives, and it is the archive that holds most of it.
 
 Absolute minimum. If an agent can infer it — omit it. No code snippets, no implementation steps, no prose that restates the obvious.
 

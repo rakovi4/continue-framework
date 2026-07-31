@@ -14,7 +14,7 @@ description: Review frontend component for hardcoded mockup placeholder data aft
 
 ## File Resolution
 
-1. **By story number**: Read `ProductSpecification/stories.md` to resolve story name → find `ProductSpecification/stories/NN-story-name/mockups/desktop/*.html` for the mockup and `frontend/src/features/{feature}/components/*.tsx` for the component
+1. **By story number**: Read `ProductSpecification/stories.md` to resolve story name → find `ProductSpecification/stories/NN-story-name/mockups/desktop/*.html` for the mockup, falling back to `ProductSpecification/stories/done/NN-story-name/mockups/desktop/*.html` for a story in the **Done** table (`.claude/rules/workflow.md`, "Resolving a story folder"), and `frontend/src/features/{feature}/components/*.tsx` for the component
 2. **By component path**: Find the component directly, locate the matching mockup from the story directory
 3. **Interactive**: Read current story's `progress.md`, find the active `align-design` step, resolve from there
 

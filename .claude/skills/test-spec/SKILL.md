@@ -25,7 +25,7 @@ Parse input first — by name (`"Login/Logout"`), by number (`5`), or interactiv
 
 Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, and the **target** story's folder: `mockups/`, its spec `*.md`, `endpoints.md`, `interview.md`.
 
-For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not shipped behavior. Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends.
+For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not shipped behavior. Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends — under `stories/` or `stories/done/`, a closed story being the usual home of a settled rule (`.claude/rules/workflow.md`, "Resolving a story folder").
 
 If `interview.md` exists, extract:
 - Business rules and constraints → map to API test scenarios
@@ -41,7 +41,7 @@ If `interview.md` exists, extract:
 
 Load `.claude/templates/spec/test-spec-format.md` for category formats, ordering principles, and BDD rules.
 
-Create files in `ProductSpecification/stories/NN-story-name/tests/`:
+Create files in the `tests/` directory of the folder the story resolved to — `ProductSpecification/stories/NN-story-name/tests/`, or `stories/done/NN-story-name/tests/` for a story that has closed (`.claude/rules/workflow.md`, "Resolving a story folder"):
 - `01_API_Tests.md`, `02_UI_Tests.md`, `03_Load_Tests.md`
 - `04_Infrastructure_Tests.md`, `05_Security_Tests.md`, `06_Integration_Tests.md`
 
