@@ -102,8 +102,14 @@ story already in **Done** when a repo adopts the rule predates it and keeps its 
 `stories/`. The one-time fix is a sweep, not a mechanism: for each **Done** row whose folder is
 still under `stories/`, `git mv` it into `stories/done/` — re-pointing its mockups' `<script src>`
 prefixes for the added depth (`.claude/templates/ui/mockup-generation-rules.md`, "Script import
-path") — in a single commit. Run it once, when adopting; after that the completion commit above
-keeps the invariant true on its own.
+path") — in a single commit. The move invalidates more than those prefixes: after the `git mv`,
+grep the repo for `ProductSpecification/stories/` outside `stories/done/` and re-point every
+literal reference an archived story just orphaned — a decision record, an `interview.md`, a
+`carryover.md`. Markdown has no build to go red, so a dangling precedent link degrades silently
+into "no precedent exists", which is exactly the invented-second-guard failure the current-state
+rule exists to prevent. Run it once, when adopting, **as its own commit** — never folded into a
+work unit's behavior commit; `/framework-sync`'s **Next Steps** is where an adopting repo is told
+to run it. After that the completion commit above keeps the invariant true on its own.
 
 ## When to update
 
