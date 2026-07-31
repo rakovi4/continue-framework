@@ -16,6 +16,22 @@ Those six scenario types are the **categories**, not the delivery order. In a ti
 
 Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding).
 
+## Where the Current State Lives
+
+**The acceptance suite is the current-state documentation of what the product does.** It is grouped by functionality rather than by story, each test carries its Gherkin scenario in its display annotation, it is black-box (HTTP and browser only, so it describes externally observable behavior), and it is self-correcting: when a later increment changes a behavior, the earlier test is rewritten or the build goes red — an outdated behavior makes the build red, never a document quietly stale. So a reader asking *what does this area do today* reads the acceptance tests **of the area it is about to touch** — test class names, scenario descriptions, Statements — and never sweeps story folders to reconstruct the present.
+
+**A story folder is a delta plus its rationale**, not a description of the present. It holds one increment: the story spec, `interview.md`, `decisions/*-decision.md`, and `tests/tier3/`. When the same functionality is extended by a later story, no single folder answers "what does this do now" — the later delta supersedes the earlier one and neither says so. Read a story folder for a **named** precedent (the decision behind a specific rule, the interview behind a specific constraint), never as a sweep.
+
+Three things the suite genuinely cannot hold, each with an existing home:
+
+| Not in the suite | Why | Where it lives |
+|---|---|---|
+| Deliberate non-goals ("we do not do X") | No test asserts the absence of something unbuilt | The story spec — correctly historical, a decision of that moment |
+| Rationale (why a limit is *that* number) | A test states the rule, not the argument for it | `decisions/*-decision.md` and `interview.md` in the story folder |
+| Tier 3 scenarios | Recorded and never built, so absent from the code by definition | `tests/tier3/` |
+
+**Rejected, on purpose:** a consolidated `ProductSpecification/features/{slug}.md` layer, folded in by a `feature-doc` work unit at story close — dropped because prose duplicating executable behavior is a second, unchecked surface that drifts the moment someone edits a test and not the doc.
+
 ## Scenario Sequences
 
 Each scenario type (backend, integration, frontend, security, load, infrastructure) runs a TDD cycle: a `red-* → /test-review → commit → /refactor → commit` work unit, then a `green-* → /test-coverage → commit → /refactor → commit` work unit, one scenario at a time. `/refactor` always lands in its own commit, separate from the behavior commit (see Atomic Work Units below and the Commit Discipline section of `.claude/guidelines/tdd-rules.md`). The exact per-phase step list for each scenario type, the `adapters-discovery` gate, and the bug-task discovery-first sequence live in **`.claude/guidelines/workflow-detail.md`** — read it before executing scenario or task work.
