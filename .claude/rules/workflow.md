@@ -43,7 +43,7 @@ Each scenario type (backend, integration, frontend, security, load, infrastructu
 
 ## Progress Tracking
 
-Each story has a progress file at `ProductSpecification/stories/NN-story-name/progress.md`; each task at `ProductSpecification/tasks/{N}-{type}-{slug}/progress.md`. It is the single source of truth for **state** — which work unit runs next.
+Each story has a progress file at `ProductSpecification/stories/NN-story-name/progress.md` — or `ProductSpecification/stories/done/NN-story-name/progress.md` once the story is archived; each task at `ProductSpecification/tasks/{N}-{type}-{slug}/progress.md`, likewise under `tasks/done/` once archived. It is the single source of truth for **state** — which work unit runs next.
 
 Status markers:
 
