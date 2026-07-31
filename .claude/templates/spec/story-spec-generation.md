@@ -21,7 +21,15 @@ Before generating any specification, read and understand:
 3. **Expected load**: `ProductSpecification/ExpectedLoad.md`
 4. **Archived drafts**: `ProductSpecification/Archived/DraftStories/1st-iteration/`
    — find the draft related to this story, if one exists
-5. **Existing specifications**: `ProductSpecification/stories/*/NN_StoryName.md`
+5. **What the areas this story touches already do**: the acceptance tests **of those
+   areas** — test class names, scenario descriptions, Statements — never a sweep of
+   `stories/*/NN_StoryName.md`, which reconstructs the present from a pile of deltas
+   (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is
+   silent about an area, read that area's production code and record what you found —
+   silence is not evidence of absence. In a repo with no acceptance suite yet, say so
+   explicitly and fall back to the story folders. Open an earlier story's spec only for
+   a **named** precedent: the deliberate non-goal or the decision this story extends or
+   contradicts
 6. **Story-specific context** (optional): `ProductSpecification/stories/NN-story-name/interview.md`
    - If present, read it for additional context, external documentation, and special instructions
 

@@ -25,10 +25,10 @@ Before asking any questions, silently read:
 3. **Expected load**: `ProductSpecification/ExpectedLoad.md`
 4. **Existing story spec** (if any): `ProductSpecification/stories/NN-story-name/NN_StoryName.md`
 5. **Archived drafts**: `ProductSpecification/Archived/DraftStories/1st-iteration/` (scan for relevant files)
-6. **Existing interviews**: ALL existing `ProductSpecification/stories/*/interview.md` files
+6. **A named precedent, if this story has one**: the `interview.md` or `decisions/*-decision.md` of the *specific* earlier story whose decision this one extends or contradicts. Never all `stories/*/interview.md` — that sweep reconstructs the present from a pile of deltas; item 9 answers that question instead
 7. **Existing domain code**: Scan `backend/domain/src/` and `backend/usecase/src/`
 8. **Existing adapters**: Scan `backend/adapters/*/src/`
-9. **Existing acceptance tests**: Scan `acceptance/`
+9. **What the areas this story touches already do**: the acceptance tests **of those areas** — test class names, scenario descriptions, Statements. This is the current state, not the story folders (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is silent about an area, read that area's production code (items 7-8) and say so in the interview — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders
 10. **Existing test cases doc** (if any): `ProductSpecification/stories/NN-story-name/tests/01_API_Tests.md`
 
 ### Phase 2: Story Selection

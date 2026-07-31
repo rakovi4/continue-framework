@@ -21,7 +21,9 @@ are implemented in that order, Tier 3 is recorded in `tests/tier3/` and never bu
 
 ### Phase 1: Context & Story Selection
 
-Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, story folder (`stories/*/`): mockups, `*.md`, `endpoints.md`, `interview.md`.
+Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, and the **target** story's folder: `mockups/`, its spec `*.md`, `endpoints.md`, `interview.md`.
+
+For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends.
 
 Parse input: by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask).
 
