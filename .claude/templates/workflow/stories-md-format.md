@@ -91,16 +91,11 @@ Progress** to **Done**, keeping every column value intact.
 **The row move and the folder move are one act.** The same behavior commit that lands the
 row in **Done** also archives the story folder:
 `ProductSpecification/stories/NN-story-name/` → `ProductSpecification/stories/done/NN-story-name/`,
-under the same staged-`progress.md` gate the task archive uses (`/continue` SKILL.md step 11 —
-stage `progress.md`, confirm the advance is in the staged blob and zero `[ ]`/`[~]` remain, only
-then `git mv`). Both halves or neither: a row in **Done** whose folder still sits beside the
-active ones, or an archived folder whose row still reads In Progress, is a half-closed story that
-no single file reports as wrong. A mid-cycle review finding that reopens the story reverses both
-in its `review-fix:` commit.
-
-Archiving hides nothing: `stories/done/` is read exactly like `stories/` for a closed story's
-rationale — its `decisions/*-decision.md`, its `interview.md`, its spec's non-goals — so a lookup
-that resolves a story by number or name checks both locations.
+under the same staged-`progress.md` gate the task archive uses (`/continue` SKILL.md step 11).
+Both halves or neither: a row in **Done** whose folder still sits beside the active ones, or an
+archived folder whose row still reads In Progress, is a half-closed story that no single file
+reports as wrong. A mid-cycle review finding that reopens the story reverses both in its
+`review-fix:` commit.
 
 ## When to update
 
