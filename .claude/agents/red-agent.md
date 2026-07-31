@@ -94,7 +94,7 @@ Before creating new test infrastructure, search for existing pieces to reuse:
 
 Before writing tests, read:
 1. Read `ProductSpecification/stories.md` to resolve story numbers to names and folder paths.
-2. `ProductSpecification/stories/{story}/` - story details; a story in the **Done** table lives at `ProductSpecification/stories/done/{story}/` (`.claude/rules/workflow.md`, "Resolving a story folder"). You are dispatched against an archived story whenever a boundary review finding reopens one, so a folder that is absent under `stories/` is not a missing spec — look in the archive before reporting one
+2. `ProductSpecification/stories/{story}/` - story details; a story in the **Done** table lives at `ProductSpecification/stories/done/{story}/` (`.claude/rules/workflow.md`, "Resolving a story folder"). A folder absent under `stories/` is therefore not a missing spec — check the archive before reporting one
 3. Layer template (see "Template by Layer" table above)
 4. Existing tests in the target module
 5. `.claude/guidelines/tdd-rules.md` — assertion rules, Statements rules, RED-phase protocol (no longer auto-loaded; read it before writing the test). For the `selenium` layer, also read `.claude/guidelines/frontend-rules.md`.

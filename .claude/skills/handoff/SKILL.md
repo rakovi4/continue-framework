@@ -25,7 +25,7 @@ Run this to persist what a future session would otherwise lose. `/handoff` runs 
 
 `{scenario-slug}` derives from the scenario heading in `progress.md`. Files are created lazily -- only on first append.
 
-**Resolve the story root before writing**: `stories/NN-story-name/` first, then `stories/done/NN-story-name/` (`.claude/rules/workflow.md`, "Resolving a story folder"). Write into the folder that resolved -- a work unit reopened after a boundary finding is under `stories/` again, and one recording a moment about an archived story writes beside that story's own summaries, never into a second folder re-created under `stories/`.
+**Resolve the story root before writing**: `stories/NN-story-name/` first, then `stories/done/NN-story-name/` (`.claude/rules/workflow.md`, "Resolving a story folder"). Write into the folder that resolved -- a moment recorded about an archived story writes beside that story's own summaries, never into a second folder re-created under `stories/`.
 
 ## Constraints
 
