@@ -18,7 +18,7 @@
 
 - Test example: `backend/adapters/storage/src/test/java/com/example/storage/access/task/H2TaskStorageSaveTest.java`
 - H2Test interface: `backend/adapters/storage/src/test/java/com/example/storage/H2Test.java`
-- Storage example: `backend/adapters/storage/src/main/java/com/example/storage/access/user/H2TaskStorage.java`
+- Storage example: `backend/adapters/storage/src/main/java/com/example/storage/access/task/H2TaskStorage.java`
 - Entity example: `backend/adapters/storage/src/main/java/com/example/storage/entity/task/TaskEntity.java`
 
 ## Naming Convention

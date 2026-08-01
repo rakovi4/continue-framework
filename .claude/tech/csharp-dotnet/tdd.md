@@ -65,7 +65,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — C#/ASP.NET Core Specifics
 
-- DB adapter tests: `WebApplicationFactory<T>` with test database + transaction rollback or fixture cleanup
+- Storage adapter tests: `WebApplicationFactory<T>` with test database + transaction rollback or fixture cleanup
 - REST adapter tests: `WebApplicationFactory<T>` + `HttpClient` from test server
 - Mocking: `Moq` (`Mock<T>`) or `NSubstitute` (`Substitute.For<T>()`). Reset before each test via constructor (xUnit creates new instance per test) or `[SetUp]` (NUnit)
 - Fakes: plain C# classes implementing port interfaces with in-memory `Dictionary` or `List` storage

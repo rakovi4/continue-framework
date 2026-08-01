@@ -65,7 +65,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — Python/Django Specifics
 
-- DB adapter tests: `@pytest.mark.django_db` with `TransactionTestCase` or fixture-based cleanup
+- Storage adapter tests: `@pytest.mark.django_db` with `TransactionTestCase` or fixture-based cleanup
 - REST adapter tests: Django `TestClient` or `APIClient` (DRF)
 - Mocking: `unittest.mock.Mock()` / `MagicMock()` for mocks. Reset before each test via fixture or `mock.reset_mock()`
 - Fakes: plain Python classes implementing port protocols with in-memory `dict` or `list` storage

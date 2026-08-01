@@ -67,7 +67,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — Go Specifics
 
-- DB adapter tests: use test database with transaction rollback or table truncation cleanup
+- Storage adapter tests: use test database with transaction rollback or table truncation cleanup
 - HTTP adapter tests: `httptest.NewServer` or `httptest.NewRecorder` with chi router
 - Mocking: `testify/mock` for mocks, or hand-written fakes implementing port interfaces (preferred for Clean Architecture)
 - Fakes: plain Go structs implementing port interfaces with in-memory `map` or `[]T` storage

@@ -67,7 +67,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation — Node/Express Specifics
 
-- DB adapter tests: use test database with transaction rollback or truncation cleanup
+- Storage adapter tests: use test database with transaction rollback or truncation cleanup
 - REST adapter tests: `supertest` with the Express app instance
 - Mocking: `jest.fn()` / `vi.fn()` for mocks. Reset before each test via `beforeEach(() => { jest.clearAllMocks() })` or `vi.clearAllMocks()`
 - Fakes: plain TypeScript classes implementing port interfaces with in-memory `Map` or `Array` storage

@@ -66,7 +66,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 
 ## Test Data & Isolation -- PHP/Laravel Specifics
 
-- DB adapter tests: `use RefreshDatabase` trait or `DatabaseTransactions` trait
+- Storage adapter tests: `use RefreshDatabase` trait or `DatabaseTransactions` trait
 - REST adapter tests: Laravel `TestCase` with `$this->getJson()`, `$this->postJson()` etc.
 - Mocking: `Mockery::mock()` for mocks. Reset via `Mockery::close()` in `tearDown()` or automatic with `MockeryPHPUnitIntegration` trait
 - Fakes: plain PHP classes implementing port interfaces with in-memory `array` storage
