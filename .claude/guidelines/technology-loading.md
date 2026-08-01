@@ -20,7 +20,7 @@ Agents and skills resolve the correct concern based on the layer they operate on
 
 | Layer / Skill context | Concern key |
 |-----------------------|-------------|
-| Domain, usecase, application, REST adapter, DB adapter, email adapter, scheduling | `backend` |
+| Domain, usecase, application, REST adapter, storage adapter, email adapter, scheduling | `backend` |
 | Frontend logic, API clients, feature structure | `frontend` |
 | Component styling, CSS extraction, icons | `css` |
 | Selenium/browser tests, align-design, design-review | `browser-testing` |
