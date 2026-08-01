@@ -4,6 +4,22 @@ How `/continue` derives a story's `progress.md` when none exists. The file's sha
 is in [`progress-format.md`](progress-format.md); this file is the derivation.
 Tasks are never bootstrapped — `/task` generates everything at creation time.
 
+## Precondition: the story genuinely has no folder
+
+Bootstrapping fires on absence, so absence must be established in **both** locations:
+`ProductSpecification/stories/NN-story-name/` **and**
+`ProductSpecification/stories/done/NN-story-name/` (`.claude/rules/workflow.md`,
+"Resolving a story folder"). A hit in either is the story — read its `progress.md` and
+derive nothing.
+
+This is not a courtesy check. A completed story is archived, so a resolver that looks
+only under `stories/` reports every shipped story as missing, and the derivation below
+is what happens next: it re-creates the folder under `stories/`, emits an all-`[ ]`
+`## Spec` section (step 1's `tests/`-absent case, since the real `tests/` are in the
+archive), and sends `/continue` to re-run `/interview` and the story spec over behavior
+that already shipped. The bootstrap has no way to notice — every signal it reads is
+genuinely absent from the path it was given.
+
 ## Procedure
 
 1. **Detect spec artifacts** in the story directory:

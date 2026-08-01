@@ -24,6 +24,12 @@ set and is never tiered.
 ## Scope by story state
 
 Classify **every** folder under `ProductSpecification/stories/` first, then act.
+**Never descend into `ProductSpecification/stories/done/`, and never classify `done/`
+itself as a story folder.** This is the one deliberate exception to resolving both
+locations (`.claude/rules/workflow.md`, "Resolving a story folder"): everything in the
+archive is complete, which is already the **Skip** row below — reaching it by walking the
+archive would only re-derive that answer, while treating `done/` as a story would put a
+non-story on the classification path at all.
 **Test the rows in order; the first match wins** — a Done story's `tests/` exist and
 its checkboxes are `[x]`, so it matches the last two rows too, and only row order
 keeps it out of them.

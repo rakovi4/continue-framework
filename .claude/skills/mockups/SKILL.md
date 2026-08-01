@@ -26,6 +26,8 @@ Read these files before generating anything:
 6. Landing page: `Landing/index.html` (brand reference)
 7. If exists: `ProductSpecification/stories/NN-story-name/interview.md`
 
+Items 5 and 7 resolve `stories/` first, then `stories/done/` (`.claude/rules/workflow.md`, "Resolving a story folder") -- a story that later work backports a mockup into has usually closed since. Where the generated files land is Phase 4's template, "Output Location".
+
 ## Phase 2: Story Selection
 
 Parse user input (by name, by number, or interactive).

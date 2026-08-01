@@ -96,3 +96,9 @@ Default upstream: `https://github.com/rakovi4/continue-framework` (branch `main`
    arrived). The merged prompts read per-repo `Tier:` markers that no diff can carry, and
    nothing else writes them (`.claude/skills/retier/SKILL.md`). It commits per story, so it
    never rides the sync commit.
+4. **The story-archive backfill** — **once**, if this merge brought the archive rule in
+   (`.claude/rules/workflow.md`, "A repo adopting this rule backfills once") and `stories.md`
+   has **Done** rows whose folders are still under `stories/`. Those folders predate the rule,
+   no diff can move them, and this sync may not touch them — product specification is outside
+   the sync surface. The sweep is in `.claude/templates/workflow/stories-md-format.md`,
+   "Backfilling an adopting repo". It lands as its own commit, so it never rides the sync commit.

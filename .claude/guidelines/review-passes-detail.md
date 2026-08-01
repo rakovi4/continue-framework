@@ -189,9 +189,10 @@ after it, so on a work item's final unit a finding may need steps in a plan alre
 declared complete — in a folder `/continue`'s resolver no longer matches. That final unit
 is always a boundary, so this is no longer the rare case it was under per-unit cadence: a
 bug task, whose entire fix is one block, meets it on the only pass it ever runs. Then the
-`review-fix:` commit that lands the steps also reopens the item: the task folder comes back
-out of `done/`, or the story row back to In Progress, and the newcomer's first step becomes
-the plan's only `[~]`. Reopening is honest about what happened; leaving the steps in a
+`review-fix:` commit that lands the steps also reopens the item: the item comes back out of
+`done/` — for a story its **Done**-table row returns to **In Progress** in the same commit as
+the folder, both halves of the completion fact reversing together — and the newcomer's first
+step becomes the plan's only `[~]`. Reopening is honest about what happened; leaving the steps in a
 done-flipped plan makes them unreachable, which is how a surfaced finding turns into a
 silently dropped one.
 

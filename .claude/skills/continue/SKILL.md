@@ -9,7 +9,7 @@ description: Continue working on a story or task by reading progress.md, executi
 
 1. **Identify work item** from argument
 2. **Backlog promotion** -- if the story row is in the **Backlog** table in `ProductSpecification/stories.md`, move it to **In Progress** before proceeding
-3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`)
+3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`). **Missing means both locations came back empty** — resolve `ProductSpecification/stories/NN-story-name/` *and* `ProductSpecification/stories/done/NN-story-name/` before the bootstrap may fire (`.claude/rules/workflow.md`, "Resolving a story folder"); a hit in either is the story, so read its `progress.md` and bootstrap nothing. What an unchecked bootstrap does to an already-shipped story is in the template's "Precondition: the story genuinely has no folder"
 4. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the next step is the first `[~]` or `[ ]` entry
 5. **Read journey context** -- read `carryover.md` (story root, if it exists) and the current scenario's summary file (`summaries/{scenario-slug}.md`, if it exists). Treat both as additional context for the work unit -- they preserve predictions, decisions, surprises, and quirks from prior conversations. `/continue` only READS these files; it never writes them (the `/handoff` skill is the sole writer).
 6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
@@ -17,9 +17,9 @@ description: Continue working on a story or task by reading progress.md, executi
 8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, read usecase constructor to identify ports and map to adapters (see `.claude/guidelines/workflow-detail.md`). Mark `[x] adapters-discovery`, insert concrete steps below it, commit progress.md. The bug-task `[ ] steps discovery` gate resolves the same way via its Work Unit Dispatch row -- run its hazard-catalogue fan-out, then insert the TDD steps.
 9. **Update progress** -- mark completed, advance next
 10. **Update stories.md** -- for stories only, update the phase columns in `ProductSpecification/stories.md` (see below)
-11. **Behavior commit** -- commit the work unit's behavior change (include progress.md, and `ProductSpecification/stories.md` for stories). Then gate the `done/` move on the **staged file**, not on what you believe you wrote: stage progress.md, confirm the advance is in the staged content, and confirm zero `[ ]`/`[~]` entries remain (`git diff --cached` on progress.md; `grep -c '^- \[[ ~]\]'` must be 0). Only then move the task folder to `ProductSpecification/tasks/done/` and include the move in this commit. An unstaged advance is the live failure mode -- editing progress.md and then `git mv`-ing the folder commits the rename carrying the *pre-edit* content, shipping a "task complete" commit whose source of truth still says in-progress.
+11. **Behavior commit** -- commit the work unit's behavior change (include progress.md, and `ProductSpecification/stories.md` for stories). Then gate the `done/` archive move on the **staged file**, not on what you believe you wrote: stage progress.md, confirm the advance is in the staged content, and confirm zero `[ ]`/`[~]` entries remain (`git diff --cached` on progress.md; `grep -c '^- \[[ ~]\]'` must be 0). Only then move the **work item's folder** into its `done/` archive and include the move in this commit: a task goes `ProductSpecification/tasks/{N}-{type}-{slug}/` → `ProductSpecification/tasks/done/`, a story goes `ProductSpecification/stories/NN-story-name/` → `ProductSpecification/stories/done/NN-story-name/`. Create the archive directory first if it is absent (`mkdir -p ProductSpecification/stories/done`) -- `git mv` does not create the destination's parent and fails fatally (`fatal: renaming ... No such file or directory`), stranding the unit with progress.md and stories.md already edited and nothing committed. The story move also adds one directory level, which invalidates the relative `<script src>` prefix inside its mockups -- re-point them in the same commit (`.claude/templates/ui/mockup-generation-rules.md`, "Script import path"). For a story the folder move rides the **same commit as the row move** from the **In Progress** table to the **Done** table in `stories.md` (step 10) -- one completion fact, two halves, both or neither. The gate governs **both** halves: evaluate it before step 10's row move is written, not only before the `git mv`. If it fails, neither half goes in this commit -- a **Done** row committed without its folder is exactly the half-closed story this rule exists to prevent. An unstaged advance is the live failure mode -- editing progress.md and then `git mv`-ing the folder commits the rename carrying the *pre-edit* content, shipping a "complete" commit whose source of truth still says in-progress.
 12. **Refactor batch (+ review passes at a boundary)** -- dispatch `/refactor`; land the refactor commit (`/refactor`'s changes only; skipped if it changed nothing). If this unit is a **boundary** and triage says RUN, dispatch the two review passes (`agent-review-agent` + `premortem-agent`) concurrently in the same batch, over the **boundary range** (see "Boundary Review Passes" below); they are non-gating -- collect their verdicts for the report. Skip `/refactor` for a progress-only behavior commit.
-13. **Triage & auto-fix (boundary units only)** -- partition the passes' tagged findings (SAFE / NEEDS_CYCLE / NEEDS_CLARIFICATION), quiz any NEEDS_CLARIFICATION after the passes return, apply the SAFE subset inline, and land a single trailing `review-fix:` commit (skipped when nothing is SAFE). Fold all verdicts into the stop-and-report.
+13. **Triage & auto-fix (boundary units only)** -- partition the passes' tagged findings (SAFE / NEEDS_CYCLE / NEEDS_CLARIFICATION), quiz any NEEDS_CLARIFICATION after the passes return, apply the SAFE subset inline, and land a single trailing `review-fix:` commit (skipped only when nothing SAFE survived **and** no mid-cycle finding inserted scenarios or reopened the item). Fold all verdicts into the stop-and-report.
 
 The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/rules/workflow.md`; the detailed scenario sequences, adapter-discovery procedure, progress mechanics, and task sequences are in `.claude/guidelines/workflow-detail.md`. Progress file format examples are in `.claude/templates/workflow/progress-format.md`.
 
@@ -27,11 +27,13 @@ The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/r
 
 | Argument | Resolution |
 |----------|------------|
-| `task N` | Find `ProductSpecification/tasks/N-*/progress.md` |
-| Bare number or name | Resolve story via `ProductSpecification/stories.md` then `ProductSpecification/stories/NN-story-name/progress.md` |
+| `task N` | Find `ProductSpecification/tasks/N-*/progress.md`, then `ProductSpecification/tasks/done/N-*/progress.md`. A **QA** task resolved from the archive is a *revival*, not a resume: move its folder back out of `tasks/done/` and reset its checkboxes before dispatching (`.claude/guidelines/workflow-detail.md`, "QA Task Sequence"). Any other work item that resolves with no `[ ]`/`[~]` left is complete -- report that and STOP without dispatching |
+| Bare number or name | Resolve story via `ProductSpecification/stories.md`, then `ProductSpecification/stories/NN-story-name/progress.md`, then `ProductSpecification/stories/done/NN-story-name/progress.md` |
 | No argument | Scan recent git log for `Story N` or `Task N` references; most recent wins |
 
-**File lookup:** Use `find` via Bash (not Glob) when searching for progress files or story folders. Glob is unreliable on Windows/MINGW with large `.gitignore` files. For story resolution, derive the folder name from `ProductSpecification/stories.md` — kebab-case the story name, treating punctuation as word separators (e.g., story 5 "Reset password" → `05-reset-password`; "Login/Logout" → `01-login-logout`) — and Read the progress file directly. Use `ls` or `find` via Bash only when the folder name is ambiguous.
+Both work-item rows resolve the active location first and the `done/` archive second, per `.claude/rules/workflow.md`, "Resolving a story folder" — an argument that names a completed item resolves to its archived folder rather than to nothing.
+
+**File lookup:** Use `find` via Bash (not Glob) when searching for progress files or story folders. Glob is unreliable on Windows/MINGW with large `.gitignore` files. For story resolution, derive the folder name from `ProductSpecification/stories.md` — kebab-case the story name, treating punctuation as word separators (e.g., story 5 "Reset password" → `05-reset-password`; "Login/Logout" → `01-login-logout`) — and Read the progress file directly, falling back to the same name under `stories/done/`. Use `ls` or `find` via Bash only when the folder name is ambiguous.
 
 ## Work Unit Dispatch
 
@@ -121,8 +123,15 @@ expected, not a deviation owing an argument. Its `progress.md` steps go in as a 
 commit as the test file. The passes fire only at a boundary, so no cycle is in flight to strand:
 when that section precedes the cursor, mark the newcomer's first step `[~]` and return the next
 block's `[~]` to `[ ]` (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). If this
-unit already flipped the item to `done/` or the Done table, reopen it in the same `review-fix:`
-commit. Untiered stories are unchanged. Why, and the `tier3/` exit:
+unit already archived the item, reopen it in the same `review-fix:` commit — move the folder back
+out of `done/` (`stories/done/NN-story-name/` → `stories/NN-story-name/`, or `tasks/done/{N}-…/` →
+`tasks/{N}-…/`) **and**, for a story, move its row back from the **Done** table to **In Progress**.
+Both halves of the completion fact reverse together, exactly as step 11 landed them together;
+reversing only the row leaves a folder in `done/` that the plan says is still open. The reverse
+move also reverses the depth: re-point the story's mockups' `<script src>` prefixes back to the
+shallower level in the same commit (`.claude/templates/ui/mockup-generation-rules.md`, "Script
+import path") — the reopen breaks them in the opposite direction, and just as silently.
+Untiered stories are unchanged. Why, and the `tier3/` exit:
 `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
 
 **Quiz (NEEDS_CLARIFICATION only) — last resort, gated.** Enforce "Consumer obligations" in
@@ -138,12 +147,15 @@ already holds them) and run the affected tests. **If any go RED, discard that fi
 re-route the finding to a follow-up — a `review-fix:` commit never lands red.** Land a single trailing
 `review-fix:` commit with the fixes that stayed green, **after** the quiz so directly-SAFE and
 clarified-then-SAFE fixes share one commit. Commit order per boundary unit: behavior → `refactor:` →
-`review-fix:`. Skip it when triage SKIPped, no finding fired, or nothing SAFE survived. Non-gating —
+`review-fix:`. Skip it when triage SKIPped, no finding fired, or nothing SAFE survived — **unless** a
+mid-cycle finding's scenario insertion or reopen still needs to land, which the commit carries even
+with zero SAFE fixes (a NEEDS_CYCLE finding is never SAFE, so the skip would otherwise fire in exactly
+the case the reopen exists for). Non-gating —
 discarding an un-committed fix is not a revert; a landed commit is never reverted.
 
 ## Pre-Commit Checklist
 
-Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the boundary test was evaluated against the **staged** progress.md, and in a boundary unit the triage predicate was evaluated and — on RUN — the two passes ran over the boundary range, (6) in a boundary unit, any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit moves a task folder to `done/`, verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit. If `/refactor` was skipped, or a boundary's triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
+Before the behavior commit, verify: (1) primary skill ran, (2) `/test-review` ran (red phases), (3) `/test-coverage` ran (`green-usecase`/`green-adapter`). `/refactor` and the two review passes are not in the behavior commit — they run after, in the `/refactor` batch. Before stopping, verify: (4) `/refactor` ran (all phases except `green-acceptance`/`green-selenium`/`demo`/spec items), (5) the boundary test was evaluated against the **staged** progress.md, and in a boundary unit the triage predicate was evaluated and — on RUN — the two passes ran over the boundary range, (6) in a boundary unit, any SAFE findings were auto-fixed and landed in a trailing `review-fix:` commit (and any NEEDS_CLARIFICATION was quizzed), (7) when the behavior commit archives the work item's folder to `done/` -- a task to `ProductSpecification/tasks/done/`, a story to `ProductSpecification/stories/done/` in the same commit as its **Done**-table row move -- verify from the **staged** progress.md that the advance is staged and no `[ ]`/`[~]` remains (step 11) -- read the file, never rely on recollection of the edit -- and, when the moved folder contains `mockups/`, that no `<script src>` still carries the pre-move depth. If `/refactor` was skipped, or a boundary's triage said RUN but a pass or the auto-fix did not run -- run it before stopping.
 
 ## Sub-Skill Dispatch
 

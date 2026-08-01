@@ -42,7 +42,7 @@ Start every generated file with this header:
 ## 6. Additional Operations (PUT/DELETE)
 ```
 
-Reference: `ProductSpecification/stories/01-create-task/tests/01_API_Tests.md`
+Reference: `ProductSpecification/stories/01-create-task/tests/01_API_Tests.md`, or `stories/done/01-create-task/tests/01_API_Tests.md` once that story has closed (`.claude/rules/workflow.md`, "Resolving a story folder")
 
 ### Prerequisite Guard Checklist
 
@@ -60,7 +60,7 @@ Stories declare prerequisites (e.g., "board must exist", "column must exist"). E
 **Rules:**
 - Generate one API scenario per prerequisite per endpoint (e.g., if story has PATCH and GET, test each)
 - Generate UI blocker scenarios in a `## 0. Prerequisite Guards` section — display + navigation per blocker
-- Cross-reference existing stories for established blocker patterns (e.g., Story 5 `02_UI_Tests.md` section 0)
+- Match the blocker pattern already established for that prerequisite, from one of two places — never a sweep of the other story folders (`.claude/rules/workflow.md`, "Where the Current State Lives"). First, the **acceptance suite's existing blocker scenarios for the same prerequisite** ("board must exist" guarded somewhere already): its enabled tests are how that guard is phrased and asserted *today*, so a new scenario matching them cannot contradict shipped behavior. Second, a precedent the story's own `interview.md` **names** — open that specific story's folder, resolving `stories/` then `stories/done/` (`.claude/rules/workflow.md`, "Resolving a story folder"). If neither exists, this prerequisite is the first of its kind: phrase the guard here and it becomes the precedent
 - If a prerequisite has two states (unlinked vs expired), generate separate scenarios for each
 
 ### Side-Effect & Idempotency Guard Checklist

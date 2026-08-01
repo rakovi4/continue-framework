@@ -14,7 +14,7 @@ Each tier lives in a standard location under the `acceptance/` module. Tech prof
 
 | Tier | Standard location |
 |------|-------------------|
-| Test Class | `tests/backend/{story}/` or `tests/frontend/{story}/` |
+| Test Class | `tests/backend/{feature}/` or `tests/frontend/{feature}/` |
 | Statements | `statements/` or `statements/{feature}/` |
 | Client | `clients/application/` |
 | DTOs | `clients/application/dto/{feature}/` |

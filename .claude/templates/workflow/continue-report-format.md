@@ -74,8 +74,8 @@ line — a missing line breaks the fixed shape that makes the block scannable.
 - Completed step sits under `## Spec` or `## Harvest — Tier 1 → Tier 2`, which carry no
   `### ` heading → print the section heading as the `Scenario:` value; the `Position`
   block fraction counts that section's checkboxes.
-- No `[~]`/`[ ]` remains → `Next: none — work item complete`, and for a task that moved
-  to `done/`, append ` (moved to done/)`.
+- No `[~]`/`[ ]` remains → `Next: none — work item complete`, and for a work item that
+  moved to `done/` — a task or a story — append ` (moved to done/)`.
 - A tier or category cannot be read because the plan is untiered → omit the prefix and
   print the scenario heading alone. An untiered plan is not a fault; nothing is missing.
 

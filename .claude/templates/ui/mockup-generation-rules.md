@@ -2,6 +2,10 @@
 
 ## Output Location
 
+Under the folder the story resolved to — `stories/NN-story-name/` while it is open,
+`stories/done/NN-story-name/` once it has closed (`.claude/rules/workflow.md`,
+"Resolving a story folder"). The depth difference matters: see "Script import path".
+
 ```
 ProductSpecification/stories/NN-story-name/mockups/
 ├── desktop/
@@ -47,16 +51,30 @@ Typical components to extract (the exact set depends on the project):
 | Page table (with actions) | `<app-page-table>` | `layout`, `actions`, `create-button`, `filter-tabs`, `active-tab`, `rows` |
 | Empty state | `<app-empty-state>` | `icon`, `title`, `description`, `button-text`, `button-icon` |
 
-**Script import path** (from `stories/NN/mockups/desktop/`):
+**Script import path** — relative to the mockup file's actual depth, which the story's
+location decides. From `stories/NN-story-name/mockups/desktop/`:
 ```html
 <script src="../../../../ui/components/app-dashboard-stats.js"></script>
 ```
+From `stories/done/NN-story-name/mockups/desktop/`, one level deeper, it is
+`../../../../../ui/components/…`. Archiving a story at completion
+(`.claude/rules/workflow.md`, "Resolving a story folder") therefore invalidates every
+prefix in its mockups: the old path resolves to `ProductSpecification/stories/ui/…`,
+which does not exist, and the components silently fail to render — under `file://`
+there is no error anyone sees, only an unstyled page. The reverse move breaks it
+symmetrically — coming back out of `done/`, the deeper prefix resolves above
+`ProductSpecification/`. **The depth follows the folder in both directions**: `/continue`
+re-points the prefixes in the same commit as the archive move, and back again in the
+`review-fix:` commit that reopens a story out of `done/`. After either move, grep the
+moved `mockups/` for `src="../../../../ui/` and confirm the depth matches where the
+folder now sits. A mockup backported into an already-archived story is written at the
+deeper prefix from the start.
 
 **Rules:**
 - Always show all 4 stat cards. Use `0` for unavailable values, descriptive sub-text for context.
 - Read each component's doc comment (top of `.js` file) for the full attribute API.
 - Never duplicate component CSS inline — it will drift.
-- After generating mockups, if a new structural pattern appears in 2+ places, extract it into a new component and backport to existing stories.
+- After generating mockups, if a new structural pattern appears in 2+ places, extract it into a new component and backport to existing stories — `stories/*/mockups/` **and** `stories/done/*/mockups/`, since a closed story's mockups are still the design reference for its screens and a single `stories/*` glob silently skips every archived one. Write each backport at the prefix depth of the folder it lands in (see "Script import path").
 
 ## Format
 

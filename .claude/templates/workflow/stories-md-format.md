@@ -88,6 +88,29 @@ an empty Tier 2 can reach `Tests = T1total/T1total · 0/0` and `% = 100%` while
 checkboxes, never on the count or the percentage. When complete, move the row from **In
 Progress** to **Done**, keeping every column value intact.
 
+**The row move and the folder move are one act.** The same behavior commit that lands the
+row in **Done** also archives the story folder:
+`ProductSpecification/stories/NN-story-name/` → `ProductSpecification/stories/done/NN-story-name/`,
+under the same staged-`progress.md` gate the task archive uses (`/continue` SKILL.md step 11).
+Both halves or neither: a row in **Done** whose folder still sits beside the active ones, or an
+archived folder whose row still reads In Progress, is a half-closed story that no single file
+reports as wrong. A mid-cycle review finding that reopens the story reverses both in its
+`review-fix:` commit.
+
+**Backfilling an adopting repo.** The move above fires only on a completion commit, so every
+story already in **Done** when a repo adopts the rule predates it and keeps its folder under
+`stories/`. The one-time fix is a sweep, not a mechanism: for each **Done** row whose folder is
+still under `stories/`, `git mv` it into `stories/done/` — re-pointing its mockups' `<script src>`
+prefixes for the added depth (`.claude/templates/ui/mockup-generation-rules.md`, "Script import
+path") — in a single commit. The move invalidates more than those prefixes: after the `git mv`,
+grep the repo for `ProductSpecification/stories/` outside `stories/done/` and re-point every
+literal reference an archived story just orphaned — a decision record, an `interview.md`, a
+`carryover.md`. Markdown has no build to go red, so a dangling precedent link degrades silently
+into "no precedent exists", which is exactly the invented-second-guard failure the current-state
+rule exists to prevent. Run it once, when adopting, **as its own commit** — never folded into a
+work unit's behavior commit; `/framework-sync`'s **Next Steps** is where an adopting repo is told
+to run it. After that the completion commit above keeps the invariant true on its own.
+
 ## When to update
 
 After every `progress.md` commit for a story, in the same commit. Recount Tests and % from

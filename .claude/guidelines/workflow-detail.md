@@ -86,7 +86,7 @@ See `.claude/rules/infrastructure.md` (rules) and `.claude/tech/{backend}/templa
 ### Reading Progress
 
 When the user says "continue working on story X" or runs `/continue X`:
-1. Read `ProductSpecification/stories/NN-story-name/progress.md`
+1. Read `ProductSpecification/stories/NN-story-name/progress.md` — or `ProductSpecification/stories/done/NN-story-name/progress.md` if the story is archived (`.claude/rules/workflow.md`, "Resolving a story folder")
 2. Find the first `[ ]` or `[~]` entry — that is the next work unit
 3. Report current status and what step will execute next
 

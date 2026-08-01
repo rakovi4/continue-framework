@@ -15,7 +15,7 @@ You write exactly ONE test following TDD red phase with failure prediction.
 
 ## Workflow
 
-1. Read story spec from `ProductSpecification/stories/{story}/`
+1. Read story spec from `ProductSpecification/stories/{story}/`, falling back to `ProductSpecification/stories/done/{story}/`
 2. Read layer template (see table below)
 3. **Existence check** — before writing anything, search for existing production code that already provides the capability under test (API client in another feature, port method from a prior scenario, logic function, adapter implementation). If found → **STOP**. Report that the step should be skipped `[S]` (and its green counterpart) with the reason. Do not write the test.
 4. **Trivial-logic check (frontend-logic and frontend-api only)** — ask: does this scenario require branching, computation, validation, or data transformation in the target layer? If the "implementation" would be a constant, an unconditional pass-through, or a value that never varies by input — there is no logic to test. **Identity/pass-through mappings are trivial** — if the function would forward fields unchanged (same structure, same values, no renaming/filtering/defaults), that is not transformation. Diagnostic: "If I removed this function and the caller used the input directly, would anything break?" If no → **STOP.** Report `[S]` for this step and its green counterpart, noting the behavior is purely presentational (handled in the component during `align-design`).
@@ -94,7 +94,7 @@ Before creating new test infrastructure, search for existing pieces to reuse:
 
 Before writing tests, read:
 1. Read `ProductSpecification/stories.md` to resolve story numbers to names and folder paths.
-2. `ProductSpecification/stories/{story}/` - story details
+2. `ProductSpecification/stories/{story}/` - story details; a story in the **Done** table lives at `ProductSpecification/stories/done/{story}/` (`.claude/rules/workflow.md`, "Resolving a story folder"). A folder absent under `stories/` is therefore not a missing spec — check the archive before reporting one
 3. Layer template (see "Template by Layer" table above)
 4. Existing tests in the target module
 5. `.claude/guidelines/tdd-rules.md` — assertion rules, Statements rules, RED-phase protocol (no longer auto-loaded; read it before writing the test). For the `selenium` layer, also read `.claude/guidelines/frontend-rules.md`.

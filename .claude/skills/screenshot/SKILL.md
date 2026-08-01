@@ -14,7 +14,7 @@ Automate taking screenshots of HTML mockups using Puppeteer from a centralized r
 
 ## Mockups Location
 
-Default location: `ProductSpecification/stories/*/mockups/`
+Default location: `ProductSpecification/stories/*/mockups/` **and** `ProductSpecification/stories/done/*/mockups/` — a closed story's mockups are still the design reference for the screens it owns (`.claude/rules/workflow.md`, "Resolving a story folder"), so a no-argument run covers both. Enumerate `stories/*/mockups/` and then `stories/done/*/mockups/`; a single `stories/*/mockups/` glob silently misses every archived story, since the archived ones sit one level deeper. Their mockups also carry a deeper `<script src>` prefix — `.claude/templates/ui/mockup-generation-rules.md`, "Script import path".
 
 ## Workflow
 

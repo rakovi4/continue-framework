@@ -21,9 +21,11 @@ are implemented in that order, Tier 3 is recorded in `tests/tier3/` and never bu
 
 ### Phase 1: Context & Story Selection
 
-Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, story folder (`stories/*/`): mockups, `*.md`, `endpoints.md`, `interview.md`.
+Parse input first — by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask) — since the reads below are scoped to the resolved story and the areas it touches.
 
-Parse input: by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask).
+Read before generating: `ProductSpecification/BriefProductDescription.md`, `ProductSpecification/stories.md`, `ProductSpecification/ExpectedLoad.md`, and the **target** story's folder: `mockups/`, its spec `*.md`, `endpoints.md`, `interview.md`. Resolve that folder `stories/NN-story-name/` first, then `stories/done/NN-story-name/` (`.claude/rules/workflow.md`, "Resolving a story folder") — these reads tolerate absence, so an unresolved archived folder is indistinguishable from a story that has no interview, and generation proceeds from the spec alone.
+
+For what the product already does in the areas this story touches — so a drafted scenario neither re-specifies shipped behavior nor contradicts it — read the **acceptance tests of those areas**: test class names, scenario descriptions, Statements. Never sweep the other story folders to reconstruct it (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests count as shipped — one still carrying its disable/skip marker is a pending increment, not shipped behavior. Where the suite is silent about an area, read that area's production code — silence is not evidence of absence. In a repo with no acceptance suite yet, say so explicitly and fall back to the story folders. Open an earlier story's folder only for a **named** precedent: the decision behind a rule this story extends — under `stories/` or `stories/done/`, a closed story being the usual home of a settled rule (`.claude/rules/workflow.md`, "Resolving a story folder").
 
 If `interview.md` exists, extract:
 - Business rules and constraints → map to API test scenarios
@@ -31,7 +33,7 @@ If `interview.md` exists, extract:
 - External API error modes → map to integration tests
 - Rate limits and performance constraints → map to load tests when they exercise the project's declared **Load Challenge Profile** (read `ExpectedLoad.md` to identify it); skip constraints that don't match the project's profile
 
-**Prerequisite analysis** (mandatory): Read the story's Prerequisites section and Validation Rules table. For each prerequisite, generate guard scenarios in BOTH API and UI tests following the Prerequisite Guard Checklist in `test-spec-format.md` — its rules cover extraction, per-endpoint coverage, and cross-referencing existing stories for established blocker patterns.
+**Prerequisite analysis** (mandatory): Read the story's Prerequisites section and Validation Rules table. For each prerequisite, generate guard scenarios in BOTH API and UI tests following the Prerequisite Guard Checklist in `test-spec-format.md` — its rules cover extraction, per-endpoint coverage, and which two sources an established blocker pattern is read from — never a sweep of the other story folders.
 
 **Side-effect & idempotency analysis** (mandatory): Scan the story spec and `interview.md` for operations that move money, call an external system, send email, or mutate persisted state in a batch. For each one that can be re-run (scheduled job, webhook, user retry), generate re-run-safety scenarios in BOTH directions — inbound duplicate-event and outbound re-attempt-after-partial-failure — following the Side-Effect & Idempotency Guard Checklist in `test-spec-format.md`. Phase 2 stamps their `hz-02` provenance; the tier itself is Phase 5's call.
 
@@ -39,7 +41,7 @@ If `interview.md` exists, extract:
 
 Load `.claude/templates/spec/test-spec-format.md` for category formats, ordering principles, and BDD rules.
 
-Create files in `ProductSpecification/stories/NN-story-name/tests/`:
+Create files in the `tests/` directory of the folder the story resolved to — `ProductSpecification/stories/NN-story-name/tests/`, or `stories/done/NN-story-name/tests/` for a story that has closed (`.claude/rules/workflow.md`, "Resolving a story folder"):
 - `01_API_Tests.md`, `02_UI_Tests.md`, `03_Load_Tests.md`
 - `04_Infrastructure_Tests.md`, `05_Security_Tests.md`, `06_Integration_Tests.md`
 

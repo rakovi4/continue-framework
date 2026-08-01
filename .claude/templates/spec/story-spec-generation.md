@@ -10,7 +10,7 @@ table and generates no spec.
 ## Input (provided by the caller)
 
 - Story number and name, resolved via `ProductSpecification/stories.md`
-- Story folder: `ProductSpecification/stories/NN-story-name/`
+- Story folder: `ProductSpecification/stories/NN-story-name/` — the folder the story resolved to, which is `stories/done/NN-story-name/` for a story that has closed (`.claude/rules/workflow.md`, "Resolving a story folder"). Confirm both are empty before creating one: a spec generated into a second folder beside an archived original re-specs shipped behavior
 
 ## Phase 1: Context Gathering
 
@@ -21,8 +21,18 @@ Before generating any specification, read and understand:
 3. **Expected load**: `ProductSpecification/ExpectedLoad.md`
 4. **Archived drafts**: `ProductSpecification/Archived/DraftStories/1st-iteration/`
    — find the draft related to this story, if one exists
-5. **Existing specifications**: `ProductSpecification/stories/*/NN_StoryName.md`
-6. **Story-specific context** (optional): `ProductSpecification/stories/NN-story-name/interview.md`
+5. **What the areas this story touches already do**: the acceptance tests **of those
+   areas** — test class names, scenario descriptions, Statements — never a sweep of
+   `stories/*/NN_StoryName.md`, which reconstructs the present from a pile of deltas
+   (`.claude/rules/workflow.md`, "Where the Current State Lives"). Only **enabled** tests
+   count as shipped — one still carrying its disable/skip marker is a pending increment,
+   not shipped behavior. Where the suite is silent about an area, read that area's
+   production code and note what you found in the Notes file, never as current-state prose
+   in the spec itself — silence is not evidence of absence. In a repo with no acceptance suite yet, say so
+   explicitly and fall back to the story folders. Open an earlier story's spec only for
+   a **named** precedent: the deliberate non-goal or the decision this story extends or
+   contradicts
+6. **Story-specific context** (optional): `interview.md` in the story folder resolved in **Input** above
    - If present, read it for additional context, external documentation, and special instructions
 
 ## Phase 2: Generate Specifications

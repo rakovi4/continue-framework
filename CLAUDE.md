@@ -24,6 +24,8 @@ All backend modules live under `backend/`. Never place them in the project root.
 
 Dependency flow is strictly inward. Never import from outer layers in inner layers.
 
+The `acceptance` suite is also the **current-state documentation** of what the product does — read it (not a sweep of story folders) to learn how an area behaves today. Story folders are deltas plus their rationale. See `.claude/rules/workflow.md`, "Where the Current State Lives".
+
 ## On-Demand Guidelines
 
 The always-on rules (`.claude/rules/*.md`) hold only the high-level map, invariants, and safety guardrails. The per-topic detail is deferred to `.claude/guidelines/` and is **not** auto-loaded — read the matching file **before** doing that kind of work.
