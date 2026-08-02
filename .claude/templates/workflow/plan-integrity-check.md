@@ -14,7 +14,7 @@ nobody anticipated.
 ## Checks
 
 Checks 1, 2, 4 and 6 need a **tier-major** plan (any `## Tier N — ` heading). Checks 3
-and 5 apply to every plan, tiered or not. All six are greps over `progress.md` and
+and 5 apply to every plan, tiered or not; check 7 applies to refactoring tasks. All seven are greps over `progress.md` and
 `tests/*.md` — no agent, no build.
 
 1. **Heading shape.** Every scenario section heading matches
@@ -75,6 +75,11 @@ and 5 apply to every plan, tiered or not. All six are greps over `progress.md` a
    `extended/` is the one genuine exemption: it is a pre-tiering directory `/retier` leaves
    untouched permanently, so its headings carry no markers and never will. Recursing into it
    would fail this check on every resume in a migrated repo, forever.
+
+7. **Refactoring discovery changed the plan.** A completed `refactor (steps discovery)`
+   checkbox must end with `(plan: +N/-N/~N)` and at least one count must be non-zero.
+   Otherwise stop: a discovery artifact beside an unchanged `## Fix` plan is not a
+   completed plan-reconciliation gate.
 
 ## On a failed check
 

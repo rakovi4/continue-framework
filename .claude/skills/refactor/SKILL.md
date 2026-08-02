@@ -22,7 +22,9 @@ Scatter–gather: **three parallel read-only detectors** scan for smells, then a
 
 1. **Identify the target** file (and its tests / siblings). This determines which
    file-type checks apply (backend vs `.tsx`).
-2. **Dispatch the detectors in parallel** (single message, multiple agent calls).
+2. **Dispatch the detectors concurrently and await all of them** — start every
+   named agent before awaiting results, then gather every result. No dispatch is
+   detached or fire-and-forget: step 3 requires the complete result set.
    Each runs only its cluster of `.claude/templates/refactoring/scan-checklist.md`
    and returns a candidate table:
    - `refactor-mechanics-agent` — cluster M (size, complexity, variables, dead code)
@@ -38,6 +40,9 @@ Scatter–gather: **three parallel read-only detectors** scan for smells, then a
 If the target is small with few methods/concerns, skip the fan-out and run a
 single `refactor-agent` pass over the whole checklist — the detector
 orchestration + merge overhead can exceed the single-agent cost on tiny files.
+Dispatch that lone pass and await its result. Here the fixer's report is this
+skill's entire output, so an unawaited call could report "refactored" before a
+file was touched.
 
 ## Available Templates
 
@@ -62,6 +67,7 @@ orchestration + merge overhead can exceed the single-agent cost on tiny files.
 - `simplify-expressions.md` - Static imports, method references, inline variables
 - `flatten-control-flow.md` - Flatten conditionals, Optional patterns, child delegation
 - `extract-method.md` - Named computations, guards, long method decomposition
+- `replace-comment-with-code.md` - Replace narrative comments with intention-revealing code
 - `extract-class.md` - Split large class by concern, extract superclass for shared infra
 - `adapter-query.md` - Extract typed AdapterQuery for Specification/CriteriaQuery logic
 - `subselect-read-model.md` - Consolidate multiple repositories into single query with ORM relationships

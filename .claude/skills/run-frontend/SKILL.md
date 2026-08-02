@@ -19,7 +19,8 @@ Run the frontend script in background:
 infrastructure/scripts/run-frontend.sh
 ```
 
-Use `run_in_background: true` so the dev server keeps running.
+Start the dev server as a persistent, pollable command so it keeps running after
+the startup check. Retain its session identifier.
 
 The script loads port configuration from `infrastructure/.env` and starts the frontend on the configured port.
 

@@ -38,6 +38,22 @@ Mockups contain placeholder values (`user@example.com`, fake dates, sample price
 - Use the native `fetch` API (not axios). Base URL from the backend URL environment variable.
 - **NEVER hardcode `http://localhost:8080`** in HTTP mock handlers or production code. Use the backend URL environment variable -- the test runner sets it dynamically from the backend port. Production API clients read the variable with a fallback to empty string. HTTP mock tests read the variable for handler URLs.
 
+## Parallel Frontend Lane Ownership
+
+In staged frontend work, a worker may edit only the explicit file manifest assigned
+by the coordinator. Stage 1 interface-only files are read-only during Stage 2.
+Reject a design that co-locates a frozen contract with behavior a Stage 2 lane must
+implement; separate the interface before dispatch. Never stage, commit, or edit
+`progress.md` from a lane.
+
+Before editing, compare the needed path with every lane manifest. If it is owned by
+another lane, is a frozen interface, was dirty at dispatch, or was not declared,
+stop and return the path plus the required change to the coordinator. Do not widen
+ownership, copy the behavior elsewhere, or make a compatible-looking interface
+change locally. A lane computes changes only inside its manifest relative to the
+recorded baseline; concurrent peer changes do not belong to its diff. A lane
+succeeds only when those paths and its complete lane checks pass.
+
 ## Selenium Tests
 
 - 2-tier DSL: Test Class (thin, reads like English) + Statements Class (locators, actions, assertions).

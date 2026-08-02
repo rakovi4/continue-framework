@@ -42,11 +42,14 @@ genuinely absent from the path it was given.
 3. **Scan existing test classes and production code** for steps already done.
 4. **Emit the sections** in tier order (below), marking completed steps `[x]`, the
    next `[~]`, the rest `[ ]`.
-5. For backend, integration, security, load and infrastructure scenarios **always
-   include `design` after `red-acceptance`** — it is mandatory for every scenario
-   needing new implementation, and omitted only when the entire scenario is `[S]`.
-   Include `[ ] adapters-discovery` after `green-usecase`; it resolves when reached.
-6. For frontend scenarios, include `demo` as the final step.
+5. For new backend, integration, security, load, and infrastructure scenarios emit
+   the three stages and their approval checkboxes from
+   `parallel-backend-stages.md`. Stage 1 includes design and adapter discovery.
+   Preserve the legacy serial shape when repository evidence shows that a scenario
+   already started under it.
+6. For new frontend scenarios emit the three staged frontend checkboxes from
+   `progress-format.md`. Preserve the legacy `red-selenium` through `demo` shape
+   only when repository evidence shows that scenario already started under it.
 
 ## Tier order
 

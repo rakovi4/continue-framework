@@ -4,35 +4,50 @@ Deferred companion to `.claude/rules/workflow.md`. The rules file holds the alwa
 
 ## Backend Scenario Sequence
 
-For each scenario in `tests/01_API_Tests.md`:
+For each scenario in `tests/01_API_Tests.md`, use the three-stage concurrent
+sequence in `.claude/templates/workflow/parallel-backend-stages.md`. Stage 1 runs
+acceptance RED beside contract design and adapter discovery, then freezes the
+interfaces at a user-review boundary. Stage 2 runs complete use-case and adapter
+RED-to-GREEN lanes concurrently, then concurrent gap-driven coverage follow-ups.
+The final stage closes acceptance with independent review.
 
-1. `red-acceptance` → `/red-acceptance` → `/test-review` → commit → `/refactor` (MANDATORY) → commit
-2. `design` → `/design-preview` → user approves (optionally with ADR) or escalates to `/architecture` → commit (if ADR produced)
-3. `red-usecase` → `/red-usecase` → `/test-review` → commit → `/refactor` (MANDATORY) → commit
-4. `green-usecase` → `/green-usecase` → `/test-coverage usecase --focus` → commit → `/refactor` (MANDATORY) → commit
-5. `adapters-discovery` → adapter discovery: identify ports and map to adapters, mark `[x] adapters-discovery`, insert concrete `red-adapter X` / `green-adapter X` steps below it (or `[S]` if no new adapters), commit progress.md
-6. `red-adapter X` → `/red-adapter X` → `/test-review` → commit → `/refactor` (MANDATORY) → commit (one per port)
-7. `green-adapter X` → `/green-adapter X` → `/test-coverage {adapter} --focus` → commit → `/refactor` (MANDATORY) → commit (one per port)
-8. `green-acceptance` → `/green-acceptance` → commit
-
-The `[ ] adapters-discovery` checkbox is a gate — it must be resolved before any subsequent step executes. The full procedure is in `.claude/templates/workflow/adapter-discovery-checklist.md`.
+Scenarios whose serial sequence is already in progress keep the legacy
+`red-acceptance` through `green-acceptance` shape. Its `adapters-discovery` remains
+a gate and follows `.claude/templates/workflow/adapter-discovery-checklist.md`.
+`/framework-sync` upgrades a legacy scenario only while every step in that scenario
+is still pending; the first completed, skipped, or current step freezes the whole block.
 
 ## Frontend Scenario Sequence
 
-For each scenario in `tests/02_UI_Tests.md`:
+For each scenario in `tests/02_UI_Tests.md`, use this shared-worktree contract:
 
-1. `red-selenium` → `/red-selenium` → `/test-review` → commit → `/refactor` (MANDATORY) → commit
-2. `red-frontend` → `/red-frontend` → `/test-review` → commit → `/refactor` (MANDATORY) → commit
-3. `green-frontend` → `/green-frontend` → commit → `/refactor` (MANDATORY) → commit
-4. `red-frontend-api` → `/red-frontend-api` → `/test-review` → commit → `/refactor` (MANDATORY) → commit
-5. `green-frontend-api` → `/green-frontend-api` → commit → `/refactor` (MANDATORY) → commit
-6. `align-design` → Build component → `/align-design` → `/design-review` (MANDATORY) → `/test-coverage frontend --focus` → commit → `/refactor` (MANDATORY) → `/align-design` verify-only → commit
-7. `green-selenium` → `/run-backend` → `/run-frontend` → `/green-selenium` → commit
-8. `demo` → `/demo {test_class}` → progress-only commit
+1. `stage-1 frontend acceptance RED + interface design` runs Selenium RED beside
+   non-interactive design. It fixes the component, logic, API-client, and test
+   interfaces before implementation starts.
+2. `stage-2 frontend implementation lanes` runs complete frontend-logic,
+   API-client, and design-alignment lanes concurrently. Each lane preserves its own
+   RED-before-GREEN and refactor sequence and owns a disjoint file set; Stage 1
+   interfaces are read-only.
+3. `stage-3 frontend acceptance GREEN + review` starts only after every Stage 2 lane
+   joins successfully. It runs remove-marker-only Selenium GREEN beside
+   `agent-review` and `premortem`, then performs the headed demo after GREEN.
+
+Workers share the worktree but never stage, commit, or edit `progress.md`. The
+orchestrator alone declares ownership, rejects overlapping paths, joins every lane
+exactly once, runs combined verification, stages explicit paths, commits, and
+advances stages. A failed lane leaves its stage current while successful disjoint
+results remain available for resume. Late or duplicate completion cannot advance a
+stage or launch its successor twice.
+
+Legacy frontend scenarios already started with `red-selenium` through `demo` keep
+that serial shape permanently. Do not rewrite an in-flight scenario beneath its
+cursor.
 
 ## Other Scenario Sequences
 
-Integration, security, load, and infrastructure scenarios each run the **same TDD cycle as the backend sequence above** (`red-acceptance` → `design` → `red/green-usecase` → `adapters-discovery` → `red/green-adapter` → `green-acceptance`). They differ only in the spec file read and the concerns covered:
+Integration, security, load, and infrastructure scenarios use the **same
+three-stage sequence as backend scenarios**. They differ only in the spec file read
+and the concerns covered:
 
 | Scenario type | Spec file (if exists) | Concerns covered |
 |---------------|----------------------|------------------|
@@ -83,6 +98,14 @@ See `.claude/rules/infrastructure.md` (rules) and `.claude/tech/{backend}/templa
 
 ## Progress Tracking
 
+### Free-form work units
+
+Named checkbox kinds select their specialized routes. Any other checkbox text is a
+free-form work-unit intent: `/continue` executes it inline in the main agent without
+inventing red, green, coverage, or review gates.
+The direct route still runs affected tests, advances progress, and follows the normal
+commit and stop rules. The fallback is an explicit `/continue` route.
+
 ### Reading Progress
 
 When the user says "continue working on story X" or runs `/continue X`:
@@ -117,7 +140,7 @@ See the `/handoff` and `/continue` skills for the mechanics (file layout, carryo
 
 # Task Workflow Detail
 
-Bug and refactoring tasks follow the same TDD discipline as stories: `/test-review` after red phases, `/refactor` after every phase (except `green-acceptance`, `green-selenium`, `demo`), with `/refactor` in its own commit separate from the behavior commit (see Atomic Work Units in `.claude/rules/workflow.md`). Task commits use the `task:` prefix — both the behavior commit and the refactor commit. Tasks don't need bootstrapping -- `/task` generates everything at creation time.
+Bug and refactoring tasks follow the same TDD discipline as stories: `/test-review` after red phases, `/refactor` after every phase (except `green-acceptance`, `green-selenium`, `demo`), with `/refactor` in its own commit separate from the behavior commit (see Atomic Work Units in `.claude/rules/workflow.md`). Task commits use the `task:` prefix — both the behavior commit and the refactor commit. Tasks don't need bootstrapping; `/task` creates their discovery sequence.
 
 ## Bug Task Sequence (Discovery-First)
 
@@ -140,9 +163,22 @@ The `[ ] steps-discovery` checkbox is a gate -- it must be resolved before any s
 
 **Why `reproduce in prod-copy` is a separate step:** prod-copy reproduction often surfaces details the original reporter omitted (exact field length, browser, sequence of actions, network response). Doing it before root-cause analysis prevents wasted investigation on the wrong code path.
 
-**Refactoring tasks are unaffected** by the discovery sequence — their steps are user-defined from the spec interview, since the scope is structural and known up front.
+## Refactoring Task Sequence (Design-First)
 
-**Scoped steps (refactoring + story scenarios only):** Progress should only include TDD steps for layers the fix actually touches. If the fix is pure CSS, don't generate logic/API/align-design steps. If the fix is backend-only, don't generate frontend steps. Affected layers are determined from the spec at creation time. For bug tasks, layer scoping happens at `steps discovery`, not at creation.
+Every refactoring task starts `spec` → `design` → `refactor (steps discovery)`. The spec captures the problem, intended structural outcome, constraints, and likely files without freezing an implementation sequence. Design preview approves the object and boundary model before planning begins. Steps discovery then reconciles that design and the current repository into scoped `## Fix` headings and concrete checkboxes.
+
+The discovery checkbox is a plan-reconciliation gate: compare the approved design and discovered evidence with the committed pre-unit `progress.md`, then add, remove, rename, split, merge, or reorder the concrete `## Fix` steps accordingly. The gate cannot complete from a companion document alone. Its resolved checkbox records `plan: +N/-N/~N` for added, removed, and changed checkboxes; at least one count must be non-zero, otherwise the step did not discover or reconcile the plan it exists to change.
+
+**Choose the work-unit shape from the change, not from the task type.** Before adding
+each checkbox, classify whether it changes executable code behavior. Only that class
+gets a RED-to-GREEN pair. Behavior-preserving code restructuring uses one direct
+refactoring step with the existing suite as verification. Documentation, prompt-library,
+configuration, planning, and other non-code changes use one direct implementation step
+with affected checks. Never manufacture `red-workflow`/`green-workflow` or another
+named pair merely because discovery needs something dispatchable. The decision table and
+examples are in `.claude/templates/workflow/steps-discovery-shapes.md`.
+
+**Scoped steps (refactoring + story scenarios only):** Progress should only include TDD steps for layers the fix actually touches. If the fix is pure CSS, don't generate logic/API/align-design steps. If the fix is backend-only, don't generate frontend steps. For refactoring and bug tasks, layer scoping happens at steps discovery; for story scenarios it comes from the approved scenario design.
 
 ## QA Task Sequence
 

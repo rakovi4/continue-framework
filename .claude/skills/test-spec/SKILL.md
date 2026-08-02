@@ -4,7 +4,6 @@ description: Generate BDD test specifications for story in 6 categories (API, UI
 ---
 
 # Generate Test Specifications
-
 Generate BDD-style test specifications for a story in 6 categories — one file per
 category under `tests/`. The drafted scenarios are then split by **consequence of
 failure** into three tiers (`.claude/templates/spec/tier-ladder.md`): Tiers 1 and 2
@@ -18,7 +17,6 @@ are implemented in that order, Tier 3 is recorded in `tests/tier3/` and never bu
 ```
 
 ## Workflow
-
 ### Phase 1: Context & Story Selection
 
 Parse input first — by name (`"Login/Logout"`), by number (`5`), or interactive (list and ask) — since the reads below are scoped to the resolved story and the areas it touches.
@@ -116,17 +114,17 @@ of two while every assertion is kept.
 
 Dispatch `consolidation-agent` (`.claude/agents/consolidation-agent.md`) **once**, for
 the whole story, over every `tests/*.md`. It merges only what
-`.claude/templates/spec/consolidation-rules.md` makes eligible, unions the absorbed
-provenance tokens onto the survivor, leaves every `Tier: ?` unresolved for Phase 5, and
+`.claude/templates/spec/consolidation-rules.md` makes eligible; every eligible maximal
+group must merge. It unions the absorbed provenance tokens onto the survivor, leaves
+every `Tier: ?` unresolved for Phase 5, and
 reports each merge with what it absorbed. It runs after the scan so a folded GAP is a
 merge candidate, and before tiering so the comparative pass sorts the units that are
 actually built and the floor lands on the merged token union — the argument is in
 `consolidation-rules.md`, "Where the pass runs".
 
 On a stop condition, report it and do **not** fall through to Phase 5: a half-merged set
-holds one assertion under two headings. The before/after count is passed to the user and
-never acted on — no re-dispatch, no second merge pass, no scenario dropped to move the
-number (`tier-ladder.md`, "No targets").
+holds one assertion under two headings. Do not re-dispatch or force extra merges to hit
+the delivery ceilings; Phase 5 places distinct overflow scenarios in Tier 3.
 
 ### Phase 5: Tier the Set
 
@@ -177,8 +175,10 @@ re-dispatch from that state; never hand-repair the duplicate or the loss. Never 
 hand, and never fill in a `?` to get past a stop — that produces exactly the
 unreviewed-but-tiered set the stop exists to prevent.
 
-The reported Tier 1 size is passed through to the user, never acted on: no re-dispatch, no
-re-draft, no scenario moved down a tier to shrink it (`tier-ladder.md`, "No targets").
+Count resolved `Tier: 1` and `Tier: 2` markers in `tests/*.md` after the dispatch;
+require Tier 1 <= 10 and Tier 1 + Tier 2 <= 25. Do not trust the report alone. A
+violation or an infeasible-stack report blocks Phase 6; never hand-demote scenarios.
+Every remaining eligible scenario belongs in Tier 3.
 
 ### Phase 6: Summary
 
@@ -194,8 +194,7 @@ enters `progress.md` and a merged-away scenario is never re-drafted, so this is 
 point at which a human sees what was folded or dropped while disagreeing is still cheap.
 
 ## Rules
-
 - English, Gherkin in Markdown, DSL only (no technical details in steps)
-- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. No total-count budget of any kind (`test-spec-format.md` header; `tier-ladder.md`, "No targets") — Phase 4 shrinks the number of *passes* by merging shared executions, never the number of facts checked (`.claude/templates/spec/consolidation-rules.md`)
+- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. After consolidation, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 4 merges shared executions without dropping checked facts (`.claude/templates/spec/consolidation-rules.md`).
 - **Load tests**: profile-driven against the **Load Challenge Profile** the project declares in `ExpectedLoad.md`. The profile catalog, the relevance filter (including when to skip the file and set `Load = n/a`), the authoring rules and the file layout are all in `.claude/templates/spec/load-test-format.md`
 - **Security**: generate stack-aware scenarios only. The relevance filter, the checklist rows (including the two floor rows Phase 2 stamps), the merge rule and the per-story count are all in `test-spec-format.md` ("05_Security_Tests.md")

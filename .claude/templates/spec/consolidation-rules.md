@@ -29,16 +29,14 @@ Two corollaries follow, and both violate the invariant without deleting a line:
 
 ## Fewer passes, never fewer facts
 
-`tier-ladder.md` ("No targets") forbids a budget on Tier 1, and the per-category counts
-in `test-spec-format.md` describe expected output rather than a budget. Consolidation
-reopens neither: it reduces the number of **passes**, while the number of facts checked
-is unchanged *by construction* — which is what the invariant says.
+The delivery ceilings in `tier-ladder.md` constrain the eventual Tier 1 and Tier 2
+stack, not consolidation eligibility. Consolidation reduces the number of **passes**,
+while the number of facts checked is unchanged *by construction*.
 
-So there is no consolidation target, no ratio, and no count a set must reach. A count
-that stays high after an honest pass is information about the story — it has many
-genuinely distinct interactions — never a licence to merge further. **A merge whose
-justification is the resulting number is forbidden**, even where it would otherwise be
-eligible: the number is a reading of the work, never an input to it.
+There is no consolidation target, ratio, or permission to force a merge. A count that
+stays high after an honest pass is handled by tiering distinct overflow scenarios into
+Tier 3. **A merge whose justification is the resulting number is forbidden**, even
+where it would otherwise be eligible.
 
 ## Where the pass runs
 
@@ -65,10 +63,10 @@ unclear.
 what is recorded and not built, so merging inside them saves no pass at all, and merging
 one of them into a built scenario drafts a scenario back into the plan by the side door.
 
-## Eligibility — every clause, not most of them
+## Mandatory eligibility — every clause, not most of them
 
-A pair is a candidate only when **all** of these hold. Any clause you cannot
-positively assert is a "no".
+A group of two or more scenarios **must be merged** when all of these hold for the
+whole group. Any clause you cannot positively assert is a "no".
 
 1. **Same category file.** Category decides which layer implements the scenario and
    therefore which step block it derives; a pair split across files has no single
@@ -90,14 +88,16 @@ positively assert is a "no".
 8. **Failure stays informative.** Each absorbed fact is named in the merged scenario,
    so a red says *which* fact broke without a debugging session.
 
-Two shapes pass this test in practice: **independent facts about one result** (several
-fields of one response, several elements of one rendered view), and **several rejected
+Form maximal groups, not just pairs: if three scenarios all describe the same single
+execution, merge all three once. Two shapes pass this test in practice: **independent
+facts about one result** (several fields of one response, several elements of one
+rendered view), and **several rejected
 inputs to one validation surface** (each rejected the same way, distinguished by the
 input it names).
 
 ## Forbidden merges
 
-Eligibility says when a merge *may* happen. These say when it must not — including
+Eligibility says when a merge must happen. These say when it must not — including
 cases that slip past a hurried reading of the test above.
 
 - **A success path with a failure path of the same request.** One execution has one
@@ -189,9 +189,9 @@ destroys the read-before-write ordering that let each be built on the last.
 
 ## Reporting
 
-The pass **reports and stops** — the precedent of `tier-ladder.md`, "No targets": it
-never re-runs itself, never runs a second merge pass over its own output, and never
-adjusts a merge because of the resulting number. The report carries, at minimum: the
+The pass **reports and stops**: it never re-runs itself, never runs a second merge pass
+over its own output, and never adjusts a merge because of the resulting number. The
+report carries, at minimum: the
 before/after scenario count per file; one entry per merge naming the surviving
 `### N.M Title` and every absorbed `### N.M Title`; per absorbed scenario, each Then it
 contributed and where it now lives; and the merged marker beside the union it was built

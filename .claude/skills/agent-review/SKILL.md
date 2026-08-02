@@ -19,8 +19,9 @@ repeated read.
 
 1. Load `.claude/agents/agent-review-agent.md`.
 2. Resolve the diff: default to the last commit (`HEAD`); use `<ref>` if given.
-3. Dispatch `agent-review-agent` (Agent tool) with the diff and one line of
-   context on what the work unit did.
+3. Dispatch named agent `agent-review-agent` with the diff and one line of context
+   on what the work unit did, and await its result before continuing. This skill
+   must never return PASS before the review has actually run.
 4. Surface the agent's verdict: PASS is silent; CONCERNS/BLOCK list each problem,
    its place in the diff, and the named missing guard, as follow-ups. Findings
    never revert the commit.

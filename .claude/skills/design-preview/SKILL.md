@@ -20,10 +20,36 @@ This is also the reuse gate for a scenario invented mid-cycle (see `.claude/guid
 
 ## Workflow
 
+### Concurrent Contract-Design Mode
+
+When Stage 1 of `parallel-backend-stages.md` dispatches this skill beside acceptance
+RED, do not ask questions or wait for the acceptance lane. Infer the design from the
+scenario, existing architecture, and acceptance criterion; discover every adapter;
+create the use-case, port, and adapter skeletons; and commit only the declared files.
+Record a material choice in an ADR when needed. The coordinator presents the test
+and frozen interfaces together for user review after both lanes join.
+
+The acceptance test is optional input in this mode: inspect its committed form when
+available, but never make either lane depend on the other's completion.
+
+### Concurrent Frontend Interface-Design Mode
+
+When Stage 1 of `parallel-frontend-stages.md` dispatches this skill beside Selenium
+RED, do not ask questions or wait for the Selenium lane. Infer the design from the
+scenario, mockup, existing frontend, and acceptance criterion. Declare the shared
+component, logic, API-client, type, and test interfaces needed by Stage 2, then
+create only those interface surfaces within the coordinator's file manifest.
+
+Do not implement lane behavior, stage, commit, or edit `progress.md`. The Selenium
+test is optional input: inspect it when available, but neither lane depends on the
+other. Return the declared interfaces, changed paths, and checks to the coordinator,
+which freezes them after the Stage 1 join.
+
 ### 1. Gather Context
 
 1. **Read the story spec** — full story document for business context, requirements, constraints, business rules
-2. **Read the scenario** from `tests/01_API_Tests.md`
+2. **Read the scenario** from the category file named by its progress section:
+   `01_API`, `06_Integration`, `05_Security`, `03_Load`, or `04_Infrastructure`
 3. **Read `ProductSpecification/ExpectedLoad.md`** — for scale assumptions (use real numbers, never guess)
 4. **Read existing code** — domain entities, usecases, ports, request/response DTOs
 5. **Read ADRs** — check `decisions/*-decision.md` files in the story directory that may constrain the design
@@ -93,7 +119,8 @@ Show each option as a labelled block: title, summary, pros, cons. Include the re
 
 ### 4. Get Option Choice
 
-Ask with `AskUserQuestion`:
+Request a user decision using structured input when available, otherwise ask
+directly and pause:
 - First answer = the recommended option, label suffixed with "(Recommended)"
 - Other answers = alternative options (one per non-recommended option, up to 3 alternatives)
 - Last answer = "Reject all — escalate to `/architecture`"
@@ -104,7 +131,9 @@ If user rejects all → invoke `/architecture` and STOP. Do not proceed to the A
 
 ### 5. Get ADR Decision
 
-After an option is chosen, ask separately with `AskUserQuestion` whether to capture the decision as an ADR:
+After an option is chosen, request a separate user decision on whether to capture
+the decision as an ADR, using structured input when available and otherwise
+asking directly:
 - "Write ADR" — recommended when the user picked a non-recommended option, when the trade-offs are non-obvious, or when downstream scenarios will likely revisit the choice
 - "Skip ADR" — recommended for trivial scenarios (single-option flow) or mechanical choices with no real trade-off
 
@@ -120,8 +149,14 @@ Pick which option to mark "(Recommended)" based on the choice the user just made
 
 ## Rules
 
-- Never write code — this is a design step
-- Never create files — design lives in the conversation. Two exceptions: an escalation to `/architecture`, and step 2a's write of a net-new mid-cycle scenario (with its resolved marker) into its `tests/` category file
+- Never write code in ordinary preview mode. Concurrent contract-design and
+  frontend interface-design modes are explicit exceptions: create only their
+  declared skeleton or interface files.
+- Never create files in ordinary preview mode. Exceptions are concurrent
+  contract-design mode, an escalation to `/architecture`, and step 2a's write of a
+  net-new mid-cycle scenario into its category file.
 - Keep it concise — the goal is alignment, not a design document
 - If trivially similar to a previous scenario, say so and ask to approve
-- **Scope of progress.md changes:** design-preview may ONLY mark the `design` checkbox as `[x]`. It must NOT modify, skip, or rewrite any other steps (usecase, adapter, green-acceptance). Skip recommendations go in the design output text only — `/continue` applies approved skips to progress.md after the design work unit completes, validating each skip against the "zero production files modified" rule in `.claude/guidelines/tdd-rules.md`.
+- **Scope of progress.md changes:** design-preview never edits `progress.md` in
+  either concurrent mode; the coordinator owns it. In ordinary mode it may only
+  mark `design` `[x]` and must not rewrite other steps.

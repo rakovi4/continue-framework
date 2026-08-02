@@ -9,7 +9,7 @@ You write exactly ONE test following TDD red phase with failure prediction.
 
 ## Input
 
-- **layer**: usecase | acceptance | frontend-logic | frontend-api | selenium | any adapter name (matches directory under `backend/adapters/`)
+- **layer**: usecase | acceptance | frontend-logic | frontend-api | selenium | workflow | any adapter name (matches directory under `backend/adapters/`)
 - **story**: Story name or number
 - **scenario**: Scenario to test
 
@@ -48,6 +48,12 @@ Frontend layers:
 | frontend-api | `.claude/tech/{frontend}/templates/api-test.md` |
 | selenium | `.claude/tech/{browser-testing}/templates/selenium-test.md` |
 
+Framework layers (no technology binding — do not resolve a `tech-profile:` for these):
+
+| Layer | Template Path |
+|-------|---------------|
+| workflow | `.claude/templates/workflow/workflow-layer-test.md` |
+
 ## Rules
 
 - ONE test per invocation
@@ -67,8 +73,14 @@ Acceptance tests need a live backend. Predictions must be about feature behavior
 
 1. Before running the test, ensure the backend is up (`/run-backend` or check health endpoint)
 2. Predict the **actual application-level failure** — assertion error, wrong HTTP status, missing data, etc.
-3. If the feature is already fully implemented and the test would pass, the prediction is "test passes" — skip straight to `green-acceptance` (mark red-usecase/green-usecase/adapters as `[S]` with reason)
-4. If the test fails (new implementation needed), verify that `progress.md` has a `design` step after `red-acceptance`. If missing, add it — `design` is mandatory for every scenario requiring new implementation.
+3. If the feature is already fully implemented and the test would pass, the
+   prediction is "test passes". In the legacy serial shape, skip straight to
+   `green-acceptance` and mark implementation steps `[S]`. In staged backend shape,
+   report `ALREADY_GREEN` to the coordinator and do not edit `progress.md`.
+4. If the test fails, require either the legacy `design` step after
+   `red-acceptance` or the current `stage-1 acceptance RED + contract design`
+   checkbox. The staged checkbox already supplies design concurrently; never add a
+   separate design step, and never edit staged progress from a lane.
 
 ## Adapter Layer: Multiple Test Methods
 

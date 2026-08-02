@@ -19,7 +19,8 @@ Run the backend script in background:
 infrastructure/scripts/run-backend.sh
 ```
 
-Use `run_in_background: true` so the server keeps running.
+Start the server as a persistent, pollable command so it keeps running after the
+startup check. Retain its session identifier.
 
 The script loads port configuration from `infrastructure/.env` and starts the backend on the configured port.
 

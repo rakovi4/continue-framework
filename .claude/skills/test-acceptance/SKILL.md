@@ -17,7 +17,7 @@ source infrastructure/.env && curl -s -o /dev/null -w "%{http_code}" http://loca
 ```
 
 - `200` → OK.
-- `UNAVAILABLE` or non-200 → start backend first: `Skill tool: skill="run-backend"`. Wait for startup.
+- `UNAVAILABLE` or non-200 → execute the named `run-backend` skill first. Wait for startup.
 
 ### Frontend (required when argument is `frontend` or a frontend test class)
 
@@ -26,7 +26,7 @@ source infrastructure/.env && curl -s -o /dev/null -w "%{http_code}" http://loca
 ```
 
 - `200` → OK.
-- `UNAVAILABLE` or non-200 → start frontend first: `Skill tool: skill="run-frontend"`. Wait for startup.
+- `UNAVAILABLE` or non-200 → execute the named `run-frontend` skill first. Wait for startup.
 
 ### Load (required when argument is `load`)
 
@@ -77,8 +77,8 @@ With arguments:
 
 Read `.claude/guidelines/tdd-rules.md` and follow its "Stop on first failure" protocol:
 
-1. **Launch in background:** `run_in_background: true` — note the output file path from the result. Store `SEEN=0` to track lines already shown.
-2. **Poll with separate Bash calls:** Make repeated **individual** Bash calls (NOT a loop inside one call — that hides output until the loop finishes). Each call checks for new lines and the terminal signal:
+1. **Launch as a persistent command:** retain its pollable session or output identifier. Store `SEEN=0` to track lines already shown.
+2. **Poll with separate shell calls:** Make repeated **individual** shell calls (NOT a loop inside one call — that hides output until the loop finishes). Each call checks for new lines and the terminal signal:
    ```bash
    TOTAL=$(wc -l < "$OUTPUT" 2>/dev/null || echo 0) && sed -n "$((SEEN+1)),${TOTAL}p" "$OUTPUT" | grep -E "PASSED|FAILED|> Task|tests completed|BUILD|Results:|Tests run:" ; grep -c -E "BUILD SUCCESSFUL|BUILD FAILED" "$OUTPUT" 2>/dev/null && echo "DONE" || echo "RUNNING"
    ```

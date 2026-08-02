@@ -84,6 +84,34 @@ call) becomes an answered decision rather than a dropped follow-up: in the bound
 unit `/continue` asks the user once, and the answer routes the finding to SAFE
 (apply) or NEEDS_CYCLE (plan) — the quiz picks *which* fix, never whether to bypass
 TDD. Boundary cadence lowers the quiz's frequency by the same factor as the passes'.
+**NO_FIX** records a problem the pass intentionally will not route to either fixing path;
+it is reported with its disposition and does not expand the current work.
+
+An admitted NEEDS_CYCLE is only a proposal until the user explicitly agrees. The
+review batch may name and recommend the cycle, but it cannot add scenario or progress
+steps on silence or by default. Consent turns the proposal into the mid-cycle
+scenario described below.
+
+Staged backend and frontend Stage 3 are the explicit range exception: review runs beside
+acceptance GREEN over immutable Stage 1+2; Stage 1 reviewed test content and Stage 3
+execution guards the delta. The coordinator joins once, applies SAFE fixes afterward,
+and then closes the scenario. An admitted cycle is stored only as a decision checkpoint until
+the user explicitly agrees; silence cannot mutate the plan.
+
+**A finding does not enlarge the reviewed work merely because it is real.** Expansion
+requires observed evidence that the work violates a requirement, acceptance criterion,
+repository invariant, or test that pre-dated the finding. Importance is assessed
+separately: a serious defect outside that promise is escalated as a release concern, an
+unrelated lower-consequence defect is preserved as a named follow-up, and an unproven risk
+gets one bounded reproduction attempt. This keeps the finish line open to contrary evidence
+without letting each review invent a broader promise for the work it reviewed. The complete
+gate and disposition table live in `finding-admission-test.md`.
+
+**Do not plan work the user can trivially recover themselves.** A finding stays `NO_FIX`
+when its failure is immediately visible to the user, the correction is obvious and local,
+and it risks no hidden data loss, corrupted state, security boundary, or silently wrong
+result. Report it once, but do not turn ordinary user recovery into implementation work.
+Review follow-ups are for guards the system must own, not every detectable inconvenience.
 
 **Escalation is the last resort, and the bar is deliberately high.** A quiz is not
 the neutral, safe choice it looks like from inside a review pass. It halts a work
@@ -168,33 +196,5 @@ the guard is never built, so it needs the positive judgment the ladder requires
 (name the degradation, say why it is acceptable) and is forbidden outright when the
 mid-cycle scan stamped a floor-pinned token.
 
-**A marker alone changes no ordering, and the writer is deliberately unnamed.** The
-tier lives in the test file, but `/continue` never re-derives an existing
-`progress.md`, so a scenario whose marker says Tier 2 and whose steps nobody added is
-a scenario that will never be built — the failure mode this rule exists to prevent,
-reintroduced one layer down. The steps therefore go into the matching section of the
-scenario's own tier, at the end, in the same `review-fix:` commit as the test file.
-Boundary cadence is what makes that unconditional: the passes fire only when the block
-they read has closed, so there is no in-flight cycle for a block placed above the cursor
-to abandon — the deferral the old per-unit cadence needed is gone, and with it the
-marker-without-steps window it opened. Which actor writes them is *not* fixed, because
-`progress.md` already has many writers and naming one more does not stop the others;
-instead every resume runs the plan-integrity check
-(`.claude/templates/workflow/plan-integrity-check.md`), whose marker↔plan agreement check
-is what actually catches a scenario left in the test files with no steps.
-
-**A finding can land after its item was flipped to Done — and now usually does.** The
-`done/` move and the Done-table row-move ride the *behavior* commit, and the passes run
-after it, so on a work item's final unit a finding may need steps in a plan already
-declared complete — in a folder `/continue`'s resolver no longer matches. That final unit
-is always a boundary, so this is no longer the rare case it was under per-unit cadence: a
-bug task, whose entire fix is one block, meets it on the only pass it ever runs. Then the
-`review-fix:` commit that lands the steps also reopens the item: the item comes back out of
-`done/` — for a story its **Done**-table row returns to **In Progress** in the same commit as
-the folder, both halves of the completion fact reversing together — and the newcomer's first
-step becomes the plan's only `[~]`. Reopening is honest about what happened; leaving the steps in a
-done-flipped plan makes them unreachable, which is how a surfaced finding turns into a
-silently dropped one.
-
-Scope: a tier-major story. An untiered story has no tiers to default into and keeps
-today's behaviour — the permanent branch, not a transitional one.
+Placement, plan-integrity, reopening, and untiered-story mechanics live in
+`.claude/guidelines/review-findings-detail.md`.

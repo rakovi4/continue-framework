@@ -62,8 +62,8 @@ commit before its first implementation commit), using the **current** test code.
 - Point the **current** acceptance tests at that running app over HTTP. (Checking the
   old commit out and running the tests *there* would fail to compile — they need the
   DSL and Statements built during Tier 1 — which is why the current tests run against
-  the old *running* app instead.) Build and boot are long: `run_in_background: true`
-  with ≤30s polls per the interaction rule.
+  the old *running* app instead.) Build and boot are long: start each as a persistent,
+  pollable command and use ≤30s polls per the interaction rule.
 - **Teardown is mandatory on every exit path.** On success, failure, or abort: stop
   the baseline app (kill only the PID you started) and restore the normal backend
   before reporting. Never leave the baseline build running on the port.

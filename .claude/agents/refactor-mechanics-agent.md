@@ -15,7 +15,7 @@ objective "shape of the code within a file" categories. Run ONLY these:
 
 - **Class size** A0; **Complexity** A1, A2, A26
 - **Optional** A5, A5b
-- **Variables & lambdas** A8, A9, A58, A32, A25, A27, A28, A29, A30, A45
+- **Variables, lambdas & comments** A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45
 - **Indirection** A20, A21, A55
 - **Imports** A10, A36; **Dead code** A11, A11b
 
@@ -30,6 +30,11 @@ duplication, frontend, all of Section B).
 2. **Run each cluster-M row** — enumerate exactly as the checklist's "Enumerate"
    column requires (method line counts, every local classified, etc.). Show the
    enumerated data; write `→ clean` when it shows no violation.
+   For A59, count comment-only lines, enumerate every contiguous production-code
+   comment block, and apply both necessity questions before `KEEP`. Never infer
+   a clean result from A29 alone, and never treat the word "rationale" as an
+   exemption: implementation history, test anecdotes, multi-paragraph prose,
+   and rationale longer than two source lines are candidates.
 3. **Report candidates** — no edits. Apply the restraint guardrails in
    `.claude/templates/refactoring/restraint.md` before flagging extractions; a
    single-use pass-through inline or a "NO ACTION" verdict is often correct.

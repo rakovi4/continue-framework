@@ -11,14 +11,14 @@ you assign, re-assign, or read a tier.
 
 ## The ladder
 
-Tier is decided by what happens if the scenario's behaviour is broken in
-production — never by category, never by count.
+Tier is decided first by what happens if the scenario's behaviour is broken in
+production, then by the delivery ceilings below. Category never decides tier.
 
 | Tier | If this scenario fails… | Destination |
 |---|---|---|
-| **1** | the feature does not work at all for its primary user | `progress.md`, before any Tier 2 |
-| **2** | the feature works, but the product is unsafe or incorrect under conditions that *will* occur in production | `progress.md`, after all of Tier 1 |
-| **3** | the impact is a known, bounded, acceptable degradation | `tier3/` — never enters `progress.md` |
+| **1** | the primary user's happy path does not work | `progress.md`, before any Tier 2 |
+| **2** | the happy path works, but a selected production corner case is unsafe or incorrect | `progress.md`, after all of Tier 1 |
+| **3** | lower-priority coverage is recorded but deferred | `tier3/` — never enters `progress.md` |
 
 Tier 1 is "demonstrable feature"; Tier 2 is "trustworthy feature". `tier3/` holds
 what `extended/` has always held — scenarios that are recorded and not built —
@@ -48,11 +48,12 @@ The two boundaries do not cost the same, so they do not tie-break the same way:
 - **Unsure between 1 and 2 → choose 2.** Both tiers get implemented; a wrong call
   costs ordering only, and it is self-correcting the moment someone tries to demo
   the feature.
-- **Unsure between 2 and 3 → choose 2.** Tier 3 is never implemented. A wrong call
-  there is not a delay, it is a scenario silently deleted from the plan.
+- **Unsure between 2 and 3 → prefer 2 while capacity remains.** Once the combined
+  ceiling is reached, compare the candidates and keep the higher-consequence one
+  in Tier 2. Pinned scenarios always outrank unpinned candidates.
 
-Tier 3 therefore requires a *positive* judgment — you must be able to name the
-degradation and say why it is acceptable. "Probably fine" is a Tier 2.
+Tier 3 therefore requires a judgment: name the degradation or corner case being
+deferred and why it ranks below the Tier 2 scenarios selected for this story.
 
 ## The marker
 
@@ -159,40 +160,27 @@ identify, not a complete guard over everything irreversible. `hz-03` (lost updat
 and `hz-04` (destructive ops, schema evolution) can fail unrecoverably and are
 deliberately *not* pinned — a destructive-op guard on an admin-only path is a
 plausible Tier 3, and pinning the whole group would swallow the exit. Those rest
-on the ladder itself, where the 2-vs-3 tie-break above is what protects them:
-"probably fine" is a Tier 2.
+on the ladder itself, where comparative consequence determines which scenarios
+fit in Tier 2 before the combined ceiling is reached.
 
-## No targets — not a count, not a percentage
+## Hard delivery ceilings
 
-Tier 1 has **no budget of any kind.**
+The implemented stack has two mandatory story-wide ceilings, counted after
+consolidation across every category:
 
-A target count makes a genuine must-have get dropped to hit it. A percentage does
-the same and additionally breaks at small N — "20% of Tier 1" is not an
-instruction anyone can follow on a nine-scenario story. Tier 1 is exactly what the
-ladder selects, however many that turns out to be.
+- **Tier 1: at most 10 scenarios.** Keep only distinct
+  executions needed to demonstrate the primary user's happy path.
+- **Tier 1 + Tier 2: at most 25 scenarios.** Fill the
+  remaining slots with the highest-consequence happy-path variants and corner
+  cases. Move every other eligible scenario to Tier 3.
 
-The resulting size is still information — and it is **reported, never acted on.**
-The tiering pass states the split it produced and stops. It does not split a
-story, does not re-run itself, and does not demote a scenario: all three are
-calls made with the whole story in view, by a human, after the pass has finished.
+These are hard output constraints, not diagnostic targets. Never weaken or delete
+an assertion to meet them. Consolidate only genuinely shared executions, rank
+distinct executions comparatively, and place overflow in Tier 3 with its explicit
+deferral judgment.
 
-Two readings are worth naming in that report, and the number alone cannot tell
-them apart:
-
-- the **story** may be too big to deliver in one piece;
-- the **ladder** may not have been applied — everything got swept into Tier 1.
-
-Both can be true at once, which is why neither is wired to an automatic fix.
-Neither is ever a licence to move a scenario down a tier: an oversized Tier 1
-that was sorted correctly is a fact about the story, and shrinking it by
-re-tiering only hides that fact.
-
-On splitting specifically: a split is a real fix only when the story contains two
-separable user-visible features. Scenario count does not tell you whether it
-does. Splitting one indivisible feature into two stories yields two stories
-neither of which is demonstrable on its own — the exact outcome the ladder exists
-to prevent.
-
-This is the lesson the category counts in `test-spec-format.md` already carry —
-they describe expected output, they are not budgets — applied to the new
-boundary.
+The pinned floor still wins over the Tier 3 exit. If more than ten distinct
+executions are genuinely required for the primary happy path, or Tier 1 plus all
+pinned scenarios exceeds 25, the set is infeasible: write nothing and report that
+the story must be narrowed. Never hide an infeasible story by misclassifying a
+happy-path execution or a pinned guard.

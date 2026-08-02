@@ -35,3 +35,8 @@ description: Review frontend component for hardcoded mockup placeholder data aft
 
 - **PASS** → proceed to `/refactor` as normal
 - **FAIL** → do NOT proceed to `/refactor`. Fix the flagged violations in the component first, then re-run `/design-review`
+
+In a staged frontend design-alignment lane, review only the component files in that
+lane's manifest. A flagged fix outside the manifest or in a frozen Stage 1 interface
+is an ownership conflict: return FAIL with the path and finding, and let the
+coordinator reconcile it. Do not edit files, stage, commit, or advance progress.

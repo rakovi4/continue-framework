@@ -20,7 +20,8 @@ Discover backend adapter modules by listing directories under `backend/adapters/
 
 ### Phase 1: Run Unit Tests in Parallel
 
-Run ALL of these commands in parallel using multiple Bash tool calls in a single message:
+Run ALL of these commands concurrently using multiple shell calls started before
+awaiting any result:
 - Backend usecase tests: `{Backend test command}` with module = usecase
 - Backend adapter tests: one `{Backend test command}` per adapter module discovered
 - Frontend tests: `{Frontend test command}`
@@ -29,10 +30,7 @@ Wait for all to complete. If any fail, report failures and STOP.
 
 ### Phase 2: Start Backend
 
-Use the Skill tool to invoke `/run-backend`:
-```
-Skill tool: skill="run-backend"
-```
+Execute the named `run-backend` skill and await startup.
 
 Wait for backend to start.
 
@@ -44,10 +42,7 @@ Wait for backend to start.
 
 ### Phase 4: Stop Backend
 
-Use the Skill tool to invoke `/stop-backend`:
-```
-Skill tool: skill="stop-backend"
-```
+Execute the named `stop-backend` skill and await completion.
 
 ## Output
 

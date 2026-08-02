@@ -9,17 +9,22 @@ description: Gather refactor detector findings and apply refactorings serially, 
 
 ## Purpose
 
-The three read-only detectors (`refactor-mechanics-agent`,
-`refactor-design-agent`, `refactor-duplication-agent`) scan in parallel and
-return candidate tables. This agent **gathers** those candidates and **applies**
-the refactorings serially — because refactorings cascade (a class split changes
-sizes, a parameter removal frees locals), fixing MUST stay single-threaded with a
+The three read-only detectors scan in parallel and return candidate tables. They
+are fanned out by `/continue` itself, in one message and awaited, and this agent
+is handed the merged list — the scatter half lives on the orchestrator's surface
+because a dispatched sub-agent must nest no fan-out of its own. Which detectors
+those are, and the flag that awaits them, are named in `/continue`'s Sub-Skill
+Dispatch row for `/refactor`.
+
+This agent **applies** the refactorings
+serially — because refactorings cascade (a class split changes sizes, a
+parameter removal frees locals), fixing MUST stay single-threaded with a
 re-scan after each change.
 
 ## Workflow
 
-1. **Collect** the candidate tables from every detector that ran. Merge into one
-   list. **Dedup** — when two clusters flag the same `file:line`, keep one entry.
+1. **Read** the merged, deduped candidate list you were handed. If it arrived
+   undeduped, keep one entry per `file:line`.
 2. **Order** the list highest-impact first: class/file splits (A0) before method
    extractions (A1) before local/expression cleanups — so cascades resolve
    downward and you don't refactor code you are about to delete.
@@ -44,11 +49,23 @@ re-scan after each change.
 2. **One refactoring at a time** — test after each.
 3. **Behavior unchanged** — refactoring preserves functionality.
 4. **Delete unused code** — imports, fields, methods.
-5. **Stay in your layer** — see `.claude/guidelines/tdd-rules.md` "Stay in your
-   layer". Cross-layer compilation fixes (updating callers after a domain/VO
-   change) are allowed plumbing, not a layer violation.
-6. **Never defer a smell fix** — if a candidate is a real violation, fix it this
-   session, not a future phase or conversation.
+5. **Stay in your layer for behavior changes** — see
+   `.claude/guidelines/tdd-rules.md` "Stay in your layer". Cross-layer compilation
+   fixes (updating callers after a domain/VO change) are allowed plumbing, not a
+   layer violation. This bounds what you may **change**; it does not bound what you
+   may **clean up** — see rule 6.
+6. **Never defer a fix you could apply** — if a candidate is a real violation, fix
+   it this session, not a future phase or conversation. This covers **every**
+   behavior-preserving finding you make, not only the detectors' in-layer smells:
+   a rename, dead code, a stale anchor or roster, a comment that outlived its
+   subject. Fix it wherever it lives. The one exception is a **file-domain lock**
+   in force for this dispatch — under a lock, report and name the locked file,
+   because a concurrent writer would collide.
+7. **Reporting a finding is not a free action** — a report becomes a plan step,
+   which costs two checkboxes and four commits. Before reporting anything you did
+   not fix, apply `.claude/templates/workflow/finding-admission-test.md`. A finding
+   that fails it cannot expand the current work item — report its failed rule,
+   consequence, and Stage 3 disposition instead.
 
 ## Restraint
 

@@ -19,6 +19,11 @@ are resolved.
 
 Anything outside the synced rows is not read, not diffed, and not reported.
 
+After this upstream merge, `/framework-sync` may run an explicitly routed,
+deterministic checkout-local migration. Such a migration reads product state but never
+takes product files from upstream, and lands in a separate commit. The scenario stage
+plan migration is defined in `../workflow/scenario-stage-migration.md`.
+
 ## Baseline File
 
 `.claude/framework-baseline` — one line, created by the first successful sync:
@@ -101,6 +106,8 @@ Settings   (N)  key — offered, not applied
 
 Asked user (N)  path — the contradiction, and the resolution chosen
 Verification: cross-refs OK | routing OK | line limits OK | product-agnostic OK
+
+Progress migration: <N migrated> | <N preserved — started> | <N already staged>
 ```
 
 Every row names a file. A sync that reports only a count is unreviewable.

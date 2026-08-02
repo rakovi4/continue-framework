@@ -47,6 +47,19 @@ Never write production code without a failing test first.
 - GREEN → REFACTOR: only after test passes.
 - REFACTOR → RED: only after all tests still pass.
 
+### Parallel Frontend Lanes
+
+Concurrency never collapses a lane's TDD sequence. A frontend-logic or API-client
+lane completes RED → test review → GREEN → refactor in that order; design alignment
+completes build → align → design review → focused coverage → refactor → verify-only
+align. Do not start GREEN because another lane reached GREEN, and do not publish a
+partially completed lane.
+
+The coordinator's manifest is a hard write boundary. Frozen Stage 1 interfaces and
+other lanes' files are read-only. When a test exposes an interface or ownership
+defect, stop with the conflicting path and evidence; never repair it from inside the
+lane. Lane workers do not stage, commit, or edit progress state.
+
 ### Zero Tolerance for Test Failures, Skips, and Hidden Non-Execution
 - When running tests, ALL failures must be investigated and resolved — not just the target test.
 - **There is no such thing as a "pre-existing" failure.** Never dismiss a failure as pre-existing, known, or unrelated. If a test fails, it is YOUR problem right now. Either fix the root cause or create a task to fix it — but never report "all tests passed" when the build is red.

@@ -16,6 +16,11 @@ Runs after GREEN phase to find uncovered branches and plan remediation.
 
 ## Workflow
 
+When invoked in staged frontend lane report-only mode, perform the same measurement
+and classification but return every gap to the coordinator. Do not edit
+`progress.md`; the coordinator applies admission and owns follow-up insertion after
+the lane join.
+
 1. **Run coverage for primary module** — load `.claude/tech/{backend}/templates/testing/coverage-commands.md` for tool-specific commands, and `.claude/templates/testing/coverage-commands.md` for universal workflow (focus mode, module mapping, report format)
 2. **Focus filter — all touched files** — see universal coverage-commands template. If the focus filter returns no classes but the green phase wrote new code with branches, the filter is wrong — investigate.
 3. **Multi-module coverage** — see universal coverage-commands template for module-to-test mapping. For each module OTHER than the primary that has touched files, run that module's coverage too.

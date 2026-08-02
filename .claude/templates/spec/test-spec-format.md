@@ -4,14 +4,15 @@ Per-category file formats and ordering *within* a category. **Tier** — the
 consequence-of-failure split that orders scenarios *across* categories, its
 `Tier:` marker, and the pinned floor — is defined in
 [`tier-ladder.md`](tier-ladder.md). Read that before assigning or reading a tier.
-The counts in the category headings below size a **category**; they say nothing
-about tier, and Tier 1 has no count of its own.
+The counts in the category headings below guide drafting only. The story-wide hard
+ceilings are applied after consolidation: Tier 1 has at most 10 scenarios and Tier 1
+plus Tier 2 has at most 25; remaining eligible scenarios go to Tier 3.
 
 **Consolidation** — merging scenarios that share one execution, so a story spends one
 TDD cycle per interaction rather than one per checked fact — is defined in
 [`consolidation-rules.md`](consolidation-rules.md) and applied to the whole drafted set
-by its own pass. The counts below are not a budget and never a consolidation target:
-a merge removes a duplicated pass, never a checked fact.
+by its own pass. Category counts never justify an invalid merge: a merge removes a
+duplicated pass, never a checked fact.
 
 ## 01_API_Tests.md (8-12 tests)
 

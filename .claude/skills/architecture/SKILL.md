@@ -29,7 +29,8 @@ When implementation reveals a design fork — multiple viable approaches with di
 
 1. **Present the problem** — describe the tension or fork point clearly
 2. **Propose 2-4 options** with trade-offs (how it works, pros/cons, impact, edge cases)
-3. **Use AskUserQuestion** to let the developer choose or propose alternatives
+3. **Request a user decision** using structured input when available, otherwise
+   ask directly; pause so the developer can choose or propose alternatives
 4. **Iterate** until the approach is clear
 5. **Draw diagrams** when helpful — write HTML files to visualize complex flows
 

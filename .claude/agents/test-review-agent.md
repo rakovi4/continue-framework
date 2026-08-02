@@ -9,20 +9,23 @@ description: Gather detector findings and apply strict-assertion fixes serially
 
 ## Purpose
 
-The four read-only detector agents (`test-review-assertions-agent`,
-`test-review-placement-agent`, `test-review-statements-agent`,
-`test-review-selenium-agent`) scan in parallel and return findings tables. This
-agent **gathers** those findings and **applies** the fixes serially — replacing
-loose validation with strict, field-level assertions and correcting placement /
-Statements-quality / selenium violations, while the test still validates the same
-behavior.
+The four read-only detector agents scan in parallel and return findings tables.
+They are fanned out by `/continue` itself, in one message and awaited, and this
+agent is handed the merged list — the scatter half lives on the orchestrator's
+surface because a dispatched sub-agent must nest no fan-out of its own. Which
+detectors those are, the flag that awaits them, and who runs the suite are named
+in `/continue`'s Sub-Skill Dispatch row for `/test-review`.
+
+This agent **applies** the fixes serially —
+replacing loose validation with strict, field-level assertions and correcting
+placement / Statements-quality / selenium violations, while the test still
+validates the same behavior.
 
 ## Workflow
 
-1. **Collect** the findings tables from every detector that ran. Merge them into
-   one list, ordered by file.
-2. **Dedup** — when two detectors flag the same `file:line`, keep one entry and
-   note both check numbers.
+1. **Read** the merged findings list you were handed, ordered by file.
+2. **Dedup** — if two entries flag the same `file:line`, keep one and note both
+   check numbers.
 3. **For assertion findings**, load `.claude/templates/testing/determinism-hierarchy.md`
    and classify each value top-down before writing the fix. Default is strict —
    only "truly opaque" values may keep `isNotNull()`, with a written justification.
@@ -33,11 +36,12 @@ behavior.
    - For missing-field findings, read the DTO/record and assert EVERY field.
 5. **Verify all fields asserted** — re-read each touched assertion method against
    its DTO; add any field still missing.
-6. **Run tests** via `/test-runner` to verify behavior is unchanged.
+6. **Run tests** for the module yourself, with the project test command, to
+   verify behavior is unchanged — dispatch nobody to run them.
 7. **Print the filled checklist** using `.claude/templates/workflow/test-review-output-format.md`
    before reporting. Fix any remaining violation BEFORE reporting "no issues."
 
-## No Deferred Assertions
+## No Deferred Fixes
 
 Every loose assertion the detectors found MUST be resolved to a strict assertion
 in this review. "Tighten later", "TBD", "acceptable at this phase", and "will be
@@ -45,6 +49,19 @@ defined during green" are NOT acceptable outcomes — see
 `.claude/templates/testing/determinism-hierarchy.md` for value-tracing guidance.
 The test defines expected behavior; it is the specification. If a displayed
 value's format is unknown, decide it now — the frontend must match the test.
+
+This extends past assertions to **every behavior-preserving finding you make**,
+structural ones included: a vacuous floor, a control the diff voided, a stale
+roster, a helper on both sides of a comparison. Fix it in this review, in whatever
+file it lives in. The one exception is a **file-domain lock** in force for this
+dispatch — under a lock, report and name the locked file, because a concurrent
+writer would collide.
+
+Reporting is not a free action: a report becomes a plan step, which costs two
+checkboxes and four commits. Before reporting anything you did not fix, apply
+`.claude/templates/workflow/finding-admission-test.md`. A finding that fails it is
+not allowed to expand the current work item — report its failed rule, consequence,
+and Stage 3 disposition instead.
 
 ## Forbidden Actions
 

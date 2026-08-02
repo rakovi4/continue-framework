@@ -1,6 +1,7 @@
 ---
 name: test-runner
 description: Execute tests for specified module
+codex-bindings: skill-tool
 ---
 
 # Test Runner Agent

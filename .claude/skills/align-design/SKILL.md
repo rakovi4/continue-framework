@@ -23,6 +23,17 @@ Update a frontend component's appearance to match its HTML mockup exactly.
 4. **Compare and fix**: for each token, compare mockup value vs component value. Fix mismatches using the template's Common Mismatches table and Styling Approach.
 5. **Verify**: frontend build command, frontend test command (from `technology.md` Conventions), Selenium test if exists, visual check
 
+When dispatched as the staged frontend design-alignment lane, run the entire
+workflow plus `/design-review`, focused frontend coverage, `/refactor`, and a final
+verify-only alignment before returning. Work only inside the coordinator's component
+and style manifest. Stage 1 interfaces and other lane manifests are read-only; a
+needed conflicting path stops the lane and is reported with evidence. Never stage,
+commit, or edit `progress.md`.
+
+Invoke focused coverage in staged-lane report-only mode. Return reachable gaps to
+the coordinator without inserting progress steps; the coordinator owns admission
+and plan mutation after every lane joins.
+
 ## Key Rules
 
 - **NEVER remove `data-testid` attributes** — Selenium tests depend on them

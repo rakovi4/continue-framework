@@ -45,7 +45,14 @@ What the suite genuinely cannot hold, each with an existing home:
 
 ## Scenario Sequences
 
-Each scenario type (backend, integration, frontend, security, load, infrastructure) runs a TDD cycle: a `red-* → /test-review → commit → /refactor → commit` work unit, then a `green-* → /test-coverage → commit → /refactor → commit` work unit, one scenario at a time. `/refactor` always lands in its own commit, separate from the behavior commit (see Atomic Work Units below and the Commit Discipline section of `.claude/guidelines/tdd-rules.md`). The exact per-phase step list for each scenario type, the `adapters-discovery` gate, and the bug-task discovery-first sequence live in **`.claude/guidelines/workflow-detail.md`** — read it before executing scenario or task work.
+Backend, integration, security, load, and infrastructure scenarios use three
+human-reviewed stages: acceptance RED beside contract design; concurrent complete
+RED-to-GREEN use-case and adapter lanes; then acceptance GREEN beside independent
+review. Frontend scenarios also use three stages: Selenium RED beside interface
+design; concurrent complete frontend-logic, API-client, and design-alignment lanes;
+then Selenium GREEN beside independent review. `/refactor` lands separately inside
+every lane that requires it. Exact mechanics and legacy in-flight behavior live in
+**`.claude/guidelines/workflow-detail.md`**.
 
 ## Progress Tracking
 
@@ -64,9 +71,17 @@ Story sections are **tier-major** — they mirror the tier-first delivery order 
 
 ## Atomic Work Units
 
-A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Within a work unit, never pause between sub-skills to report status or ask for confirmation — **with one sanctioned exception: the NEEDS_CLARIFICATION boundary quiz** (see below). A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing).
+A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Within a work unit, never pause between sub-skills to report status or ask for confirmation — **with one sanctioned exception: the NEEDS_CLARIFICATION boundary quiz** (see below). A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
 
 **Boundary work units add a third commit and the review passes.** A work unit is a **boundary** when its behavior commit closes the block it belongs to — a story scenario, a task step, a bug task's whole fix, the spec section, the harvest checkbox — i.e. no step of that block is left `[ ]` or `[~]` (the block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries"). Only then do the two fresh-context review passes (`agent-review` + `premortem`) run, in the `/refactor` batch, reading **every commit of the completed block** rather than one behavior commit; their auto-fixed SAFE findings land in a trailing `review-fix:` commit (skipped when none apply). They stay non-gating — verdicts are folded into the report, the commits land regardless (how the boundary is detected, dispatched, and triaged is owned by `/continue`; why the cadence is per block is in `.claude/guidelines/review-passes-detail.md`). A mid-block unit runs `/refactor` and stops at two commits.
+
+The staged backend and frontend sequences have one explicit range exception: their
+Stage 3 review runs concurrently with acceptance GREEN and reads the immutable Stage
+1+2 range. Stage 1 already reviewed the acceptance-test content; Stage 3 suite
+execution guards the remove-marker-only delta. That batch is consumed once and
+scenario closure does not dispatch a duplicate review.
+
+**Boundary review is depth-limited to one generation.** A block created from a boundary review's `NEEDS_CYCLE` finding carries the durable `<!-- review-origin: boundary -->` marker defined by `progress-format.md`. It still runs its complete TDD work unit and `/refactor`, but its closing boundary skips `agent-review` and `premortem`; findings from review must not recursively commission another review generation. The original boundary's required review is unchanged, and a trailing `review-fix:` commit is terminal inside that boundary — validating it never starts another review batch.
 
 **The boundary quiz:** when a review pass tags a finding NEEDS_CLARIFICATION, `/continue` may call `AskUserQuestion` once — in that boundary unit, after the passes finish and before the `review-fix:` commit — to resolve the fix direction. This is the only sanctioned pause for user input inside a work unit, and it never lets the unit stop early. **A quiz is the last resort, not the neutral option:** a review pass that can name the better fix direction must name it and own the decision, and `/continue` demotes an ill-formed clarification to a follow-up rather than asking. The escalation bar is in `.claude/templates/workflow/clarification-escalation-test.md`.
 
@@ -77,7 +92,7 @@ STOP only after the work unit's last commit; NEVER stop after the behavior commi
 Tasks are standalone work items that don't need the full story lifecycle. Three types:
 
 - **bug** — Something is broken. Discover root cause first, then fix with a targeted TDD cycle.
-- **refactoring** — Structural improvement. User-defined steps with standard TDD sub-skills.
+- **refactoring** — Structural improvement. After its initial spec, every task runs design preview and steps discovery before concrete TDD work is added.
 - **qa** — Manual checklist (smoke / regression) verified against an external environment. No production code change, no TDD cycle.
 
 Tasks live in `ProductSpecification/tasks/{N}-{type}-{slug}/`. When all checkboxes in a task's `progress.md` are `[x]` (or `[S]`), the task folder is moved to `ProductSpecification/tasks/done/`. Task commits use the `task:` prefix. The discovery-first bug sequence, QA session lifecycle, and scoped-steps rules are in `.claude/guidelines/workflow-detail.md`.

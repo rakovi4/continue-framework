@@ -11,8 +11,8 @@ boundary, then all of Tier 2 in the same category order. Heading shape is
 section under each tier. Tier 3 never appears — it lives in `tests/tier3/` and is
 never implemented (`.claude/templates/spec/tier-ladder.md`).
 
-Tiering changes the *order* of scenarios, never their steps: each scenario runs the
-same TDD cycle wherever its tier puts it.
+Tiering changes the *order* of scenarios, never their steps: each new scenario uses
+the same three-stage backend-style or frontend sequence wherever its tier puts it.
 
 A scenario heading is the test file's `### N.M Title` **verbatim** — not renumbered,
 not relabelled `Scenario 1`. One category file feeds two tier sections, so
@@ -35,32 +35,17 @@ tier's scenarios are the gaps — and that is correct.
 ## Tier 1 — Backend Scenarios (01_API_Tests.md)
 
 ### 1.1 A member opens a board they own
-- [x] red-acceptance
-- [~] design               <- MANDATORY for every scenario needing new implementation
-- [ ] red-usecase
-- [ ] green-usecase
-- [ ] adapters-discovery
-- [ ] green-acceptance
-
-#### After adapters-discovery resolves (example):
-- [x] adapters-discovery (storage, rest)
-- [ ] red-adapter storage
-- [ ] green-adapter storage
-- [ ] red-adapter rest
-- [ ] green-adapter rest
-- [ ] green-acceptance
+- [~] stage-1 acceptance RED + contract design
+- [ ] approve stage-1 contracts
+- [ ] stage-2 implementation lanes
+- [ ] stage-3 acceptance GREEN + review
 
 ## Tier 1 — Frontend Scenarios (02_UI_Tests.md)
 
 ### 1.1 The board renders its columns
-- [ ] red-selenium
-- [ ] red-frontend
-- [ ] green-frontend
-- [ ] red-frontend-api
-- [ ] green-frontend-api
-- [ ] align-design
-- [ ] green-selenium
-- [ ] demo
+- [ ] stage-1 frontend acceptance RED + interface design
+- [ ] stage-2 frontend implementation lanes
+- [ ] stage-3 frontend acceptance GREEN + review
 
 ## Harvest — Tier 1 → Tier 2
 
@@ -69,27 +54,29 @@ tier's scenarios are the gaps — and that is correct.
 ## Tier 2 — Backend Scenarios (01_API_Tests.md)
 
 ### 1.4 A duplicate move request is rejected
-- [ ] red-acceptance
-- [ ] design
-- [ ] red-usecase
-- [ ] green-usecase
-- [ ] adapters-discovery
-- [ ] green-acceptance
+- [ ] stage-1 acceptance RED + contract design
+- [ ] approve stage-1 contracts
+- [ ] stage-2 implementation lanes
+- [ ] stage-3 acceptance GREEN + review
 
 ## Tier 2 — Security Scenarios (05_Security_Tests.md)
 
 ### 2.1 A member cannot open another member's board
-- [ ] red-acceptance
-- [ ] design
-- [ ] red-usecase
-- [ ] green-usecase
-- [ ] adapters-discovery
-- [ ] green-acceptance
+- [ ] stage-1 acceptance RED + contract design
+- [ ] approve stage-1 contracts
+- [ ] stage-2 implementation lanes
+- [ ] stage-3 acceptance GREEN + review
 ```
 
 Integration (`06_Integration_Tests.md`), Load (`03_Load_Tests.md`) and
-Infrastructure (`04_Infrastructure_Tests.md`) sections take the same six-step
-backend shape, under whichever tier their scenarios landed in.
+Infrastructure (`04_Infrastructure_Tests.md`) sections take the same staged backend
+shape, under whichever tier their scenarios landed in.
+
+Frontend sections use the staged frontend shape shown above. Stage 1 freezes shared
+interfaces, Stage 2 joins disjoint shared-worktree lanes, and Stage 3 owns final
+Selenium verification, independent review, and demo. Frontend scenarios whose
+legacy `red-selenium` through `demo` sequence already started keep that shape; never
+replace checkboxes underneath an active cursor.
 
 ### The harvest boundary
 
@@ -168,32 +155,33 @@ Type: refactoring
 
 ## Spec
 - [x] spec
+- [~] design
+- [ ] refactor (steps discovery)
 
 ## Fix
-
-### Step 1: Step description
-- [~] red-adapter storage             <- CURRENT
-- [ ] green-adapter storage
-
-### Step 2: Step description
-- [ ] refactor usecase
-- [ ] refactor (cleanup)
-- [ ] green-acceptance
 ```
+
+A refactoring task always runs design before `refactor (steps discovery)`. Discovery fills the initially empty `## Fix` section and records `plan: +N/-N/~N` against committed pre-unit progress; at least one count is non-zero.
+
+Choose concrete step shapes with
+[`steps-discovery-shapes.md`](steps-discovery-shapes.md). Plain checkboxes are
+first-class work units; never add fake RED/GREEN labels merely for dispatch.
 
 ## Blocks and boundaries
 
-A **block** is the unit the commit-time review passes fire at the end of
-(`.claude/skills/continue/SKILL.md`, "Boundary Review Passes"), and it is read straight off
-the shapes above — no extra syntax, no marker. A block is a story scenario's `### N.M {Title}`
+A **block** is the unit the commit-time review passes fire at the end of (`.claude/skills/continue/SKILL.md`, "Boundary Review Passes"), and it is read straight off the shapes above. A block is a story scenario's `### N.M {Title}`
 heading and its steps; a refactoring task's `### Step N: …` and its steps; a bug task's whole
 `## Fix: …` section (its steps carry no `### ` heading); or a `## Spec` / `## Harvest — Tier 1
 → Tier 2` section. Slice one from its heading to the next heading of same or higher level.
 
+A block introduced by a boundary review's admitted `NEEDS_CYCLE` finding places `<!-- review-origin: boundary -->` below its heading. It still runs full TDD and `/refactor`, but its closing boundary dispatches no review batch.
+A staged backend or frontend scenario may temporarily append `resolve stage-3 cycle proposals`
+after Stage 3. It is a decision checkpoint, not an implementation cycle; the adjacent
+comment is durable proposal state, and consent is required before concrete cycle
+blocks are inserted.
 A block is **closed** when that slice holds no `- [ ]` and no `- [~]` line — every step reads
 `[x]` or `[S]` — and the work unit whose commit closes it is a **boundary**. The block's
 **first commit** is the oldest commit whose `progress.md` already shows one of its steps
 `[x]`/`[S]`; walking `git log --follow` over `progress.md` newest-to-oldest finds it, and
-`{that commit}~1..HEAD` is everything the block cost — the range a boundary reviews. Nothing
-in the file records any of this: it is recomputed from the checkboxes each time, so a plan
-written before boundaries existed reads identically and no actor can leave a stale one behind.
+`{that commit}~1..HEAD` is everything the block cost — the range a boundary reviews. Apart from the
+review-origin marker, closure and range are recomputed from the checkboxes each time, so a plan written before boundaries existed reads identically and no actor can leave a stale one behind.

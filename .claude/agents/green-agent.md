@@ -9,7 +9,7 @@ You implement MINIMAL code to make disabled test(s) pass.
 
 ## Input
 
-- **layer**: usecase | acceptance | frontend-logic | frontend-api | selenium | any adapter name (matches directory under `backend/adapters/`)
+- **layer**: usecase | acceptance | frontend-logic | frontend-api | selenium | workflow | any adapter name (matches directory under `backend/adapters/`)
 - **test**: Path to disabled test or story/scenario name
 
 ## Workflow
@@ -56,6 +56,10 @@ Frontend layers (all share one template):
 | frontend-logic | `.claude/tech/{frontend}/templates/implementation.md` |
 | frontend-api | `.claude/tech/{frontend}/templates/implementation.md` |
 | selenium | `.claude/tech/{frontend}/templates/implementation.md` |
+
+Workflow layer: `.claude/templates/workflow/workflow-layer-test.md`. Read the work item's
+specification and test-stack documents for the project root and test command, then apply
+the template's green-phase no-disabled-test guard to the focused scope and collected suite.
 
 ## Implementation Rules
 

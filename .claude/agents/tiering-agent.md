@@ -23,7 +23,8 @@ open to say which.
   you are guessing at.
 - **ladder**: `.claude/templates/spec/tier-ladder.md` — the tiers and their
   tie-breaks, the marker and its `?` form, the provenance table, the pinned
-  floor, and the no-targets rule. Read it first; it governs every call you make
+  floor, and the hard delivery ceilings. Read it first; it governs every call you
+  make
   and this file does not restate it. Where it and this file differ, the ladder
   wins.
 - **story spec**: the story folder's spec. You need the primary user and what
@@ -49,11 +50,16 @@ open to say which.
    `Tier: ? (tokens)` — authoring stamped its route and left the tier to you.
 3. Evaluate the stop conditions below — before anything is written, so a stop
    leaves every file exactly as you found it.
-4. Assign a tier to every scenario, comparatively, against the primary user.
-5. Apply the floor to the assignments, then write every marker in the ladder's
+4. Identify the minimal primary-user happy path, then rank the remaining scenarios
+   by consequence of failure.
+5. Apply the floor and hard ceilings. Stop without writing if Tier 1 needs more
+   than 10 distinct executions or Tier 1 plus pinned scenarios needs more than 25.
+   Otherwise keep at most 10 in Tier 1, fill Tier 2 up to a combined maximum of 25,
+   and assign every remaining scenario to Tier 3 with a deferral judgment.
+6. Write every marker in the ladder's
    form (`tier-ladder.md`, "The marker").
-6. Move each scenario to the directory its tier calls for (below).
-7. Report the split and stop.
+7. Move each scenario to the directory its tier calls for (below).
+8. Report the split and stop.
 
 ### Moving between `tests/` and `tier3/`
 
@@ -76,6 +82,9 @@ Then verify the move conserved the set. Every `### N.M Title` that existed befor
 the pass exists after it, in exactly **one** file, still carrying a marker. A
 heading in neither file, or in both, is a failed move: restore it and report the
 failure in place of the split.
+
+Finally count the resolved markers in `tests/*.md`; fail the split unless Tier 1
+is at most 10 and Tier 1 plus Tier 2 is at most 25.
 
 ## Stop conditions
 
@@ -109,9 +118,16 @@ checklist owns one named file. There is no equivalent for `hz-NN` — hazard
 scenarios land in every category file, so an unstamped one arrives
 indistinguishable from a story-spec one and the emitter is the sole guard there.
 
+**An infeasible delivery stack.** After ranking but before writing, stop if the
+minimal happy path requires more than 10 scenarios, or if Tier 1 plus every scenario
+blocked from Tier 3 by the pinned floor exceeds 25. Report both counts and the
+scenarios that make the ceiling impossible. Do not demote them to manufacture a
+valid split.
+
 ## Report
 
-- The split: per tier, per file, and the Tier 1 total.
+- The split: per tier, per file, the Tier 1 total, and the Tier 1 + Tier 2 total.
+  Assert `Tier 1 <= 10` and `Tier 1 + Tier 2 <= 25` explicitly.
 - **Every Tier 3 scenario, named** — file, `### N.M Title`, and the degradation
   judgment quoted from its marker. A count is not enough: Tier 3 is the only
   assignment nothing downstream revisits, since it never enters `progress.md` and
@@ -133,9 +149,9 @@ indistinguishable from a story-spec one and the emitter is the sole guard there.
   when there are none, delete any stale copy so its absence means "no inversions".
 - Any stop condition hit, and what triggered it.
 
-The size of Tier 1 is a diagnostic you state and never act on: you do not split
-the story, re-run yourself, or demote a scenario to shrink it (`tier-ladder.md`,
-"No targets"). State the split and stop.
+The ceilings are output invariants. Rank the whole set once; do not re-run the pass
+or weaken scenarios to chase the counts. Overflow belongs in Tier 3 unless the
+pinned floor makes the set infeasible.
 
 ## Rules
 

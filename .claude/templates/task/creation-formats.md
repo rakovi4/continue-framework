@@ -18,8 +18,9 @@ produced later by the discovery sequence (`root cause analysis` records the
 cause and key files in `spec.md`; `design` settles the fix approach). Pre-baking
 a solution at creation commits to an assumption before any investigation has run.
 
-**Refactoring** and **qa** specs do state a Solution at creation (the intended
-structural change / when-to-run), since there is no unknown cause to discover.
+**Refactoring** and **qa** specs do state an intended outcome at creation. A
+refactoring task does not pre-plan implementation steps: design preview approves
+the approach and steps discovery derives the executable plan.
 
 ```markdown
 # Task {N}: {Title}
@@ -98,18 +99,14 @@ Type: refactoring
 
 ## Spec
 - [x] spec
+- [~] design
+- [ ] refactor (steps discovery)
 
 ## Fix
-
-### Step 1: {description}
-- [ ] red-adapter storage
-- [ ] green-adapter storage
-
-### Step 2: {description}
-- [ ] refactor usecase
-- [ ] refactor (cleanup)
-- [ ] green-acceptance
 ```
+
+`refactor (steps discovery)` replaces the empty `## Fix` body with scoped,
+concrete step headings and checkboxes after the design is approved.
 
 ### QA
 

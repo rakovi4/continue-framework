@@ -37,7 +37,8 @@ Default upstream: `https://github.com/rakovi4/continue-framework` (branch `main`
    ```
    git diff <baseline>..framework/main -- .claude CLAUDE.md ':(exclude).claude/settings.json'
    ```
-   Empty → report "already up to date at `<short-rev>`", touch nothing, stop. Otherwise
+   Empty → report "prompt library already up to date at `<short-rev>`", then run the
+   step 11 progress-layout audit before deciding there is nothing to commit. Otherwise
    apply it with `git apply --3way`, one file at a time so each result is inspectable.
    A file that fails to apply is not a failure of the sync — read both sides
    (`git show framework/main:<path>` vs the local file) and merge it by hand. Classify
@@ -66,12 +67,21 @@ Default upstream: `https://github.com/rakovi4/continue-framework` (branch `main`
 10. **Commit** the merge and the baseline together as `framework: sync from upstream
     <short-rev>`, with the report's substance in the body. Under `--dry-run`, stop after
     step 9 and write nothing.
+11. **Migrate unstarted scenario plans.** After the sync commit (or immediately
+    after an up-to-date result), run
+    `.claude/templates/workflow/scenario-stage-migration.md` over every story
+    `progress.md`. Convert each wholly unstarted legacy backend-style or frontend
+    scenario to its staged layout; preserve a scenario as a whole when any one of its
+    steps started.
+    Under `--dry-run`, report candidates without writing. Otherwise commit all migrated
+    progress files separately as `framework: migrate unstarted scenario plans`.
 
 ## Constraints
 
-- **Never sync outside the surface** defined in the merge template — product
+- **Never merge upstream files outside the surface** defined in the merge template — product
   specification, product code, infrastructure, and repo-level docs stay untouched, whatever
-  upstream carries in those paths.
+  upstream carries in those paths. Step 11 is not an upstream-file sync: it is a
+  deterministic, checkout-local plan migration governed by its own template and commit.
 - **Never push to the upstream remote.** This skill is pull-only; local improvements go
   upstream by a separate, deliberate route.
 - **A contradiction stops the merge.** When upstream and local state opposing rules for
@@ -79,13 +89,16 @@ Default upstream: `https://github.com/rakovi4/continue-framework` (branch `main`
   recency, line count, or authorship.
 - **Keep local when unsure.** Taking an upstream change is recoverable from git history;
   a lost local change leaves no trace in the resulting diff.
-- **One commit.** The merge, the settings decision, and the baseline land together, so the
-  sync can be reverted as a unit.
+- **One prompt-sync commit.** The merge, settings decision, and baseline land together.
+  The derived progress migration lands separately so prompt changes and product state can
+  be reviewed or reverted independently.
 
 ## Templates
 
 - `.claude/templates/documentation/framework-sync-merge.md` — sync surface, baseline
   format, per-file decision table, settings key-merge, verification checklist, report format.
+- `.claude/templates/workflow/scenario-stage-migration.md` — idempotent migration of
+  wholly unstarted legacy backend-style and frontend scenario blocks.
 
 ## Next Steps
 

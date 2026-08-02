@@ -64,6 +64,8 @@ All templates live in `.claude/templates/refactoring/`.
 | `// Unreachable` comment (left by coverage agent) | Remove the dead code branch and simplify the condition | (inline -- delete branch, simplify) |
 | Long method (>10 lines) | Extract private methods per concern | `extract-method.md` |
 | Commented block sections (`// comment` + code + blank) | Extract each block, use comment as method name | `extract-method.md` |
+| Narrative comment or section label that restates code | Rename, extract, or simplify until the code expresses the intent; then delete the comment | `replace-comment-with-code.md` |
+| Comment bloat: implementation history, test anecdote, multi-paragraph prose, rationale longer than two lines, or rationale with no present decision impact | Delete obsolete prose; move a durable external contract to its owning documentation; compress only irreducible current rationale to at most two source lines | `replace-comment-with-code.md` |
 | Blank line wrapped sections (blank line + code + blank) | Extract each block, derive method name from purpose | `extract-method.md` |
 | Sequential independent blocks (3+ small operations, no shared state, each a distinct concern) | Extract each block into named method -- parent becomes table of contents | `extract-method.md` |
 | Single-use local: simple pass-through (accessor result used once, NOT a call to an injected dependency) | Inline variable | `simplify-expressions.md` |

@@ -31,7 +31,9 @@ file at a time — so there are no concurrent writes to shared Statements files.
 1. **Determine the test's layer** (usecase / rest / storage / acceptance / selenium) —
    this selects the tech file each detector loads and whether the selenium
    detector runs.
-2. **Dispatch the detectors in parallel** (single message, multiple agent calls).
+2. **Dispatch the detectors concurrently and await all of them** — start every
+   named agent before awaiting results, then gather every result. No dispatch is
+   detached or fire-and-forget: step 3 requires the complete result set.
    Each runs only its cluster of `.claude/templates/workflow/test-review-checklist.md`
    and returns a findings table:
    - `test-review-assertions-agent` — cluster A (assertion strictness)
@@ -47,3 +49,5 @@ file at a time — so there are no concurrent writes to shared Statements files.
 If the target test is small with very few assertions, skip the fan-out and run a
 single `test-review-agent` pass over the whole checklist — the detector
 orchestration + merge overhead can exceed the single-agent cost on tiny files.
+Await that one dispatch too. This pass both finds and fixes, so an unawaited call
+could report the review done before a single assertion has been tightened.

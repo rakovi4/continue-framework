@@ -40,10 +40,10 @@ facts needed two.
 - **The rules file sets the vocabulary; this file sets the pass.** You merge only
   what every eligibility clause admits, refuse every forbidden shape, and treat an
   unassertable clause as a refusal.
-- **Not merging is free; merging wrongly is not.** An unmerged pair costs one extra
-  pass, recoverable at any time. A bad merge costs a lost assertion, an ambiguous
-  red, or hardening dragged into the shippable milestone — none of which anything
-  downstream revisits. Ambiguity resolves toward leaving the pair alone.
+- **Every eligible group merges; ambiguity does not.** Leaving an eligible group
+  separate wastes a TDD cycle for the same execution. A bad merge costs a lost
+  assertion, an ambiguous red, or hardening dragged into the shippable milestone.
+  Apply every clause; ambiguity resolves toward leaving the group alone.
 - **You consume provenance; you never produce it.** Tokens union onto the survivor
   verbatim. You never invent one, never drop one, and never elect a primary.
 - **You never assign a tier.** Every marker you write keeps its literal `?`. The
@@ -57,16 +57,17 @@ facts needed two.
    marker line and Then clauses. This is the comparand your report is checked against.
 3. Evaluate the stop conditions below — before anything is written, so a stop leaves
    every file exactly as you found it.
-4. Within each `## N. Section` of each file, form candidate groups: scenarios sharing
-   an actor, an entry point and a Given. Across sections or files, form none.
-5. Test every candidate group against **all eight** eligibility clauses and against
+4. Within each `## N. Section` of each file, form maximal candidate groups sharing
+   an actor, entry point, compatible Given state and one When. Across sections or
+   files, form none.
+5. Test every whole candidate group against **all eight** eligibility clauses and
    the forbidden list. Record the clause that failed for each rejected group — a
    rejection you cannot name a clause for is a rejection you have not made.
 6. Write each surviving merge: one heading at the lowest absorbed number, a title
    naming the interaction, one marker line carrying the unioned tokens against `?`,
    one Given, one When, and every Then from every absorbed scenario. Delete the
    absorbed headings. Renumber nothing.
-7. Verify conservation (below), then report and stop.
+7. Verify conservation and that no eligible pair remains, then report and stop.
 
 ### Conservation, checked before reporting
 
@@ -84,6 +85,8 @@ not a finding to report around.
 - **Every heading is accounted for.** Each starting `### N.M Title` either still
   exists unchanged, or is named in exactly one merge entry as absorbed. A heading in
   neither is a scenario you deleted rather than merged.
+- **No eligible pair remains.** Reapply all eight clauses to the survivors. If two
+  scenarios still describe one safely mergeable execution, consolidation is incomplete.
 
 ## Stop conditions
 
@@ -121,7 +124,7 @@ of the floor, which is the whole reason this pass runs before tiering.
 
 The after-count is a diagnostic you state and never act on: you do not re-run
 yourself, do not run a second merge pass over your own output, and do not loosen a
-clause because the number is still high (`tier-ladder.md`, "No targets";
+clause because the number is still high (`tier-ladder.md`, "Hard delivery ceilings";
 `consolidation-rules.md`, "Fewer passes, never fewer facts"). A set that consolidates
 to few merges is a story with many genuinely distinct interactions. State the result
 and stop.
