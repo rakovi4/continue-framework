@@ -32,6 +32,19 @@ and frozen interfaces together for user review after both lanes join.
 The acceptance test is optional input in this mode: inspect its committed form when
 available, but never make either lane depend on the other's completion.
 
+Before returning, apply `parallel-backend-stages.md`'s Stage 2 lane-plan gate. Keep
+all collaborating classes and focused tests for one use case or adapter boundary in
+one complete lane; never split by production class, test class, guard subset, or work
+size. Thus a scenario owned by one adapter produces one RED agent for its complete
+focused test surface followed by one GREEN agent for its complete production fix.
+Freeze natural seams so genuinely independent lanes can start together, and do not
+mistake cross-lane post-join verification for an implementation dependency; focused
+composition inside one adapter stays in that adapter's RED surface. Return each
+lane's architectural unit, each writable path with its intended behavior delta,
+and separately named frozen symbol/signature/model surfaces. Never return a dependency
+between Stage 2 lanes: freeze the seam, coalesce the work, or fail the design gate.
+The coordinator records the independent-lane plan for approval and Stage 2 dispatch.
+
 ### Concurrent Frontend Interface-Design Mode
 
 When Stage 1 of `parallel-frontend-stages.md` dispatches this skill beside Selenium
