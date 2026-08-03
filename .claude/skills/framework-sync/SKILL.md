@@ -70,9 +70,10 @@ Default upstream: `https://github.com/rakovi4/continue-framework` (branch `main`
 11. **Migrate unstarted scenario plans.** After the sync commit (or immediately
     after an up-to-date result), run
     `.claude/templates/workflow/scenario-stage-migration.md` over every story
-    `progress.md`. Convert each wholly unstarted legacy backend-style or frontend
-    scenario to its staged layout; preserve a scenario as a whole when any one of its
-    steps started.
+    `progress.md`. Inspect every `###` scenario block regardless of its enclosing `##`
+    heading. Convert each wholly unstarted legacy backend-style or frontend scenario
+    to its staged layout; preserve a scenario as a whole when any one of its steps
+    started.
     Under `--dry-run`, report candidates without writing. Otherwise commit all migrated
     progress files separately as `framework: migrate unstarted scenario plans`.
 

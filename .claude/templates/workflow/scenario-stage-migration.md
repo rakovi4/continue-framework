@@ -7,16 +7,17 @@ scenarios or touching work that has begun.
 ## Scope
 
 Enumerate every `progress.md` under the product specification tree with `find`; select
-only files whose H1 identifies a story. Inspect scenario blocks under Backend,
-Integration, Frontend, Security, Load, and Infrastructure sections, including
-tier-prefixed versions. Never migrate task plans or non-scenario sections.
+only files whose H1 identifies a story. Inspect every scenario block headed by `###`,
+regardless of its enclosing `##` heading. A story may reorder scenarios under custom
+grouping sections; that must not remove them from migration scope. Never migrate task
+plans or blocks without a scenario heading.
 
 ## Candidate Test
 
 A scenario is a candidate only when every marker in one of these exact legacy
 sequences is `[ ]`:
 
-**Backend-style** — Backend, Integration, Security, Load, or Infrastructure only:
+**Backend-style**:
 
 ```markdown
 - [ ] red-acceptance
@@ -27,7 +28,7 @@ sequences is `[ ]`:
 - [ ] green-acceptance
 ```
 
-**Frontend** — Frontend only:
+**Frontend**:
 
 ```markdown
 - [ ] red-selenium
