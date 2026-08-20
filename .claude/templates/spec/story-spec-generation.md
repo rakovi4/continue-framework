@@ -34,14 +34,23 @@ Before generating any specification, read and understand:
    contradicts
 6. **Story-specific context** (optional): `interview.md` in the story folder resolved in **Input** above
    - If present, read it for additional context, external documentation, and special instructions
+   - Classify every relevant interview fact before drafting: observable behavior,
+     business rules, and user-facing constraints feed the main spec; implementation
+     choices, architecture, data/storage design, algorithms, technology, protocols,
+     endpoint mechanics, deployment, and integration mechanics feed the Notes file
 
 ## Phase 2: Generate Specifications
 
 Load `.claude/templates/spec/story-templates.md` for document structure.
 
 Generate **two files**:
-- Main spec: `NN_StoryName.md` (~50 lines max, implementation-focused)
-- Notes file: `NN_StoryName_Notes.md` (warnings, suggestions, technical details)
+- Main spec: `NN_StoryName.md` (~50 lines max, domain language only)
+- Notes file: `NN_StoryName_Notes.md` (implementation context, warnings, suggestions)
+
+The main spec describes what the user can do, the business rules that govern it,
+and the observable outcomes. It must not name or prescribe implementation machinery.
+If a technical constraint affects observable behavior, translate its effect into a
+domain requirement in the main spec and record the technical cause only in Notes.
 
 ## Phase 3: Hazard Catalogue Scan
 
@@ -50,11 +59,12 @@ closed-list complement to the open-ended commit-time review passes. Dispatch it 
 as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read its "How to apply
 it", "The dispatch shape"); the artifact under scan is the **drafted spec**.
 
-Fold every GAP back into the spec as an explicit requirement or constraint (and its Notes
-file) so test-spec and design-preview inherit it. At story altitude the guard is a named
-requirement, not yet a test — but it must be specific enough that a downstream test could
-go red on it. An unresolved GAP blocks Phase 4: fold every fired-trigger GAP in, or
-explicitly dismiss it with a reason, before output.
+Fold every GAP back into the appropriate artifact so test-spec and design-preview inherit
+it: observable requirements and constraints enter the main spec in domain language;
+implementation mechanisms and rationale enter Notes. At story altitude an observable
+guard is a named requirement, not yet a test — but it must be specific enough that a
+downstream test could go red on it. An unresolved GAP blocks Phase 4: fold every
+fired-trigger GAP in, or explicitly dismiss it with a reason, before output.
 
 **Nothing is stamped here, and nothing is lost by that.** A story draft has no numbered
 scenarios, so a COVERED line names its guard in the spec's own terms and there is no
@@ -84,7 +94,12 @@ with reason).
 
 - **Language**: English
 - **Main file brevity**: Target ~50 lines max — ruthlessly cut fluff
-- **Notes completeness**: All warnings, suggestions, technical details go to Notes file
+- **Domain-only main spec**: Use the vocabulary of users and the business domain;
+  describe behavior, rules, constraints, and outcomes without implementation terminology
+- **Notes completeness**: All implementation choices, architecture, technology,
+  integration mechanics, warnings, suggestions, and technical details go to Notes
+- **Technical limitations**: Put the mechanism in Notes; put only its observable effect,
+  expressed as a domain rule, in the main spec
 - **Archived drafts**: Use as reference but apply new compact format
 - **No redundancy**: If it's in main file, don't repeat in notes
 - Check if spec already exists before creating (avoid duplicates)

@@ -53,6 +53,11 @@ After each round, if the user's answers reveal topics not covered by the standar
 
 ## Output Format
 
+The interview is a source artifact, not the final story specification. Preserve
+technical answers when they clarify feasibility or implementation limitations; the
+next story-spec step will route them to `NN_StoryName_Notes.md`. Business behavior and
+observable constraints will be rewritten in domain language in the main story file.
+
 **Format rules:**
 - Use `##` headers for major sections
 - Use `###` for subsections

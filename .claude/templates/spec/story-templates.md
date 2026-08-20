@@ -2,7 +2,7 @@
 
 ## Main Story File: `NN_StoryName.md`
 
-Brief, scannable, implementation-focused. **Target: ~50 lines max.**
+Brief, scannable, and written exclusively in domain language. **Target: ~50 lines max.**
 
 ```markdown
 # [Story Title]
@@ -22,21 +22,30 @@ Brief, scannable, implementation-focused. **Target: ~50 lines max.**
 [Essential validations only - keep minimal]
 
 ## Screen States
-[List of distinct screens/states needed for implementation]
+[List distinct user-visible screens/states]
 
 ## Core Requirements
-[Critical implementation requirements - brief bullets, no fluff]
+[Critical observable behavior and business constraints - brief bullets, no fluff]
 ```
 
 **Rules for main file:**
-- No warnings, suggestions, or technical notes
+- Use the vocabulary of users and the business domain
+- Describe what happens, not how the system implements it
+- Include observable behavior, business rules, validation, and user-facing constraints
+- Exclude architecture, data/storage design, algorithms, technology, protocols,
+  endpoint mechanics, deployment, and integration mechanics
+- When a technical limitation affects behavior, state only its observable effect as a
+  domain rule; put the technical cause in Notes
+- No warnings, suggestions, rationale, or technical notes
 - No "nice-to-haves" or future enhancements
 - No verbose explanations - just facts
-- Every line must be actionable for implementation
+- Every requirement must be externally meaningful and testable
 
 ## Notes File: `NN_StoryName_Notes.md`
 
-All supplementary information goes here:
+All implementation context and supplementary information goes here. Do not repeat a
+domain requirement from the main spec; explain only the implementation constraint,
+rationale, or consequence that a delivery team needs in order to realize it.
 
 ```markdown
 # [Story Title] - Notes & Considerations
@@ -69,6 +78,9 @@ All supplementary information goes here:
 
 ## Technical Notes
 
+### Implementation Decisions
+[Architecture, data/storage design, algorithms, technology, and protocol choices]
+
 ### Load Considerations
 [Performance concerns based on ExpectedLoad.md:
 - Single-user application
@@ -81,7 +93,7 @@ All supplementary information goes here:
 [Infrastructure/deployment concerns]
 
 ### Integration Notes
-[Integration and external API concerns:
+[Integration mechanics and external API concerns:
 - External API dependencies
 - OAuth token lifecycle
 - Rate limits and throttling

@@ -1,0 +1,19 @@
+{
+  "description": "Load the shared Claude/Codex project rules into every Codex session.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/load-project-rules.sh\"",
+            "timeout": 10,
+            "statusMessage": "Loading shared project rules",
+            "additionalContextLimit": 0
+          }
+        ]
+      }
+    ]
+  }
+}

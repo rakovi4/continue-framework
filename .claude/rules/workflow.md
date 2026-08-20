@@ -16,7 +16,7 @@ Those six scenario types are the **categories**, not the delivery order. In a ti
 
 **Backlog** stories have all `·` columns (no folder yet); rows are added by the `/story` skill. When `/continue N` targets a Backlog story, auto-promote it: move the row from **Backlog** to **In Progress** in `ProductSpecification/stories.md` before starting work.
 
-Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding).
+Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding). The interview may capture technical constraints needed to understand feasibility, but the generated main story spec uses domain language exclusively. Implementation choices, architecture, technology, and integration mechanics belong in the story's Notes file. When a technical limitation changes externally observable behavior, state that behavior in domain terms in the main spec and keep the mechanism in Notes.
 
 ## Where the Current State Lives
 
