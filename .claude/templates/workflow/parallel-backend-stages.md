@@ -28,6 +28,11 @@ estimated work:
   discovered adapter boundary. Collaborating classes inside one boundary stay in
   that lane. If one adapter owns the scenario, one RED agent owns its complete
   focused test surface and one GREEN agent owns the complete production fix.
+- Treat `frozen-surfaces` and `writes` as contract and ownership inventories, never
+  as lists of test targets. Each lane's RED surface enters through public usecase
+  methods or the adapter's public technology-facing entry/implemented port. Internal
+  DTOs, mappings, persistence models, security helpers, resolvers, exception
+  translators, and similar collaborators are covered through that entry.
 - Maximize genuine concurrency by freezing seams that let independent lanes compile
   and test against Stage 1 contracts. A focused composition check for collaborators
   inside one adapter belongs to that single adapter lane. A cross-lane acceptance or
@@ -96,9 +101,10 @@ finds a contract defect fails with evidence; it never edits the frozen interface
 
 Before dispatch:
 
-1. Normalize the plan: merge subdivisions of one boundary; reject overlapping writes,
-   missing behavior deltas, and frozen-surface changes. Reconstruct a missing legacy
-   plan. If normalization requires a contract change, return to Stage 1.
+1. Normalize the plan: merge subdivisions of one boundary; reject per-internal-type
+   test targets, overlapping writes, missing behavior deltas, and frozen-surface
+   changes. Reconstruct a missing legacy plan. If normalization requires a contract
+   change, return to Stage 1.
 2. Reject every dependency between lanes. Merge the work when it belongs to one
    boundary; otherwise return to Stage 1 and freeze a seam.
 3. Start every lane immediately, up to agent capacity. Surplus lanes wait only for

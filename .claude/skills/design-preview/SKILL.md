@@ -37,6 +37,11 @@ all collaborating classes and focused tests for one use case or adapter boundary
 one complete lane; never split by production class, test class, guard subset, or work
 size. Thus a scenario owned by one adapter produces one RED agent for its complete
 focused test surface followed by one GREEN agent for its complete production fix.
+The frozen-surface and writable-path inventories are not test inventories. Name each
+lane's architectural test boundary and its public entries: usecase methods or the
+adapter's technology-facing entries/implemented ports. Internal requests, responses, DTOs,
+mappings, persistence models, security helpers, resolvers, and exception translators
+are collaborators covered through that entry, never standalone test targets.
 Freeze natural seams so genuinely independent lanes can start together, and do not
 mistake cross-lane post-join verification for an implementation dependency; focused
 composition inside one adapter stays in that adapter's RED surface. Return each
