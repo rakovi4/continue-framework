@@ -56,10 +56,9 @@ estimated work:
   `writes`.
 
 The coordinator rejects a design result that lacks this gate's evidence. After the
-Stage 1 join it records the approved execution shape next to the Stage 2 checkbox:
+Stage 1 join it records the approved execution shape in the active work-log entry:
 
 ```markdown
-- [ ] stage-2 implementation lanes
 <!-- stage-2-plan:
 usecase: unit={usecase}; writes=[{path}: {delta}, ...]; frozen-surfaces=[...]
 adapter-{name}: unit={adapter boundary}; writes=[{path}: {delta}, ...]; frozen-surfaces=[...]
@@ -76,13 +75,13 @@ pending.
 If acceptance RED reports `ALREADY_GREEN`, the design lane may finish its read and
 commit only genuinely missing contract artifacts; it must not replace working code.
 The coordinator records the result and, after Stage 1 approval, marks Stage 2 `[S]`
-with the reason before advancing to Stage 3 verification.
+with a compact work-log reference before advancing to Stage 3 verification.
 
 Stage 1 closes with a user review of the acceptance test, frozen interfaces, and lane
 plan. Approval freezes the use-case and port contracts for Stage 2. The coordinator
 records approval by completing its checkbox and advancing Stage 2. Rejection resets
 Stage 1 to current, leaves approval and Stage 2 pending, and records the requested
-change in the Stage 1 dispatch context. Stage 2 is undispatchable while approval is
+change in the Stage 1 work-log entry. Stage 2 is undispatchable while approval is
 not `[x]`.
 
 ## Stage 2 — Implementation Lanes
@@ -116,9 +115,8 @@ edits, and the publication lock serializes index writes.
 
 Every lane returns its commit identities, checks, status, and owned paths. As part
 of each successful publication lock, the coordinator immediately stores that lane
-in an HTML comment below the Stage 2 checkbox and commits the checkpoint before
-releasing the lock; lane agents still never edit `progress.md`. This closes the
-interruption window between publication and durable recognition.
+in the active work-log entry and commits the checkpoint before releasing the lock;
+lane agents still edit neither tracking file. This closes the interruption window.
 
 On resume, require the recorded commit to be an ancestor of `HEAD` and compare each
 owned path at `HEAD` with that lane's committed tree. Preserve the lane only when
@@ -126,10 +124,7 @@ both checks match; dispatch failed, missing, reverted, or invalidated lanes. A f
 lane leaves the stage `[~]`, names itself and its failure, and does not cancel or
 roll back successful independent lanes.
 
-```markdown
-- [~] stage-2 implementation lanes
-<!-- lanes: usecase=abc123 PASS; storage=def456 PASS; rest=FAILED timeout -->
-```
+`<!-- lanes: usecase=abc123 PASS; storage=def456 PASS; rest=FAILED timeout -->`
 
 ### Commit Publication Lock
 
@@ -139,7 +134,7 @@ Implementation and tests remain concurrent. Only publication is serialized:
 2. It requests the coordinator's commit lock.
 3. Under the lock it verifies its owned-path diff, stages explicit owned paths, and
    commits. Unrelated unstaged paths do not block publication and are never staged.
-4. The coordinator commits that lane's `progress.md` checkpoint, then releases the
+4. The coordinator commits that lane's active work-log record, then releases the
    lock.
 5. The lane never uses a shared catch-all stage command or edits `progress.md`.
 
@@ -173,7 +168,7 @@ join, so they cannot race the acceptance lane.
 
 An admitted `NEEDS_CYCLE` is a proposal, not cycle plan state. Complete and commit
 Stage 3, append a `resolve stage-3 cycle proposals` decision checkbox, and store the
-proposals in an adjacent HTML comment. This ends the Stage 3 work unit at a legal
+proposals in the Stage 3 work-log entry. This ends the Stage 3 work unit at a legal
 commit boundary. The later decision work unit adds cycle checkboxes only after
 explicit agreement; rejection completes the decision without adding them. With no
 proposal, Stage 3 completes the scenario directly.

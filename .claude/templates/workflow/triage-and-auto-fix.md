@@ -27,7 +27,8 @@ Collect SAFE findings as `{ source, file, line, problem, suggested_fix }`.
 Only a finding carrying observed evidence and a citation to a requirement, acceptance criterion,
 repository invariant, or already-landed test that pre-dated the review can pass admission. If either
 link is absent, report the failed rule and disposition, then drop it from planning: never insert it
-into `progress.md`. An admitted block annotates its observation as required by the admission test.
+into `progress.md`. Record dispositions in the work log; an admitted block's compact provenance
+marker remains as required by the admission test.
 
 **Trivial user recovery.** Route a finding to `NO_FIX` instead of a follow-up when the failure is
 immediately visible, its correction is obvious and local to the user, and it cannot cause hidden
@@ -66,11 +67,12 @@ already holds them) and run the affected tests. **If any go RED, discard that fi
 re-route the finding to a follow-up — a `review-fix:` commit never lands red.** Land a single trailing
 `review-fix:` commit with the fixes that stayed green, **after** the quiz so directly-SAFE and
 clarified-then-SAFE fixes share one commit. Commit order per boundary unit: behavior → `refactor:` →
-`review-fix:`. Skip it when triage SKIPped, no finding fired, or nothing SAFE survived. Non-gating —
-discarding an un-committed fix is not a revert; a landed commit is never reverted.
+`review-fix:` or `worklog:`. When no SAFE fix survives, commit the post-review log update alone as
+`worklog:`; when triage SKIPped, no trailing commit is needed. Non-gating — discarding
+an un-committed fix is not a revert; a landed commit is never reverted.
 
 **Terminal review batch.** Consume this partition exactly once. Tests run for SAFE fixes may reject
-or re-route a fix, but the `review-fix:` commit and anything observed while validating it are not a
+or re-route a fix, but the trailing `review-fix:` or `worklog:` commit and anything observed while validating it are not a
 new boundary and must not dispatch either review pass again. When a marked review-origin block later
 closes, report `Review passes: SKIPPED (review-depth guard — review-origin block)` and finish its
 ordinary work unit after `/refactor`.

@@ -2,6 +2,9 @@
 
 How a `progress.md` with no prior file is derived is in
 [`bootstrapping.md`](bootstrapping.md); this file is the shape it is derived into.
+The file is a structural plan: headings, status checkboxes, and compact control
+tokens only. Each checkbox is one physical line and at most 200 characters. Routine
+execution evidence belongs in [`worklog-format.md`](worklog-format.md).
 
 ## Story
 
@@ -102,7 +105,7 @@ Reordering a story underneath its own in-flight work unit would strand it.
 
 ## Task (bug)
 
-Bug tasks start with discovery, not pre-planned TDD steps. `steps-discovery` is a gate (analogous to `adapters-discovery` in stories) -- it expands in place into concrete TDD steps once the root cause is known. A `design` step (`/design-preview`) runs before `steps discovery` so the steps are planned against an approved fix approach. Prod-copy bugs prepend a `reproduce in prod-copy` step. When the gate resolves, its marker MUST record the hazard scan (`scanned all _index.md groups; GAPs: …`) — a bare `[x] steps discovery` is an unscanned gate (see "Hazard scan at steps discovery" in `.claude/guidelines/workflow-detail.md`).
+Bug tasks start with discovery, not pre-planned TDD steps. `steps-discovery` is a gate (analogous to `adapters-discovery` in stories) -- it expands in place into concrete TDD steps once the root cause is known. A `design` step (`/design-preview`) runs before `steps discovery` so the steps are planned against an approved fix approach. Prod-copy bugs prepend a `reproduce in prod-copy` step. When the gate resolves, its compact marker MUST point to the work-log scan record — a bare `[x] steps discovery` is an unscanned gate (see "Hazard scan at steps discovery" in `.claude/guidelines/workflow-detail.md`).
 
 ```markdown
 # Task N: Title — Progress
@@ -126,7 +129,7 @@ After `steps discovery` resolves, `/continue` replaces it with concrete TDD step
 - [x] reproduce in prod-copy
 - [x] root cause analysis
 - [x] design
-- [x] steps discovery (scope: frontend logic + component; scanned all _index.md groups; GAPs: none fired)
+- [x] steps discovery (scan: worklog; GAPs: 0)
 - [~] red-frontend                    <- CURRENT
 - [ ] green-frontend
 - [ ] align-design
@@ -139,7 +142,7 @@ When the fix changes externally observable behavior (or tightens acceptance-leve
 ## Fix: Bug description
 - [x] root cause analysis
 - [x] design
-- [x] steps discovery (scope: adapter X production code + adapter-test stubs + acceptance mock; scanned all _index.md groups; GAPs: 1 folded → red-acceptance for outbound re-attempt idempotency)
+- [x] steps discovery (scan: worklog; GAPs: 1)
 - [~] red-adapter X                   <- CURRENT (tighten adapter-test stubs, predict failure)
 - [ ] red-acceptance                  (tighten acceptance mock, predict failure in affected flows)
 - [ ] green-adapter X                 (single production fix — resolves both red surfaces)
@@ -176,9 +179,9 @@ heading and its steps; a refactoring task's `### Step N: …` and its steps; a b
 
 A block introduced by a boundary review's admitted `NEEDS_CYCLE` finding places `<!-- review-origin: boundary -->` below its heading. It still runs full TDD and `/refactor`, but its closing boundary dispatches no review batch.
 A staged backend or frontend scenario may temporarily append `resolve stage-3 cycle proposals`
-after Stage 3. It is a decision checkpoint, not an implementation cycle; the adjacent
-comment is durable proposal state, and consent is required before concrete cycle
-blocks are inserted.
+after Stage 3. It is a decision checkpoint, not an implementation cycle; the proposal
+is durable state under `worklog/`, and consent is required before concrete cycle blocks
+are inserted.
 A block is **closed** when that slice holds no `- [ ]` and no `- [~]` line — every step reads
 `[x]` or `[S]` — and the work unit whose commit closes it is a **boundary**. The block's
 **first commit** is the oldest commit whose `progress.md` already shows one of its steps

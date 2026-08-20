@@ -2,7 +2,7 @@
 
 Frontend scenarios use one shared worktree. The coordinator alone owns
 `progress.md`, staging, commits, and stage transitions. Before every dispatch it
-records an explicit file manifest and each path's baseline blob or absent marker;
+records the file manifest and each path's baseline in the active work-log record;
 manifests must be disjoint. A manifest path already dirty before dispatch makes the
 lane undispatchable: never mix a worker edit with pre-existing work in one file.
 
@@ -41,24 +41,22 @@ rejects every worktree path absent from all manifests. Workers never stage or
 commit. Each returns status, checks, and changed paths. The
 coordinator records only the first terminal result for each lane and ignores late or
 duplicate completions. After each success it writes a coordinator-owned checkpoint
-below Stage 2 containing the lane, manifest, baseline blobs, resulting file hashes,
-and checks. A failure keeps Stage 2 current and preserves successful disjoint
-changes.
+to the active work-log entry containing the lane, manifest, baseline blobs, resulting
+file hashes, and checks. A failure keeps Stage 2 current and preserves successful
+disjoint changes.
 
-```markdown
-- [~] stage-2 frontend implementation lanes
-<!-- frontend-lanes: logic=PASS manifest=... baseline=... result=... checks=... -->
-```
+`<!-- frontend-lanes: logic=PASS manifest=... baseline=... result=... checks=... -->`
 
 On resume, validate every checkpoint's manifest, baseline, result hashes, and checks
 against the retained worktree. Preserve only matching successful lanes; redispatch
 incomplete or invalidated lanes. A checkpoint is coordinator state, not permission
-for a worker to edit `progress.md`.
+for a worker to edit either tracking file.
 
 After all required lanes succeed, the coordinator verifies changed paths against
 the manifests and clean baselines, runs the combined frontend checks, stages
-explicit paths, commits once, removes the transient checkpoint, and advances Stage
-3. It must not launch Stage 3 before this join succeeds.
+explicit paths, commits once, marks the checkpoint joined, and advances Stage 3.
+Preserve the checkpoint as evidence. Do not launch Stage 3 before
+the join succeeds.
 
 Focused coverage runs in report-only lane mode: it returns gaps without editing
 `progress.md`. After the join, the coordinator applies the finding-admission test
@@ -79,14 +77,14 @@ After GREEN, run the headed demo, then partition review findings. Apply SAFE fix
 only after the join so they cannot race verification.
 
 Persist the joined review result with the exact Stage 2 commit as a coordinator
-checkpoint. A verification-only retry against that same commit reuses the checkpoint
+checkpoint in the active work-log record. A retry against that commit reuses it
 and dispatches only Selenium. If failure requires a Stage 2 repair, invalidate the
 old checkpoint; after the repaired Stage 2 join, dispatch a new review generation
 once over the updated range. Late results from an invalidated generation are ignored.
 
 An admitted `NEEDS_CYCLE` remains a proposal. Complete Stage 3 and append a
-`resolve stage-3 cycle proposals` decision checkpoint with an adjacent durable
-comment; insert no implementation steps until the user explicitly agrees. Rejection
+`resolve stage-3 cycle proposals` decision checkpoint with a durable pointer to its
+work-log record; insert no implementation steps until the user explicitly agrees. Rejection
 completes the checkpoint without insertion, and silence never advances it. With no
 proposal, Stage 3 closes the scenario.
 

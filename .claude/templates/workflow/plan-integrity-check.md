@@ -14,7 +14,8 @@ nobody anticipated.
 ## Checks
 
 Checks 1, 2, 4 and 6 need a **tier-major** plan (any `## Tier N — ` heading). Checks 3
-and 5 apply to every plan, tiered or not; check 7 applies to refactoring tasks. All seven are greps over `progress.md` and
+and 5 apply to every plan, tiered or not; check 7 applies to refactoring tasks. The
+write-time check 8 applies to every staged progress edit. Checks 1–7 are greps over `progress.md` and
 `tests/*.md` — no agent, no build.
 
 1. **Heading shape.** Every scenario section heading matches
@@ -80,6 +81,17 @@ and 5 apply to every plan, tiered or not; check 7 applies to refactoring tasks. 
    checkbox must end with `(plan: +N/-N/~N)` and at least one count must be non-zero.
    Otherwise stop: a discovery artifact beside an unchanged `## Fix` plan is not a
    completed plan-reconciliation gate.
+
+8. **New progress content is structural.** Before every commit containing
+   `progress.md`, inspect its zero-context staged diff. Every added non-blank line
+   must be an H1/H2/H3 heading, `Type:` line, checkbox line, or the exact
+   `<!-- review-origin: boundary -->` marker. A checkbox must occupy one physical
+   line; compact dispatch/audit tokens are allowed, but an indented continuation,
+   prose paragraph, test output, verdict, lane checkpoint, or other HTML comment
+   fails. Any added checkbox over 200 characters also fails. Put the rejected content
+   in the invocation's `worklog/` record and re-stage.
+   Checking additions rather than the whole file grandfathers legacy narrative
+   while preventing any new bloat.
 
 ## On a failed check
 

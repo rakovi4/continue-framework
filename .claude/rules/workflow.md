@@ -58,6 +58,16 @@ every lane that requires it. Exact mechanics and legacy in-flight behavior live 
 
 Each story has a progress file at `ProductSpecification/stories/NN-story-name/progress.md` — or `ProductSpecification/stories/done/NN-story-name/progress.md` once the story is archived; each task at `ProductSpecification/tasks/{N}-{type}-{slug}/progress.md`, likewise under `tasks/done/` once archived. It is the single source of truth for **state** — which work unit runs next.
 
+**Progress files are plans, not journals.** They contain headings, status checkboxes,
+and only compact tokens required to dispatch or audit the plan; each checkbox is one
+physical line and at most 200 characters. Never append work
+summaries, test evidence, review verdicts, implementation discoveries, approval
+history, lane manifests, or multi-line commentary to a checkbox. `/continue` writes
+one bounded record per invocation under `worklog/` beside the progress file, following
+`.claude/templates/workflow/worklog-format.md`. Journey summaries remain the separate
+home for noteworthy cross-conversation context and are still written only by
+`/handoff`.
+
 Status markers:
 
 - `[x]` — done
@@ -73,7 +83,7 @@ Story sections are **tier-major** — they mirror the tier-first delivery order 
 
 A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Within a work unit, never pause between sub-skills to report status or ask for confirmation — **with one sanctioned exception: the NEEDS_CLARIFICATION boundary quiz** (see below). A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
 
-**Boundary work units add a third commit and the review passes.** A work unit is a **boundary** when its behavior commit closes the block it belongs to — a story scenario, a task step, a bug task's whole fix, the spec section, the harvest checkbox — i.e. no step of that block is left `[ ]` or `[~]` (the block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries"). Only then do the two fresh-context review passes (`agent-review` + `premortem`) run, in the `/refactor` batch, reading **every commit of the completed block** rather than one behavior commit; their auto-fixed SAFE findings land in a trailing `review-fix:` commit (skipped when none apply). They stay non-gating — verdicts are folded into the report, the commits land regardless (how the boundary is detected, dispatched, and triaged is owned by `/continue`; why the cadence is per block is in `.claude/guidelines/review-passes-detail.md`). A mid-block unit runs `/refactor` and stops at two commits.
+**Boundary work units add the review passes and a trailing record commit.** A work unit is a **boundary** when its behavior commit closes the block it belongs to — a story scenario, a task step, a bug task's whole fix, the spec section, the harvest checkbox — i.e. no step of that block is left `[ ]` or `[~]` (the block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries"). Only then do the two fresh-context review passes (`agent-review` + `premortem`) run, in the `/refactor` batch, reading **every commit of the completed block** rather than one behavior commit. Their verdicts are added to the invocation's work-log record: SAFE fixes and the record land together in `review-fix:`, otherwise it lands in `worklog:`. Triage SKIP needs no trailing commit because the behavior record is already complete. The passes stay non-gating (mechanics are owned by `/continue`; rationale by `.claude/guidelines/review-passes-detail.md`). A mid-block unit runs `/refactor` and stops at two commits.
 
 The staged backend and frontend sequences have one explicit range exception: their
 Stage 3 review runs concurrently with acceptance GREEN and reads the immutable Stage
@@ -81,9 +91,9 @@ Stage 3 review runs concurrently with acceptance GREEN and reads the immutable S
 execution guards the remove-marker-only delta. That batch is consumed once and
 scenario closure does not dispatch a duplicate review.
 
-**Boundary review is depth-limited to one generation.** A block created from a boundary review's `NEEDS_CYCLE` finding carries the durable `<!-- review-origin: boundary -->` marker defined by `progress-format.md`. It still runs its complete TDD work unit and `/refactor`, but its closing boundary skips `agent-review` and `premortem`; findings from review must not recursively commission another review generation. The original boundary's required review is unchanged, and a trailing `review-fix:` commit is terminal inside that boundary — validating it never starts another review batch.
+**Boundary review is depth-limited to one generation.** A block created from a boundary review's `NEEDS_CYCLE` finding carries the durable `<!-- review-origin: boundary -->` marker defined by `progress-format.md`. It still runs its complete TDD work unit and `/refactor`, but its closing boundary skips `agent-review` and `premortem`; findings from review must not recursively commission another review generation. The original boundary's required review is unchanged, and its trailing `review-fix:` or `worklog:` commit is terminal — validating it never starts another review batch.
 
-**The boundary quiz:** when a review pass tags a finding NEEDS_CLARIFICATION, `/continue` may call `AskUserQuestion` once — in that boundary unit, after the passes finish and before the `review-fix:` commit — to resolve the fix direction. This is the only sanctioned pause for user input inside a work unit, and it never lets the unit stop early. **A quiz is the last resort, not the neutral option:** a review pass that can name the better fix direction must name it and own the decision, and `/continue` demotes an ill-formed clarification to a follow-up rather than asking. The escalation bar is in `.claude/templates/workflow/clarification-escalation-test.md`.
+**The boundary quiz:** when a review pass tags a finding NEEDS_CLARIFICATION, `/continue` may call `AskUserQuestion` once — in that boundary unit, after the passes finish and before the trailing record commit — to resolve the fix direction. This is the only sanctioned pause for user input inside a work unit, and it never lets the unit stop early. **A quiz is the last resort, not the neutral option:** a review pass that can name the better fix direction must name it and own the decision, and `/continue` demotes an ill-formed clarification to a follow-up rather than asking. The escalation bar is in `.claude/templates/workflow/clarification-escalation-test.md`.
 
 STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor`, a boundary's passes, or the quiz is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
 
