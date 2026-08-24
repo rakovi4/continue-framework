@@ -22,3 +22,9 @@ named capability cannot be resolved.
   reads for known paths.
 - **Workflow script:** execute the exact repository script named by the skill,
   validate its arguments, and consume its returned plan or result completely.
+- **Periodic coordinator wake-up:** use the platform's context-delivering mechanism,
+  not a detached timer. Claude Code uses its native `Monitor` tool; never replace it
+  with a shell loop, background command, or cron job. Codex submits the exact
+  repository push-script body named by the workflow through `functions.exec`, keeps
+  the returned cell alive without polling it, and terminates that cell when the
+  workflow ends. Reuse an active wake-up instead of starting a duplicate.
