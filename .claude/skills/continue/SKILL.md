@@ -10,15 +10,16 @@ description: Continue story or task work from compact progress state, recording 
 1. **Identify work item** from argument
 2. **Backlog promotion** -- if the story row is in the **Backlog** table in `ProductSpecification/stories.md`, move it to **In Progress** before proceeding
 3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`). **Missing means both locations came back empty** — resolve `ProductSpecification/stories/NN-story-name/` *and* `ProductSpecification/stories/done/NN-story-name/` before the bootstrap may fire (`.claude/rules/workflow.md`, "Resolving a story folder"); a hit in either is the story, so read its `progress.md` and bootstrap nothing. What an unchecked bootstrap does to an already-shipped story is in the template's "Precondition: the story genuinely has no folder"
+   For an existing task, normalize legacy `Type: bug` to `bugfix` and `Type: refactoring` to `refactor` in memory; do not rewrite its type or folder merely to migrate terminology.
 4. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the next step is the first `[~]` or `[ ]` entry
 5. **Read relevant context** -- read `carryover.md` (if present), the current scenario's summary, and only `worklog/` records matching the current heading/step or named by its compact pointer. Do not load the directory wholesale. `/continue` never writes journey files (`/handoff` is their sole writer).
 6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
 7. **Execute one work unit** -- dispatch sub-skills per tables below. If no named row matches, execute the checkbox intent directly in the main agent.
-8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, map usecase ports to adapters (see `.claude/guidelines/workflow-detail.md`), then insert concrete steps. Bug-task `steps discovery` runs its hazard fan-out, stores the full scan in the active work-log record, and resolves as `[x] steps discovery (scan: worklog; GAPs: N)`. A refactoring task's `refactor (steps discovery)` reconciles the concrete `## Fix` checkboxes, not merely a companion artifact.
+8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, map usecase ports to adapters (see `.claude/guidelines/workflow-detail.md`), then insert concrete steps. A TDD task's `steps discovery` runs its hazard fan-out, stores the full scan in the active work-log record, and resolves as `[x] steps discovery (scan: worklog; GAPs: N)`. A refactor task's `refactor (steps discovery)` reconciles direct `## Work` checkboxes, not merely a companion artifact.
 9. **Update records** -- create one `worklog/` Markdown record for this invocation (maximum 200 lines) and keep routine evidence, notes, coordinator plans, checkpoints, and proposals there. Composite stages update this active record while in flight. Keep `progress.md` to headings, permitted compact tokens, and one-line checkboxes of at most 200 characters: mark completed and advance next. Add a work-log pointer only when a later decision must consume that exact record. **Any new checkbox must pass `.claude/templates/workflow/finding-admission-test.md`**; a failing finding is reported and stored nowhere.
 10. **Update stories.md** -- for stories only, update the phase columns in `ProductSpecification/stories.md` (see below)
 11. **Behavior commit** -- include `progress.md`, the invocation's work-log record, and `ProductSpecification/stories.md` for stories. Before **every** progress commit, stage it and run plan-integrity check 8 against its zero-context staged diff; only added lines are checked, so legacy prose is grandfathered. Re-home any rejected evidence in the active work-log record and re-stage. For completion, also confirm the staged advance and zero `[ ]`/`[~]` entries before archiving; a story's folder move and **In Progress** → **Done** move land together. See `stories-md-format.md` for archive mechanics.
-12. **Refactor batch (+ review passes at a boundary)** -- dispatch `/refactor`; land the refactor commit (`/refactor`'s changes only; skipped if it changed nothing). If this unit is a **boundary** and triage says RUN, dispatch `agent-review-agent` and `premortem-agent` concurrently over the boundary range; collect both non-gating verdicts. Skip `/refactor` for a progress-only behavior commit.
+12. **Refactor batch (+ review passes at a boundary)** -- when a RED/GREEN route owes `/refactor`, dispatch it and land its changes separately; skip it for direct and progress-only units. If this unit is a **boundary** and triage says RUN, dispatch `agent-review-agent` and `premortem-agent` concurrently over the boundary range; collect both non-gating verdicts.
 13. **Triage & auto-fix (boundary units only)** -- when triage RUNS the passes, partition findings per `triage-and-auto-fix.md`, resolve any permitted quiz, and append every verdict/disposition to the active work-log record. Land it with SAFE fixes in `review-fix:`; if none survives, land the record alone in `worklog:`. Triage SKIP owes no trailing commit. Fold every verdict into the report.
 
 The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/rules/workflow.md`; the detailed scenario sequences, adapter-discovery procedure, progress mechanics, and task sequences are in `.claude/guidelines/workflow-detail.md`. Progress file format examples are in `.claude/templates/workflow/progress-format.md`.
@@ -37,7 +38,7 @@ Both work-item rows resolve the active location first and the `done/` archive se
 
 ## Work Unit Dispatch
 
-Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/workflow-detail.md` sequences. **This table applies equally to stories AND tasks — never skip `/test-review` or `/refactor` for task steps.**
+Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/workflow-detail.md` sequences. **Named routes apply equally to stories and TDD tasks.** No-TDD task types use only direct routes; never infer RED/GREEN or `/refactor` for them.
 
 | Checkbox | Sub-skills |
 |----------|-----------|
@@ -52,15 +53,15 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | `resolve stage-3 cycle proposals` | **User decision.** Read the proposal record named by the compact work-log pointer. Agreement inserts admitted cycle blocks; rejection inserts none; either completes the checkbox in one coordinator plan commit, while silence never advances it |
 | Spec items (`interview`, `mockups`, `api-spec`, `test-spec`) | `/{item}` then commit |
 | `story` (spec item) | **Inline** — no subagent. The template's hazard scan fans out its own `hazard-scan-agent`s, which must not nest inside a wrapper agent. Load `.claude/templates/spec/story-spec-generation.md` (internal template — NOT the `/story` skill) with the story number, name, and folder already resolved, execute its phases, then commit |
-| `root cause analysis` (bug tasks) | **Inline** — no subagent. Run `/rca`, record confirmed findings in `spec.md`, routine evidence in the active work-log record, and mark `[x]` → commit records |
+| `root cause analysis` (bugfix tasks) | **Inline** — no subagent. Run `/rca`, record confirmed findings in `spec.md`, routine evidence in the active work-log record, and mark `[x]` → commit records |
 | `design` | `/design-preview` → user approves (optionally with ADR) or `/architecture` → commit (if ADR produced) |
 | `red-*` (usecase, adapter, selenium, frontend, frontend-api) | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `green-usecase`, `green-adapter X` | `green-agent.md` → `/test-coverage {module} --focus` → commit → `/refactor` → commit |
 | `red-workflow` | `red-agent.md` (layer `workflow`) → `/test-review` → commit → `/refactor` → commit |
 | `green-workflow` | `green-agent.md` (layer `workflow`) → commit → `/refactor` → commit |
 | `adapters-discovery` | Run all 3 checks in `adapter-discovery-checklist.md`, log evidence, mark `[x]`, insert concrete adapter steps (or `[S]`) → commit records |
-| `steps discovery` (bug tasks) | **Inline** — no subagent. Run the hazard fan-out per `workflow-detail.md`; resolve every GAP, put the full required scan record in the active work-log record, render `[x] steps discovery (scan: worklog; GAPs: N)`, insert concrete TDD steps, then commit both records |
-| `refactor (steps discovery)` (refactoring tasks) | Reconcile the approved design and discovered evidence against the committed pre-unit `progress.md`; update the concrete `## Fix` headings and checkboxes; append `(plan: +N/-N/~N)` to the completed gate. Refuse completion when all counts are zero or only a companion artifact changed → run affected checks → commit |
+| `steps discovery` (`behavior-change`, `bugfix`) | **Inline** — no subagent. Run the hazard fan-out per `workflow-detail.md`; resolve every GAP, put the full scan record in the active work log, render `[x] steps discovery (scan: worklog; GAPs: N)`, insert scoped TDD steps, then commit both records |
+| `refactor (steps discovery)` (`refactor`) | Reconcile approved design and discovered evidence against committed `progress.md`; update direct behavior-preserving `## Work` steps and append `(plan: +N/-N/~N)`. Refuse zero-change completion or any RED/GREEN step → run affected checks → commit |
 | `green-acceptance` | **Inline** — no subagent. Read `green-agent.md` workflow, load acceptance implementation template, enable the disabled test (remove disable marker — only allowed test change), run acceptance tests, verify GREEN → commit |
 | `green-frontend`, `green-frontend-api` | `green-agent.md` → commit → `/refactor` → commit |
 | `green-selenium` | `/run-backend` → `/run-frontend` → `green-agent.md` (remove-marker-only: no production code, no Statements changes, no backend changes — if test fails, STOP and report) → commit |
@@ -68,8 +69,8 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | `align-design` | Build component → `/align-design` → `/design-review` (MANDATORY) → `/test-coverage frontend --focus` → commit → `/refactor` → `/align-design` verify-only → commit |
 | `demo` | `/demo {scenario_test_class}`, record evidence, then commit records |
 | `refactor usecase` / other `refactor (...)` | Apply change then run affected tests then commit |
-| QA `## Cases` checkbox | **No dispatch.** Report the next unchecked case to the user and stop -- the tester verifies it manually against the target environment, then ticks the box (or files a separate bug task if it fails) on their own. |
-| Any other checkbox | **Direct inline fallback.** Treat the full checkbox text as the work-unit intent. Execute it in the main agent, inspect the relevant scope, make the requested changes, run affected tests, advance progress, and commit. Do not infer a red/green, review, coverage, or refactor sequence that the checkbox did not name. |
+| QA `## Cases` checkbox | **No dispatch.** Report the next unchecked case to the user and stop -- the tester verifies it manually against the target environment, then ticks the box (or files a separate bugfix task if it fails) on their own. |
+| Any other checkbox | **Direct inline fallback.** Treat the full checkbox text as the work-unit intent. Execute it in the main agent, inspect the relevant scope, make the requested changes, run affected checks, advance progress, and commit. In `refactor`, `infra`, `general`, or `qa`, stop and reclassify/split if this would change executable behavior. Do not infer RED/GREEN, coverage, or `/refactor`. |
 
 The `stage-*` routes are composite scenario work units. Load the matching
 `parallel-backend-stages.md` or `parallel-frontend-stages.md` template for lane
@@ -172,7 +173,7 @@ After updating `progress.md` for a **story** (not tasks), update the story's row
 
 ## Available Templates
 
-- `.claude/templates/workflow/progress-format.md` -- progress file format for stories, bug tasks, and refactoring tasks
+- `.claude/templates/workflow/progress-format.md` -- progress file format for stories and all six task types
 - `.claude/templates/workflow/worklog-format.md` -- per-invocation execution record format
 - `.claude/templates/workflow/stories-md-format.md` -- stories.md phase/Tests/% column rules (tier-major and untiered)
 - `.claude/templates/workflow/plan-integrity-check.md` -- seven pre-dispatch checks plus staged-write check 8

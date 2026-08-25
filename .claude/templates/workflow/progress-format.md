@@ -103,77 +103,87 @@ before tiering existed are never re-bootstrapped into the tier-major shape by
 checkbox below its `## Spec` section is `[x]`** (`.claude/skills/retier/SKILL.md`).
 Reordering a story underneath its own in-flight work unit would strand it.
 
-## Task (bug)
+## Task (behavior-change)
+```markdown
+# Task N: Title — Progress
 
-Bug tasks start with discovery, not pre-planned TDD steps. `steps-discovery` is a gate (analogous to `adapters-discovery` in stories) -- it expands in place into concrete TDD steps once the root cause is known. A `design` step (`/design-preview`) runs before `steps discovery` so the steps are planned against an approved fix approach. Prod-copy bugs prepend a `reproduce in prod-copy` step. When the gate resolves, its compact marker MUST point to the work-log scan record — a bare `[x] steps discovery` is an unscanned gate (see "Hazard scan at steps discovery" in `.claude/guidelines/workflow-detail.md`).
+Type: behavior-change
+
+## Spec
+- [x] spec
+- [~] design
+- [ ] steps discovery
+
+## Change
+```
+
+Design-first discovery runs the hazard scan and inserts named RED-to-GREEN pairs
+for every affected layer. Its resolved marker points to the work-log scan record.
+
+## Task (bugfix)
+Bugfix tasks start with root-cause discovery. Prod-copy fixes prepend `reproduce in
+prod-copy`; `steps discovery` runs the hazard scan and inserts scoped TDD steps.
 
 ```markdown
 # Task N: Title — Progress
 
-Type: bug
+Type: bugfix
 
 ## Spec
 - [x] spec
 
 ## Fix: Bug description
-- [x] reproduce in prod-copy          <- only for prod-copy bugs
-- [~] root cause analysis             <- CURRENT
-- [ ] design                          <- /design-preview; [S] when fix approach is obvious
+- [ ] reproduce in prod-copy          <- only when externally observed
+- [~] root cause analysis
+- [ ] design
 - [ ] steps discovery
 ```
 
-After `steps discovery` resolves, `/continue` replaces it with concrete TDD steps for the affected layer(s), e.g.:
+Both TDD types resolve the gate as `[x] steps discovery (scan: worklog; GAPs: N)`.
+Every red step precedes the production change that makes it green. Externally
+observable changes include an acceptance RED/GREEN pair.
 
-```markdown
-## Fix: Bug description
-- [x] reproduce in prod-copy
-- [x] root cause analysis
-- [x] design
-- [x] steps discovery (scan: worklog; GAPs: 0)
-- [~] red-frontend                    <- CURRENT
-- [ ] green-frontend
-- [ ] align-design
-- [ ] demo
-```
-
-When the fix changes externally observable behavior (or tightens acceptance-level test infrastructure such as an external-service mock), discovery must also schedule a `red-acceptance` + `green-acceptance` pair (see "Acceptance red when application behavior changes" in `.claude/guidelines/workflow-detail.md`). All red steps land before the first green when one production fix resolves every red surface:
-
-```markdown
-## Fix: Bug description
-- [x] root cause analysis
-- [x] design
-- [x] steps discovery (scan: worklog; GAPs: 1)
-- [~] red-adapter X                   <- CURRENT (tighten adapter-test stubs, predict failure)
-- [ ] red-acceptance                  (tighten acceptance mock, predict failure in affected flows)
-- [ ] green-adapter X                 (single production fix — resolves both red surfaces)
-- [ ] green-acceptance                (verification only; no production or test changes)
-```
-
-## Task (refactoring)
-
+## Task (refactor)
 ```markdown
 # Task N: Title — Progress
 
-Type: refactoring
+Type: refactor
 
 ## Spec
 - [x] spec
 - [~] design
 - [ ] refactor (steps discovery)
 
-## Fix
+## Work
 ```
 
-A refactoring task always runs design before `refactor (steps discovery)`. Discovery fills the initially empty `## Fix` section and records `plan: +N/-N/~N` against committed pre-unit progress; at least one count is non-zero.
+Discovery fills `## Work` with direct behavior-preserving steps and records
+`plan: +N/-N/~N`; at least one count is non-zero. RED/GREEN is forbidden.
 
-Choose concrete step shapes with
-[`steps-discovery-shapes.md`](steps-discovery-shapes.md). Plain checkboxes are
-first-class work units; never add fake RED/GREEN labels merely for dispatch.
+## Task (infra or general)
+
+```markdown
+# Task N: Title — Progress
+
+Type: infra
+
+## Spec
+- [x] spec
+
+## Work
+
+### Step 1: Work-unit title
+- [~] direct implementation intent and verification
+```
+
+`general` uses the same shape with `Type: general`. Each spec Work item becomes one
+direct step. Infra steps operate through repository-managed infrastructure-as-code.
+Choose all task shapes with [`steps-discovery-shapes.md`](steps-discovery-shapes.md).
 
 ## Blocks and boundaries
 
 A **block** is the unit the commit-time review passes fire at the end of (`.claude/skills/continue/SKILL.md`, "Boundary Review Passes"), and it is read straight off the shapes above. A block is a story scenario's `### N.M {Title}`
-heading and its steps; a refactoring task's `### Step N: …` and its steps; a bug task's whole
+heading and its steps; a task's `### Step N: …` and its steps; a bugfix task's whole
 `## Fix: …` section (its steps carry no `### ` heading); or a `## Spec` / `## Harvest — Tier 1
 → Tier 2` section. Slice one from its heading to the next heading of same or higher level.
 

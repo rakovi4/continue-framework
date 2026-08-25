@@ -14,7 +14,7 @@ nobody anticipated.
 ## Checks
 
 Checks 1, 2, 4 and 6 need a **tier-major** plan (any `## Tier N — ` heading). Checks 3
-and 5 apply to every plan, tiered or not; check 7 applies to refactoring tasks. The
+and 5 apply to every plan, tiered or not; check 7 applies to refactor tasks. The
 write-time check 8 applies to every staged progress edit. Checks 1–7 are greps over `progress.md` and
 `tests/*.md` — no agent, no build.
 
@@ -77,9 +77,9 @@ write-time check 8 applies to every staged progress edit. Checks 1–7 are greps
    untouched permanently, so its headings carry no markers and never will. Recursing into it
    would fail this check on every resume in a migrated repo, forever.
 
-7. **Refactoring discovery changed the plan.** A completed `refactor (steps discovery)`
+7. **Refactor discovery changed the plan.** A completed `refactor (steps discovery)`
    checkbox must end with `(plan: +N/-N/~N)` and at least one count must be non-zero.
-   Otherwise stop: a discovery artifact beside an unchanged `## Fix` plan is not a
+   Otherwise stop: a discovery artifact beside an unchanged `## Work` plan is not a
    completed plan-reconciliation gate.
 
 8. **New progress content is structural.** Before every commit containing

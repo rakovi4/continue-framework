@@ -1,6 +1,6 @@
 ---
 name: rca
-description: Evidence-based root cause analysis for a defect — re-verify every prior assumption, test competing hypotheses, and confirm the cause with real data (logs, test runs, measurements) before any fix. Use for the bug-task `root cause analysis` step, or whenever a cause is claimed but not yet proven.
+description: Evidence-based root cause analysis for a defect — re-verify every prior assumption, test competing hypotheses, and confirm the cause with real data before any fix. Use for a bugfix task's root-cause step, or whenever a cause is claimed but unproven.
 ---
 
 # /rca - Root Cause Analysis
@@ -9,7 +9,7 @@ Find the real cause of a defect from evidence, not speculation. The deliverable 
 
 ## Input
 
-- **target** (optional): bug task number/slug, or a free-text symptom. If absent, infer from the current task or conversation.
+- **target** (optional): bugfix task number/slug, or a free-text symptom. If absent, infer from the current task or conversation.
 - **evidence sources** (optional): credentials or paths for authoritative data (CI API, log locations, a reproducible environment). When provided, use them — do not substitute a guess for data you could fetch.
 
 ## Core Principle

@@ -68,7 +68,7 @@ and the concerns covered:
 
 ## Net-New Scenarios Introduced Mid-Cycle
 
-The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the bug-task `steps discovery` gate; both are the seams where net-new, never-scanned behaviour enters a spec-skipping path, and both reuse the existing per-group fan-out rather than adding a new scan mechanism.
+The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the TDD-task `steps discovery` gate; both are the seams where net-new, never-scanned behaviour enters a spec-skipping path, and both reuse the existing per-group fan-out rather than adding a new scan mechanism.
 
 A scenario a `NEEDS_CYCLE` review finding turns into new work is one of these, whatever surfaced it — so it enters through the same gate, and in a tier-major story it is written with a **resolved `Tier: 2`** marker rather than left untiered. The reasoning and the two ways out of that default are in `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
 
@@ -80,7 +80,7 @@ Appending *below* the cursor instead is the alternative, and it fails in kind: i
 
 ## Boundary Review Passes
 
-The work unit that **closes a block** — a story scenario, a task step, a bug task's whole fix,
+The work unit that **closes a block** — a story scenario, a task step, a bugfix task's whole fix,
 the spec section, the harvest checkbox — is followed by two **fresh-context** passes
 (`agent-review-agent`, `premortem-agent`) reading every commit of that block, a deterministic
 triage predicate that may SKIP them, and a three-way partition of their findings into SAFE /
@@ -144,57 +144,54 @@ See the `/handoff` and `/continue` skills for the mechanics (file layout, carryo
 
 # Task Workflow Detail
 
-Bug and refactoring tasks follow the same TDD discipline as stories: `/test-review` after red phases, `/refactor` after every phase (except `green-acceptance`, `green-selenium`, `demo`), with `/refactor` in its own commit separate from the behavior commit (see Atomic Work Units in `.claude/rules/workflow.md`). Task commits use the `task:` prefix — both the behavior commit and the refactor commit. Tasks don't need bootstrapping; `/task` creates their discovery sequence.
+All task commits use `task:`. Task type selects the execution discipline; the
+affected layer only selects concrete checks. The authoritative shape table is
+`.claude/templates/workflow/steps-discovery-shapes.md`.
+For existing tasks only, read legacy `bug` as `bugfix` and `refactoring` as
+`refactor`; `/task` never emits those legacy values.
 
-## Bug Task Sequence (Discovery-First)
+## TDD Tasks
 
-Bug tasks do NOT pre-plan TDD steps at creation time. The cause is usually unknown when the task is filed -- planning a full red/green/refactor sequence up front commits to assumptions that turn out wrong. For the same reason, the bug **spec** at creation captures only the observable problem and how to reproduce it — describe the problem as thoroughly as possible (symptoms, observed vs. expected, environment, frequency, any captured response/error), but do NOT state a root cause, a proposed solution, affected layers, or key files. Those are produced by the discovery sequence below: `root cause analysis` records the cause and key files in `spec.md`, `design` settles the fix approach, and `steps discovery` scopes the layers. Every claim about the fix is deferred until something has been investigated. Instead, every bug starts with discovery:
+Only `behavior-change` and `bugfix` use TDD. Both run `/test-review` after RED and
+`/refactor` after RED/GREEN phases where the atomic-unit rule requires it.
 
-1. `reproduce in prod-copy` (prod-copy bugs only) — manually reproduce the bug in the prod-copy environment, confirm symptoms match the report, capture any unexpected behavior; progress-only commit
-2. `root cause analysis` — run `/rca`: re-verify every prior assumption, test competing hypotheses, and confirm the cause with real data (logs, test runs, measurements) before accepting it. Locate the defect and document evidence-backed findings in `spec.md`, separating measured fact from reasoned attribution — a carried-over hypothesis is not a root cause; progress-only commit
-3. `design` — with the root cause known, design the fix approach via `/design-preview`; the user approves (optionally producing an ADR for an architectural fix) or escalates to `/architecture`; commit (if an ADR is produced). This runs **before** `steps discovery` so the steps are planned against an approved approach rather than an assumed one. Mark `[S]` only when the fix approach is mechanically unambiguous from the root cause (a one-line guard, a corrected constant) and there is no design decision to make.
-4. `steps discovery` — based on the root cause and the approved design, determine which layers the fix touches and insert concrete TDD steps below this gate (`red-*`, `green-*`, `align-design`, `demo`, etc.); record the hazard-scan evidence under `worklog/` and keep only a compact scan token on the gate (see "Hazard scan at steps discovery"); commit both files
+**Behavior change (design-first):** `spec` → `design` → `steps discovery`. The spec
+states current and expected observable behavior. Discovery scopes affected layers,
+runs the hazard scan, and inserts named RED-to-GREEN pairs.
 
-The `[ ] steps-discovery` checkbox is a gate -- it must be resolved before any subsequent TDD step executes. It is the bug-task analog of `[ ] adapters-discovery` in story scenarios. The `design` step precedes it: the approach is approved first, then decomposed into steps.
+**Bugfix (discovery-first):** optional `reproduce in prod-copy` → `root cause
+analysis` → `design` → `steps discovery`. Creation records symptoms and reproduction,
+never an assumed cause or solution. RCA writes evidence-backed cause and key files;
+design settles the fix; discovery inserts the TDD plan. Design may be `[S]` only for
+a mechanically unambiguous fix.
 
-**Acceptance red when application behavior changes:** at steps discovery, ask: does the fix change externally observable application behavior — a response body, a status code, an error surface, an end-to-end flow — or invalidate acceptance-level test infrastructure (e.g., an external-service mock that must be tightened to mirror the real service)? If yes, the discovered steps MUST include a `red-acceptance` + `green-acceptance` pair surrounding the layer-level steps — a single-layer red/green is only sufficient when the change is invisible at the black-box level (pure internal restructuring, logging, performance). Ordering: all `red-*` steps (layer + acceptance) land before the first `green-*` step when one production fix resolves every red surface. In that shape `green-acceptance` is verification-only — there is no disabled test to enable because `red-acceptance` made existing tests fail via tightened infrastructure rather than adding a disabled test; state "verification only; no production or test changes" in the step description so the remove-marker-only rule is visibly satisfied. See the bug example in `.claude/templates/workflow/progress-format.md`.
+For both types, `steps discovery` is a blocking gate. Run every hazard group per
+`.claude/guidelines/hazard-catalogue/_index.md`, resolve every GAP into a RED guard or
+a reasoned dismissal, and store full `hz-NN` dispositions in the active work log.
+Render the gate as `[x] steps discovery (scan: worklog; GAPs: N)`; a bare completed
+gate is invalid. If behavior is externally observable, include acceptance RED/GREEN.
+All RED steps precede the production change that resolves them.
 
-**Hazard scan at steps discovery:** bug tasks skip the story-spec step and `/test-spec`, so the fix's guard set is decided *here* — never at a spec-time catalogue gate. Before locking the TDD steps, dispatch the scan exactly as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read its "How to apply it", "The dispatch shape"); the artifact under scan is the **root cause plus the fix's intended behaviour**, not the whole codebase. Fold every fired-trigger GAP in as a discovered red step (its forced guard is a test that goes red on the hazard), or dismiss it with a reason — an unresolved GAP blocks step insertion the way it blocks a spec-time Phase. This is the gate that catches the one-directional fix: a change that guards one side of a hazard (the inbound duplicate) while leaving its twin (the outbound re-attempt) open. It is wired here and **not** at the `red-usecase`/`red-acceptance` entry: story scenarios already crossed the `/test-spec` gate, so scanning every red phase would re-scan scanned work — the spec-skipping production path that introduces a net-new, never-scanned hazard surface is the bug-task fix, which this gate covers.
+## No-TDD Tasks
 
-**Record the scan in the work log, group id included.** Keep the gate compact:
-`[x] steps discovery (scan: worklog; GAPs: N)`. The matching record contains scope,
-all-group coverage, and every `hz-NN` disposition. A bare gate is invalid.
+`refactor`, `infra`, `general`, and `qa` never contain RED/GREEN work units.
 
-**Why the id and not just the disposition.** A bug task never reaches `/test-spec`, so it has no `tests/*.md` scenario and no `Tier:` marker — the two places a story's provenance token lives. The work-log scan record is therefore the *only* place a bug task can record which hazard class forced a discovered red step, and `hazard-scan-agent` stamps that id on every GAP precisely so the caller preserves it. Dropped there, it is unrecoverable: a forced step becomes indistinguishable from one the root-cause analysis produced. Tasks are not tiered, so the audit trail is the whole return.
+**Refactor (design-first):** `spec` → `design` → `refactor (steps discovery)`.
+Discovery reconciles the approved design and current repository into direct,
+behavior-preserving `## Work` steps. Record `plan: +N/-N/~N`; at least one count must
+be non-zero. Existing focused and affected suites verify behavior preservation.
 
-**Why `reproduce in prod-copy` is a separate step:** prod-copy reproduction often surfaces details the original reporter omitted (exact field length, browser, sequence of actions, network response). Doing it before root-cause analysis prevents wasted investigation on the wrong code path.
+**Infra and general:** `/task` creates direct `### Step N` work units from the spec.
+Each step runs relevant tests, structural checks, or validators. Infra work changes
+only repository-managed infrastructure-as-code; never mutate remote state manually.
 
-## Refactoring Task Sequence (Design-First)
+If any no-TDD task reveals a required executable behavior change, stop before that
+change and reclassify the task or split it into `behavior-change` or `bugfix`.
 
-Every refactoring task starts `spec` → `design` → `refactor (steps discovery)`. The spec captures the problem, intended structural outcome, constraints, and likely files without freezing an implementation sequence. Design preview approves the object and boundary model before planning begins. Steps discovery then reconciles that design and the current repository into scoped `## Fix` headings and concrete checkboxes.
+**QA:** cases are reusable manual checklist items, not `/continue` work units.
+`/continue` reports the next unchecked case; `/qa-run` drives it in a watched browser.
+For a new session, revive the archived task and reset progress without changing the
+spec. A failed case stays unchecked and produces a separate `bugfix` task. Multiple
+passed cases may land in one `task:` commit; boundary reviews do not run.
 
-The discovery checkbox is a plan-reconciliation gate: compare the approved design and discovered evidence with the committed pre-unit `progress.md`, then add, remove, rename, split, merge, or reorder the concrete `## Fix` steps accordingly. The gate cannot complete from a companion document alone. Its resolved checkbox records `plan: +N/-N/~N` for added, removed, and changed checkboxes; at least one count must be non-zero, otherwise the step did not discover or reconcile the plan it exists to change.
-
-**Choose the work-unit shape from the change, not from the task type.** Before adding
-each checkbox, classify whether it changes executable code behavior. Only that class
-gets a RED-to-GREEN pair. Behavior-preserving code restructuring uses one direct
-refactoring step with the existing suite as verification. Documentation, prompt-library,
-configuration, planning, and other non-code changes use one direct implementation step
-with affected checks. Never manufacture `red-workflow`/`green-workflow` or another
-named pair merely because discovery needs something dispatchable. The decision table and
-examples are in `.claude/templates/workflow/steps-discovery-shapes.md`.
-
-**Scoped steps (refactoring + story scenarios only):** Progress should only include TDD steps for layers the fix actually touches. If the fix is pure CSS, don't generate logic/API/align-design steps. If the fix is backend-only, don't generate frontend steps. For refactoring and bug tasks, layer scoping happens at steps discovery; for story scenarios it comes from the approved scenario design.
-
-## QA Task Sequence
-
-QA tasks define a reusable manual checklist verified against an external environment (prod-copy, staging). Their lifecycle differs from bug/refactoring tasks in three ways:
-
-- **No TDD, no dispatch, no boundary.** `progress.md` checkboxes are not work units — each is a manual verification step performed by a human in a browser. `/continue` does NOT auto-dispatch QA cases; on a QA task it reports the next unchecked case and reminds the tester to run it by hand. Nothing is committed by `/continue`, so no block ever closes under it and the boundary review passes never fire — a checklist session produces no diff for them to read.
-- **Session lifecycle.** `spec.md` is the immutable checklist definition (Cases section). `progress.md` mirrors those cases as `[ ]` checkboxes for the active test session. The tester ticks them as cases pass. To re-run for a new deploy, revive the task from `done/` and reset checkboxes — never edit `spec.md` to track sessions.
-- **Failures file separate bug tasks.** When a case fails during a session, the checkbox stays `[ ]` and the tester creates a separate `/task bug` (prod-copy variant if reproduced there) for the failure. Never overload the checkbox with a fail marker — `[x]` means verified, `[ ]` means not yet verified or under investigation.
-- **Watched execution via `/qa-run`.** A session is driven with `/qa-run`: a headed browser the tester watches, one action at a time, a screenshot per action. Navigation is **UI-only** — reach every page by clicking buttons/links, never by typing a direct in-app URL (the same constraint Selenium tests follow; see `.claude/guidelines/frontend-rules.md` "FORBIDDEN in-app navigation via URL", whose two exceptions — app-root entry and genuine external-arrival links such as an emailed verify/reset link — apply to manual QA too). Executing the list also validates the list: a case that cannot be verified through the UI, or whose intent is ambiguous, is a defect in the **test model** (fix `spec.md`), distinct from a **product** defect (file `/task bug`).
-
-Commits use the `task:` prefix like other task types. Multiple cases may be ticked in a single commit (a smoke session is not work-unit-atomic the way TDD is).
-
-Operational details: `/task` skill (creation, sections, progress format), `/continue` skill (execution, dispatch, adapter discovery, steps discovery), `/qa-run` skill (watched prod-copy execution, UI-only navigation, harness).
+Operational details live in `/task`, `/continue`, and `/qa-run`.

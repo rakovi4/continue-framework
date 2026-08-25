@@ -47,7 +47,7 @@ patterns below. Do not silently accept a story that fails one.
   propose the story reformulated around that value (e.g., "add message-queue
   streaming" → "a user sees updates without refreshing"). When the work has
   no user-facing outcome at all — a purely internal migration or clean-up —
-  point at `/task` (a refactoring task) as its home: the story lifecycle
+  point at `/task` (a refactor task) as its home: the story lifecycle
   would run interview, mockups, and frontend phases over work with no user
   to interview and no screen to mock up.
 - **Part-story** — a fragment of a user journey with no independent value: a

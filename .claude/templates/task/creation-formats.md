@@ -3,114 +3,151 @@
 ## Usage Examples
 
 ```
-/task bug "Modal scroll broken"
-/task refactoring "TaskBoard aggregate"
+/task behavior-change "Reject invalid transition"
+/task bugfix "Modal scroll broken"
+/task refactor "Simplify task aggregate"
+/task infra "Add health probe"
+/task general "Update contributor guide"
 /task qa "Smoke short list"
-/task                                        # Interactive
+/task
 ```
 
 ## spec.md Format
 
-At creation a **bug** spec captures only the observable problem and how to
-reproduce it — describe the problem as thoroughly as possible. Do NOT pre-fill a
-root cause, a proposed Solution, affected layers, or Key Files: those are
-produced later by the discovery sequence (`root cause analysis` records the
-cause and key files in `spec.md`; `design` settles the fix approach). Pre-baking
-a solution at creation commits to an assumption before any investigation has run.
+The six canonical types are `behavior-change`, `bugfix`, `refactor`, `infra`,
+`general`, and `qa`. Only `behavior-change` and `bugfix` use TDD.
 
-**Refactoring** and **qa** specs do state an intended outcome at creation. A
-refactoring task does not pre-plan implementation steps: design preview approves
-the approach and steps discovery derives the executable plan.
+- A **behavior-change** spec captures current and expected observable behavior,
+  constraints, and likely files. Design and steps discovery produce the TDD plan.
+- A **bugfix** spec captures only the observable problem and reproduction. Root
+  cause, solution, affected layers, and key files are discovered later.
+- A **refactor** spec captures the structural problem and behavior-preserving
+  outcome. It never contains a behavior change or RED-to-GREEN plan.
+- **Infra** and **general** specs capture the problem, intended outcome,
+  constraints, likely files, and bounded direct work units.
+- A **qa** spec captures why and when to run a reusable manual checklist plus its
+  cases. It changes no production code.
 
 ```markdown
 # Task {N}: {Title}
 
-Type: {bug|refactoring|qa}
+Type: {behavior-change|bugfix|refactor|infra|general|qa}
 
 ## Problem
 
-{description — for a bug, as thorough as possible: symptoms, observed vs.
-expected, environment, frequency, any captured response/error}
-
-## Solution  <- refactoring and qa only (omit for bug — produced during design)
-
 {description}
 
-## Key Files  <- refactoring only (omit for qa; for a bug, key files are
-                 recorded by root cause analysis, not at creation)
+## Current Behavior  <- behavior-change only
 
-- {file paths}
+{externally observable behavior before the change}
 
-## Reproduction  <- bug only
+## Expected Behavior  <- behavior-change only
 
-{steps}
+{externally observable behavior after the change}
 
-## Cases  <- qa only (omit Key Files and Reproduction)
+## Solution  <- refactor, infra, general, and qa only
 
-1. {one-line case expressing intent — no Gherkin, no implementation detail}
+{intended outcome; behavior-preserving for refactor}
+
+## Constraints  <- omit only when none are known
+
+- {constraint}
+
+## Key Files  <- behavior-change, refactor, infra, and general only
+
+- {likely file path}
+
+## Reproduction  <- bugfix only
+
+{steps, environment, frequency, and captured response/error}
+
+## Work  <- infra and general only
+
+1. {bounded direct work unit}
+2. ...
+
+## Cases  <- qa only
+
+1. {one-line case expressing intent; no Gherkin or implementation detail}
 2. ...
 ```
 
 ## progress.md Formats
 
-### Bug (any layer)
-
-Bug tasks do NOT pre-plan TDD steps at creation time. The progress file starts with a discovery sequence; concrete TDD steps are inserted by `/continue` once `steps-discovery` resolves (see Task Workflow Detail in `.claude/guidelines/workflow-detail.md`). This applies to every bug regardless of affected layer -- backend, frontend, or both.
+### Behavior change
 
 ```markdown
 # Task {N}: {Title} -- Progress
 
-Type: bug
+Type: behavior-change
+
+## Spec
+- [x] spec
+- [~] design
+- [ ] steps discovery
+
+## Change
+```
+
+`steps discovery` runs the hazard scan and fills `## Change` with scoped,
+named RED-to-GREEN pairs for every affected layer.
+
+### Bugfix
+
+```markdown
+# Task {N}: {Title} -- Progress
+
+Type: bugfix
 
 ## Spec
 - [x] spec
 
 ## Fix: {bug description}
+- [ ] reproduce in prod-copy          <- only when externally observed
 - [ ] root cause analysis
 - [ ] design
 - [ ] steps discovery
 ```
 
-### Bug (prod-copy)
+`steps discovery` runs the hazard scan and appends scoped RED-to-GREEN pairs.
 
-When the bug is observed in prod-copy (or any external environment that needs explicit reproduction before investigation), prepend a `reproduce in prod-copy` step:
-
-```markdown
-# Task {N}: {Title} -- Progress
-
-Type: bug
-
-## Spec
-- [x] spec
-
-## Fix: {bug description}
-- [ ] reproduce in prod-copy
-- [ ] root cause analysis
-- [ ] design
-- [ ] steps discovery
-```
-
-### Refactoring
+### Refactor
 
 ```markdown
 # Task {N}: {Title} -- Progress
 
-Type: refactoring
+Type: refactor
 
 ## Spec
 - [x] spec
 - [~] design
 - [ ] refactor (steps discovery)
 
-## Fix
+## Work
 ```
 
-`refactor (steps discovery)` replaces the empty `## Fix` body with scoped,
-concrete step headings and checkboxes after the design is approved.
+Discovery fills `## Work` with direct behavior-preserving refactoring steps.
+
+### Infra or general
+
+```markdown
+# Task {N}: {Title} -- Progress
+
+Type: {infra|general}
+
+## Spec
+- [x] spec
+
+## Work
+
+### Step 1: {work-unit title}
+- [~] {direct implementation intent and verification}
+```
+
+Each `spec.md` Work item becomes one step. Infra work changes repository-managed
+infrastructure-as-code; it never mutates remote infrastructure manually.
 
 ### QA
-
-QA tasks define a reusable manual checklist (smoke / regression) verified against an external environment. There is no TDD cycle and no production code change. `progress.md` mirrors `spec.md`'s Cases section as checkboxes; the tester ticks `[ ]` -> `[x]` during a session. Failed cases stay `[ ]` and a separate bug task is filed for the failure -- never overload the checkbox with a fail marker.
 
 ```markdown
 # Task {N}: {Title} -- Progress
@@ -123,5 +160,11 @@ Type: qa
 ## Cases
 - [ ] {case 1 -- short intent}
 - [ ] {case 2 -- short intent}
-- [ ] {case 3 -- short intent}
 ```
+
+QA cases are human-run checklist items. Failed cases remain unchecked and produce a
+separate `bugfix` task.
+
+`progress.md` is the source of truth for state. Routine evidence belongs in
+`worklog/`; noteworthy cross-conversation context belongs in journey summaries
+written only by `/handoff`.

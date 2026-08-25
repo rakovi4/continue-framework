@@ -1,17 +1,20 @@
 # Steps-Discovery Work-Unit Shapes
 
-Classify each planned change before writing its checkbox. Task type does not select
-the shape.
+Classify each planned change before writing its checkbox. The task type sets the
+allowed execution discipline; the affected layer selects the concrete checkbox names.
 
-| Change | Plan shape | Verification |
-|--------|------------|--------------|
-| Executable code behavior changes | Named RED-to-GREEN pair for the affected layer | New failing test, then focused and affected suites |
-| Executable code is restructured without behavior change | One direct refactoring checkbox | Existing focused and affected suites |
-| Documentation, prompt-library, planning, or non-executable configuration changes | One direct implementation checkbox | Relevant structural checks or validators |
+| Task type | Allowed plan shape | Verification |
+|-----------|--------------------|--------------|
+| `behavior-change`, `bugfix` | Named RED-to-GREEN pair for every affected layer | New failing test, then focused and affected suites |
+| `refactor` | One direct behavior-preserving refactoring checkbox per work unit | Existing focused and affected suites |
+| `infra`, `general` | One direct implementation checkbox per work unit | Relevant tests, structural checks, or validators |
+| `qa` | Manual case checkboxes only | Watched external-environment verification |
 
 RED-to-GREEN is evidence that executable behavior moved from absent or wrong to
-present and correct. When there is no executable behavior transition to demonstrate,
-inventing RED produces ceremony rather than evidence.
+present and correct. It is mandatory for the two TDD task types and forbidden for
+the four no-TDD types. If discovery in a no-TDD task finds a necessary executable
+behavior change, reclassify the task or split that work into a `behavior-change` or
+`bugfix` task before implementation.
 
 ## Examples
 

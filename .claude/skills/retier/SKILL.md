@@ -1,6 +1,9 @@
 ---
 name: retier
-description: One-shot per-repo migration that tiers a repo's existing stories — writes their `Tier:` markers and re-bootstraps the plans that can still be reordered. Run it ONCE after merging the framework diff that introduced tiering: the prompt changes ride that merge, the per-repo test-file data does not, and nothing else migrates it. Not part of any story lifecycle — /test-spec tiers every new story. Use when the user says /retier, or has just merged a framework diff that brought in tier-ladder.md.
+description: >-
+  One-shot per-repo migration that tiers existing stories and re-bootstraps plans
+  that can still be reordered. Use after merging the framework tiering change, when
+  the user says /retier, or after tier-ladder.md is introduced.
 ---
 
 # /retier — One-Shot Tiering Migration
@@ -55,7 +58,7 @@ so a story whose only "progress" is a skip decision would misclassify as in flig
 
 **A Done story is skipped because nothing reads its markers again.** Its
 `progress.md` is complete and `/continue` never re-derives it, so tiering it
-produces a diff over settled files and a report no one can act on. If a bug task
+produces a diff over settled files and a report no one can act on. If a bugfix task
 later reopens the story, the reopened plan is untiered and takes the in-flight
 branch below, which loses nothing. Tag one only if the user asks for corpus
 uniformity.

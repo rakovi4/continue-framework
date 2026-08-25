@@ -12,7 +12,7 @@ case either **passes** (tick the box) or **fails** (leave `[ ]`, file a bug).
 Executing the checklist also **validates the checklist itself** (the test model):
 a case you cannot verify through the UI, or whose intent is ambiguous, is a defect
 in the test model — fixed in the task `spec.md` — which is distinct from a product
-defect, which becomes a `/task bug`.
+defect, which becomes a `/task bugfix`.
 
 ## Input
 
@@ -57,7 +57,7 @@ defect, which becomes a `/task bug`.
    satisfied or contradicted.
 6. **Record the verdict:**
    - **Pass** → tick the case `[x]` in `progress.md`.
-   - **Product defect** → leave `[ ]`, file `/task bug` (prod-copy variant — it was
+   - **Product defect** → leave `[ ]`, file `/task bugfix` (prod-copy variant — it was
      reproduced there). Never mark a failed case `[x]`.
    - **Test-model defect** (unverifiable through the UI / case ambiguous) → leave `[ ]`,
      fix the case wording in `spec.md`, and report. This is the "validate the test

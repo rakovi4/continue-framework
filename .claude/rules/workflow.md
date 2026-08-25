@@ -83,7 +83,7 @@ Story sections are **tier-major** — they mirror the tier-first delivery order 
 
 A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Within a work unit, never pause between sub-skills to report status or ask for confirmation — **with one sanctioned exception: the NEEDS_CLARIFICATION boundary quiz** (see below). A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
 
-**Boundary work units add the review passes and a trailing record commit.** A work unit is a **boundary** when its behavior commit closes the block it belongs to — a story scenario, a task step, a bug task's whole fix, the spec section, the harvest checkbox — i.e. no step of that block is left `[ ]` or `[~]` (the block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries"). Only then do the two fresh-context review passes (`agent-review` + `premortem`) run, in the `/refactor` batch, reading **every commit of the completed block** rather than one behavior commit. Their verdicts are added to the invocation's work-log record: SAFE fixes and the record land together in `review-fix:`, otherwise it lands in `worklog:`. Triage SKIP needs no trailing commit because the behavior record is already complete. The passes stay non-gating (mechanics are owned by `/continue`; rationale by `.claude/guidelines/review-passes-detail.md`). A mid-block unit runs `/refactor` and stops at two commits.
+**Boundary work units add the review passes and a trailing record commit.** A work unit is a **boundary** when its behavior commit closes the block it belongs to — a story scenario, a task step, a bugfix task's whole fix, the spec section, the harvest checkbox — i.e. no step of that block is left `[ ]` or `[~]` (the block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries"). Only then do the two fresh-context review passes (`agent-review` + `premortem`) run, alongside `/refactor` when the route owes it and otherwise after the behavior commit, reading **every commit of the completed block** rather than one behavior commit. Their verdicts are added to the invocation's work-log record: SAFE fixes and the record land together in `review-fix:`, otherwise it lands in `worklog:`. Triage SKIP needs no trailing commit because the behavior record is already complete. The passes stay non-gating (mechanics are owned by `/continue`; rationale by `.claude/guidelines/review-passes-detail.md`). A mid-block unit stops after its behavior commit and any owed refactor commit.
 
 The staged backend and frontend sequences have one explicit range exception: their
 Stage 3 review runs concurrently with acceptance GREEN and reads the immutable Stage
@@ -99,13 +99,18 @@ STOP only after the work unit's last commit; NEVER stop after the behavior commi
 
 ## Task Workflow
 
-Tasks are standalone work items that don't need the full story lifecycle. Three types:
+Tasks are standalone work items that don't need the full story lifecycle. Six types, split by execution discipline:
 
-- **bug** — Something is broken. Discover root cause first, then fix with a targeted TDD cycle.
-- **refactoring** — Structural improvement. After its initial spec, every task runs design preview and steps discovery before concrete TDD work is added.
-- **qa** — Manual checklist (smoke / regression) verified against an external environment. No production code change, no TDD cycle.
+- **behavior-change** — Intentionally changes observable behavior. Design first, then implement through a targeted TDD cycle.
+- **bugfix** — Corrects behavior that is broken. Confirm the root cause first, then fix it through a targeted TDD cycle.
+- **refactor** — Restructures executable code without changing behavior. No TDD cycle; existing tests verify preservation.
+- **infra** — Changes infrastructure through repository-managed infrastructure-as-code. No TDD cycle; run relevant validation.
+- **general** — Bounded work that fits no specialized type. No TDD cycle; execute direct work units with affected checks.
+- **qa** — Manual checklist verified against an external environment. No production code change and no TDD cycle.
 
-Tasks live in `ProductSpecification/tasks/{N}-{type}-{slug}/`. When all checkboxes in a task's `progress.md` are `[x]` (or `[S]`), the task folder is moved to `ProductSpecification/tasks/done/`. Task commits use the `task:` prefix. The discovery-first bug sequence, QA session lifecycle, and scoped-steps rules are in `.claude/guidelines/workflow-detail.md`.
+Only `behavior-change` and `bugfix` tasks may contain RED-to-GREEN work units. If a no-TDD task reveals a required behavior change, reclassify it or split out a TDD task before implementing that change.
+
+Tasks live in `ProductSpecification/tasks/{N}-{type}-{slug}/`. When all checkboxes in a task's `progress.md` are `[x]` (or `[S]`), the task folder is moved to `ProductSpecification/tasks/done/`. Task commits use the `task:` prefix. The type-specific sequences, QA session lifecycle, and scoped-steps rules are in `.claude/guidelines/workflow-detail.md`.
 
 **Don't offer to file a task as a substitute for action.** When analysis surfaces a genuine, concrete, fixable defect, either fix it directly, or — if it is outside the current work unit / TDD phase — state that plainly and stop. Do NOT end with "want me to file a task / capture this?": the user reads a deferral offer on a real finding as dodging the work. Let the user ask for a task if they want one.
 

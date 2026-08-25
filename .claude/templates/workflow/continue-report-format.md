@@ -57,10 +57,10 @@ Summary:   Reading and writing {Entity} records now goes through the
 | Field | Story | Task |
 |-------|-------|------|
 | `Work item` | `Story NN — {Name}`: number and name from the row in `ProductSpecification/stories.md` that step 10 just updated, cross-checked against the `progress.md` H1 (`# Story N: Story Title — Progress`) | `Task N ({type}) — {Title}`: number and title from the `progress.md` H1, type from its `Type:` line |
-| `Scenario` / `Step` | The `### {N}.{M} {Title}` heading of the block the completed step sits in, **verbatim** — never renumbered or re-worded. Prefix with tier and category from the enclosing `## Tier N — {Category} Scenarios ({file})` heading, joined by ` · ` | The enclosing `### Step N: …` heading, or the `## Fix: …` heading for a bug task, verbatim |
+| `Scenario` / `Step` | The `### {N}.{M} {Title}` heading of the block the completed step sits in, **verbatim** — never renumbered or re-worded. Prefix with tier and category from the enclosing `## Tier N — {Category} Scenarios ({file})` heading, joined by ` · ` | The enclosing `### Step N: …` heading, or the `## Fix: …` heading for a bugfix task, verbatim |
 | `Done` | The checkbox this invocation flipped to `[x]` or `[S]`, by its progress.md label | same |
 | `Next` | The step the invocation advanced to — the first `[~]`/`[ ]` after the update, selected exactly as step 4 selects it | same |
-| `Position` | `step {k}/{n} in this scenario` over the block's checkboxes, then ` · ` and the scenario fraction for the current tier from the `Tests` value just written to `stories.md` | `step {k}/{n} in this step` (or `in this fix` for a bug task), then ` · {done}/{total} checkboxes in the task` |
+| `Position` | `step {k}/{n} in this scenario` over the block's checkboxes, then ` · ` and the scenario fraction for the current tier from the `Tests` value just written to `stories.md` | `step {k}/{n} in this step` (or `in this fix` for a bugfix task), then ` · {done}/{total} checkboxes in the task` |
 | `Summary` | See below | same |
 
 The number is never a bare `NN` on its own line: four terminals each showing a number

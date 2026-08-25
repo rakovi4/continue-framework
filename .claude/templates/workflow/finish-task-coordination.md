@@ -86,9 +86,11 @@ creating another.
 
 ## Task-Type Routing
 
-- **Bug and refactoring:** execute `/continue task N` semantics for each work unit
-  through its last owed commit. Preserve all discovery, TDD, approval, refactor,
-  coverage, boundary-review, and work-log requirements.
+- **Behavior change and bugfix:** execute `/continue task N` semantics with the
+  required discovery and TDD routes through the last owed commit.
+- **Refactor, infra, and general:** execute direct `/continue task N` work units
+  with affected verification and boundary review, but no RED/GREEN or TDD refactor
+  batch. Stop and reclassify or split if executable behavior must change.
 - **QA:** execute `/qa-run task N` as the owning workflow and continue through every
   remaining case while the tester keeps the watched session active. Preserve its
   one-action-at-a-time browser interaction, screenshots, acknowledgements, verdict
@@ -96,7 +98,7 @@ creating another.
   dispatch parallel agents for cases, setup, observation, diagnosis, or supporting
   work. Monitor ticks may report that no parallel work is eligible, but cannot
   dispatch anything while the QA task is active.
-- **Any other or future type:** use the workflow named by its task definition. When
+- **Any future type:** use the workflow named by its task definition. When
   none exists, execute each checkbox with `/continue`'s direct inline fallback.
   Never reject a tracked task merely because its type is unfamiliar.
 
