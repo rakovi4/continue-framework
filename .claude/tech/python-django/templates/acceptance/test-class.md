@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Inherits from `AbstractBackendTest` (backend) or `AbstractUiTest` (frontend)
-- `@pytest.mark.skip(reason="TDD Red Phase - Not yet implemented")` on test class
+- For a multi-case target, put `@pytest.mark.skip(reason="TDD Red Phase - Not yet implemented")` on its scenario-named class when all cases are RED; otherwise mark only the RED methods
 - Not-implemented marker in Statements: `raise NotImplementedError()`
 - Add class-level docstring with Gherkin-style scenario
 - Statements are plain classes instantiated in `conftest.py` fixtures

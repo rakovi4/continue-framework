@@ -45,6 +45,8 @@ Each entry names a smell the reviewer must detect. Tech templates provide BAD/GO
 31. **Unreferenced domain classes/fields from RED** -- domain stubs contain fields/classes not referenced by any test or Statements.
 32. **Sequential per-field assertions replaceable by recursive comparison** -- 2+ consecutive `assertThat(obj.getX())` calls on the same object when a single recursive/structural comparison would be shorter and give better diffs.
 33. **Null assertion on domain value object field** -- test asserts `isNull()` on a domain entity or value object field. Domain is null-free; the VO should use empty string, Optional, or Null Object. Fix the domain model and update the assertion.
+34. **Stacked acceptance test** -- one large acceptance method copies a multi-phase spec scenario or mixes independent execution phases or unrelated outcomes instead of splitting them into small, focused cases.
+35. **Fragmented or coupled acceptance case** -- a method in a multi-case scenario target lacks complete context, depends on sibling order/state, or leaves a scenario Then unmapped across the group.
 
 ## Assertion Rules
 
@@ -77,6 +79,8 @@ Each entry names a smell the reviewer must detect. Tech templates provide BAD/GO
 27. **Assert full object contents, not just IDs** -- verify all fields of domain objects
 28. **Prefer recursive comparison over sequential per-field assertions** -- when 2+ consecutive assertions target fields of the same object, replace with a single recursive/structural comparison call. See `recursive-comparison.md` to decide whether to collapse and which fields to exclude
 29. **No null assertions on domain VO fields** -- domain is null-free; `isNull()` on a VO field means the domain model is wrong, not the test
+30. **One acceptance execution per method** -- split independent phases into methods inside the same scenario target; test count never creates delivery cycles
+31. **Acceptance cases are self-contained and collectively complete** -- each case owns its setup and description; the group preserves every scenario Then
 
 ## Assertion Improvements (Concept Level)
 
@@ -114,6 +118,8 @@ Each entry names a smell the reviewer must detect. Tech templates provide BAD/GO
 | Domain class/field not referenced by test | Remove -- RED creates only current test's slice |
 | 2+ sequential per-field assertions on same object | Build expected object, use recursive/structural comparison |
 | `isNull()` on domain VO field | Fix domain model (reject null, use Optional/empty), update assertion to match |
+| Multiple independent actions in one acceptance method | Split into self-contained methods inside the same scenario target |
+| Acceptance case depends on sibling context or state | Repeat its Given/setup and give it a complete description; preserve every scenario Then across the group |
 
 ## Output Summary Format
 

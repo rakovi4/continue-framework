@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Extends `AbstractBackendTest` (backend) or `AbstractUiTest` (frontend)
-- `@Disabled("TDD Red Phase - Not yet implemented")` for new tests
+- For a multi-case target, use `@Disabled("TDD Red Phase - Not yet implemented")` on its scenario-named class when every case is RED; if some are already green, mark only the RED methods
 - Not-implemented marker in Statements: `throw new UnsupportedOperationException()`
 - `@Description` with Gherkin-style scenario
 - Statements annotated with `@Service`

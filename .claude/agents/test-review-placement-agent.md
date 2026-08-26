@@ -11,10 +11,11 @@ sibling fixer agent applies the fixes after all detectors finish.
 ## Scope
 
 You own **cluster P** of `.claude/templates/workflow/test-review-checklist.md`:
-checks **1, 8, 9, 10, 12, 13, 14, 16, 20, 23** — infrastructure in the test class,
+checks **1, 8, 9, 10, 12, 13, 14, 16, 20, 23, 29, 30** — infrastructure in the test class,
 setup/scope leaks, direct usecase calls, assertions in the test class,
 cross-Statements data passing, decomposed compound calls, storage-port injection,
-middleman delegators, and private members in the test class. Ignore rows tagged
+middleman delegators, private members, and acceptance-case execution boundaries and
+independence. Ignore rows tagged
 A, S, Se.
 
 The governing principle: the **test class** carries only narrative DSL calls;

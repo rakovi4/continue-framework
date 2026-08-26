@@ -2,13 +2,13 @@
 
 ## Workflow
 
-1. Find disabled test, remove the test disable marker
+1. Find the scenario's disabled test target and remove its shared marker or every equivalent case marker as one atomic change
 2. Start backend: `Skill tool: skill="run-backend"`
-3. Run ONLY the target test: `Skill tool: skill="test-acceptance", args="backend {TestName}"`
+3. Run ONLY the target scenario group: `Skill tool: skill="test-acceptance", args="backend {TestName}"`
 4. Check results:
    - ALL pass -- done
-   - Target fails -- re-add disable marker, analyze what prerequisite is missing
-   - Other tests fail -- re-add disable marker, investigate collateral failures
+   - Any target case fails -- re-add the group marker or markers, analyze what prerequisite is missing
+   - Other tests fail -- re-add every removed marker, investigate collateral failures
 5. Stop backend: `Skill tool: skill="stop-backend"`
 
 ## Prerequisites
@@ -20,7 +20,7 @@ Before enabling acceptance test, ensure:
 
 ## Allowed Changes
 
-Remove the disable marker from ONE test. **That is the ONLY change to ANY file.**
+Remove the disable marker or markers from ONE scenario target. A multi-case target is enabled together. **That is the ONLY change to ANY file.**
 
 Do NOT write production code. Do NOT add error/exception handlers. Do NOT modify controllers, services, entities, or any other file. If the test needs production code that doesn't exist yet, a prerequisite step (red-adapter/green-adapter) was missed.
 

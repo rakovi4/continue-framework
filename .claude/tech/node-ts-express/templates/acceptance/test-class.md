@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Test file imports base test setup (`AbstractBackendTest` or `AbstractUiTest` helpers)
-- `describe.skip("TDD Red Phase - Not yet implemented")` for new tests
+- One scenario-named `describe` contains every case; use `describe.skip("TDD Red Phase - Not yet implemented")` when all are RED, otherwise skip only the RED cases
 - Not-implemented marker in Statements: `throw new Error("Not implemented")`
 
 ## Test Types

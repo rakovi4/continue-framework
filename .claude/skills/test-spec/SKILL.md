@@ -109,8 +109,8 @@ rules on the token:
 
 Two scenarios that need the same actor, the same entry point and the same Given state,
 and whose outcomes can all be true of one execution, are one execution wearing two
-headings — and each heading costs a full TDD cycle. Merging them buys one pass instead
-of two while every assertion is kept.
+headings — and each heading costs a full TDD cycle. Merging them buys one delivery
+cycle while keeping every assertion; RED may split its executable form into several test methods without creating more cycles.
 
 Dispatch `consolidation-agent` (`.claude/agents/consolidation-agent.md`) **once**, for
 the whole story, over every `tests/*.md`. It merges only what

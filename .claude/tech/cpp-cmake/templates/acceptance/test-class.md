@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Extend `BackendTestFixture` (backend) or `UiTestFixture` (frontend)
-- `DISABLED_` prefix on test names for new tests
+- Put a multi-case target in one scenario-named suite; apply `DISABLED_` to the suite when all cases are RED, otherwise prefix only the RED tests
 - Not-implemented marker in Statements: `throw std::logic_error("Not implemented")`
 - Statements are plain classes constructed by the test fixture
 - Use `SCOPED_TRACE("scenario description")` for context

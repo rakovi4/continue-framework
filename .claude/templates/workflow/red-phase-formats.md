@@ -9,7 +9,7 @@ PREDICTED FAILURE:
 - Reason: "[why this failure is expected]"
 ```
 
-## Failure Prediction Format (Multiple Methods -- Adapter Tests)
+## Failure Prediction Format (Multiple Methods -- Adapter or Acceptance Group)
 
 ```
 PREDICTED FAILURES:
@@ -56,6 +56,8 @@ actual error output
 **Next step:** Implement feature using /green-{layer} command
 ```
 
+For a multi-method target, replace **Test method** with the scenario target and complete case roster. Repeat **Predicted failure**, **Actual failure**, and **Comparison** per case, label passing acceptance cases `ALREADY_GREEN`, and emit the final verdict only after every case has a matched RED or already-green result.
+
 ## Domain Field Gate Table
 
 Before writing domain classes, produce this table for each field:
@@ -91,4 +93,4 @@ For frontend layers, use `it.skip(...)` instead of the backend test disable mark
 
 After verified failure, the disable marker message MUST include the actual failure reason (not a generic "TDD Red Phase" label alone).
 
-For adapter test classes with multiple test methods, use **class-level** disable marker (one marker disables all methods). Individual per-method markers are unnecessary when the entire class covers one port method.
+For adapter test classes or acceptance scenario groups with multiple methods, use the narrowest shared disable marker the technology supports. Its reason names every method's actual failure compactly; if that would obscure a failure, use equivalent per-method markers. Add/remove the complete marker set as one atomic group.
