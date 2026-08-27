@@ -24,10 +24,10 @@ Tier 1 is "demonstrable feature"; Tier 2 is "trustworthy feature". `tier3/` hold
 what `extended/` has always held — scenarios that are recorded and not built —
 under a name that matches the ladder.
 
-Hazard-catalogue findings never enter Tier 1. Tier 1 is derived only from the
-story's primary-user happy path. If a hazard exposes that the stated happy path is
-incomplete, amend the story requirement first; only the resulting story-derived
-happy-path scenario may be Tier 1.
+Tier 1 is derived only from the story's primary-user happy path. Scenarios generated
+by hazard or security routes never enter it. If a finding exposes an incomplete happy
+path, amend the story requirement first; only the resulting story-derived scenario
+may be Tier 1.
 
 `extended/` directories that already exist are **not migrated** — they keep their
 name, their `_Extended` filenames, and their standing, and `tier3/` applies to

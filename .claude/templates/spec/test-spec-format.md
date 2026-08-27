@@ -77,7 +77,7 @@ For every operation that **moves money, calls an external system, or mutates per
 
 **Rules:**
 - Both directions are mandatory for any money-moving operation — covering one (e.g. inbound webhooks) does NOT cover the other (e.g. outbound re-charge on retry). This is the exact gap that ships double-charge bugs.
-- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved) with `hz-02` provenance. They never enter Tier 1. The sorter admits one to Tier 2 only when it is production-relevant, not extraordinarily rare, and severe in consequence; otherwise it moves to `tier3/`.
+- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved) with `hz-02` provenance, then tier them by `tier-ladder.md`.
 
 ## 02_UI_Tests.md (5-8 tests)
 
@@ -147,7 +147,7 @@ Generate **only scenarios relevant to the story's actual attack surface**. Do no
 | JWT security | Story issues or validates JWT tokens | Login (algorithm confusion, expiration, revocation) |
 | Input validation | Story accepts user text input | Task title, description |
 
-**Provenance**: every row stamps `sec:{row}` on the scenarios it produces — `sec:SQLi`, `sec:RateLimit`, `sec:IDOR`, and so on. Tokens record the generation route; they do not force a tier. Hazard-produced scenarios never enter Tier 1, and Tier 2 still requires the ladder's strict production-corner test.
+**Provenance**: every row stamps `sec:{row}` on the scenarios it produces — `sec:SQLi`, `sec:RateLimit`, `sec:IDOR`, and so on. Tokens record the generation route; tier them by `tier-ladder.md`.
 
 **Merge related scenarios**: this category is where the practice started — combine
 injection attempts across fields into one scenario, combine input length limits into

@@ -102,11 +102,10 @@ design whose hazards are visible, not hidden.
 
 When a GAP folds in as a **net-new scenario** rather than as a change to the design,
 classify it immediately using `.claude/templates/spec/tier-ladder.md`. It can never be
-Tier 1. Write `Tier: 2 (hz-NN)` under `tests/` only when the case is concretely important
-in production, not extraordinarily rare, and severe in consequence. Otherwise — including
-any doubt — write `Tier: 3 (hz-NN) — {missing Tier 2 evidence}` under the matching
-`tests/tier3/` category file and do not add it to `progress.md`. Preserve the scan's group
-id; this is the only point on the mid-cycle path where that provenance is known.
+Tier 1. Write a qualifying Tier 2 scenario under `tests/`; otherwise write its Tier 3
+marker under the matching `tests/tier3/` category file and do not add it to
+`progress.md`. Preserve the scan's group id; this is the only point on the mid-cycle
+path where that provenance is known.
 
 A scenario that reaches this gate from a `NEEDS_CYCLE` review finding rather than from a
 GAP uses the review-finding tier policy, carrying whatever tokens this scan stamped and

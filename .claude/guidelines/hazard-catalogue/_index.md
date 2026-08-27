@@ -54,9 +54,8 @@ index is the authoritative enumeration of groups.
   mandatory — a named test that would go red. *When* it is delivered is then decided
   by the ladder in `.claude/templates/spec/tier-ladder.md`, which can place a guard
   in Tier 2, or in Tier 3 when the impact is a bounded, acceptable degradation.
-  Hazard-generated scenarios never enter Tier 1. Tier 2 requires a production-realistic,
-  not extraordinarily rare case with severe consequences; doubt goes to Tier 3. This is
-  a **destination** rule, never a *strictness* rule: a group pass does not soften a verdict, drop a class, or pre-assign a tier
+  Hazard-generated scenarios follow that ladder and never enter Tier 1. This is a
+  **destination** rule, never a *strictness* rule: a group pass does not soften a verdict, drop a class, or pre-assign a tier
   because a lower tier now exists — it reports the GAP, the fired trigger, and the
   guard, tagged with its group id, and tiering happens afterwards in a separate pass
   that reads the whole scenario set at once. A pass that starts triaging its own

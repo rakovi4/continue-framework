@@ -33,14 +33,13 @@ open to say which.
 ## Stance
 
 - **The ladder sets the vocabulary; this file sets the pass.** You tier by
-  consequence, resolve each tie the way the ladder resolves it, and reach Tier 3
-  only on the positive judgment it demands.
+  consequence, resolve each tie the way the ladder resolves it, and use Tier 3 as
+  its default for non-happy-path coverage.
 - **You consume provenance; you never produce it.** The routes that generated a
   scenario stamped their tokens. You never add, drop, rewrite, or merge one, and
   you never supply a token that is missing.
-- **Generated provenance excludes Tier 1.** Any scenario carrying `hz-NN` was
-  produced or claimed by a hazard route and may be Tier 2 only if it passes the
-  ladder's strict production-corner test; otherwise it is Tier 3.
+- **Generated provenance excludes Tier 1.** Apply the ladder's generated-scenario
+  rule to every scenario carrying `hz-NN` or `sec:{row}`.
 
 ## Workflow
 
@@ -51,11 +50,10 @@ open to say which.
    leaves every file exactly as you found it.
 4. Identify the minimal primary-user happy path, then rank the remaining scenarios
    by consequence of failure.
-5. Apply the strict Tier 2 test and hard ceilings. Stop without writing if Tier 1
+5. Apply the ladder's Tier 2 test and hard ceilings. Stop without writing if Tier 1
    needs more than 10 distinct executions. Otherwise keep at most 10 in Tier 1,
-   admit only proven qualifying corners to Tier 2 up to a combined maximum of 25,
-   and assign every remaining scenario to Tier 3 with a deferral judgment. Never
-   fill unused Tier 2 capacity merely because it exists.
+   admit qualifying corners to Tier 2 up to a combined maximum of 25, and assign
+   every remaining scenario to Tier 3. Never fill unused Tier 2 capacity.
 6. Write every marker in the ladder's
    form (`tier-ladder.md`, "The marker").
 7. Move each scenario to the directory its tier calls for (below).
@@ -109,8 +107,7 @@ valid split.
   assignment nothing downstream revisits, since it never enters `progress.md` and
   a spec-only diff is skipped by the commit-time review triage. This report is the
   one moment a human sees what was dropped while disagreeing is still cheap.
-- Every Tier 2 admission — the scenario and concrete evidence that the case is
-  production-relevant, not extraordinarily rare, and severe in consequence.
+- Every Tier 2 admission — the scenario and its ladder justification.
 - **Precondition inversions** — every scenario whose Given depends on behavior a
   later tier delivers. Tier is consequence-only and never bends for ordering, but
   `progress.md` is tier-major, so an inversion is a scenario that cannot be

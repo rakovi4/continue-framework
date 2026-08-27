@@ -39,19 +39,13 @@ safe; do not add a checkbox for it.
 a proposed cycle. Do not add its test scenario or `progress.md` block until the user
 explicitly agrees. Declining drops the proposal; silence is not consent.
 
-**A consented NEEDS_CYCLE follow-up that becomes a scenario is classified immediately.** In a tier-major story it goes through
-`/design-preview` step 2a like any mid-cycle scenario, which writes a **resolved** marker — never `Tier: ?`.
-It never enters Tier 1. Tier 2 requires concrete production importance, a case that is not extraordinarily rare,
-and severe consequence; otherwise, including doubt, it goes to `tests/tier3/` without a progress block. A Tier 2 finding's `progress.md` steps go in as a `### {N}.{M} {Title}` block at the **end** of the matching
-`## Tier N — {Category} Scenarios ({file})` section for its own tier, in the same `review-fix:`
-commit as the test file. Put `<!-- review-origin: boundary -->` immediately below the new block's
-heading; this provenance limits the finding to one review generation without weakening its TDD
-cycle. The passes fire only at a boundary, so no cycle is in flight to strand:
-when that section precedes the cursor, mark the newcomer's first step `[~]` and return the next
-block's `[~]` to `[ ]` (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). If a Tier 2
-finding arrives after the item moved to `done/` or the Done table, reopen it in the same
-`review-fix:` commit. A Tier 3 record never reopens the item. Untiered stories are unchanged. Why, and the `tier3/` exit:
-`.claude/guidelines/review-findings-detail.md` "Mid-cycle findings use the Tier 2 threshold".
+**A consented NEEDS_CYCLE follow-up that becomes a scenario is classified immediately.**
+Route it through `/design-preview` step 2a and apply
+`.claude/guidelines/review-findings-detail.md` "Mid-cycle findings default to Tier 2".
+Write a resolved marker, never `Tier: ?`; keep Tier 3 out of `progress.md`; write an
+implemented scenario and its progress block together. Put
+`<!-- review-origin: boundary -->` below the progress heading to limit review to one
+generation. Untiered stories keep their existing behavior.
 
 **Quiz (NEEDS_CLARIFICATION only) — last resort, gated.** Enforce "Consumer obligations" in
 `.claude/templates/workflow/clarification-escalation-test.md`: **demote to NEEDS_CYCLE** any finding with

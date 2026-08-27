@@ -142,7 +142,7 @@ SAFE-only auto-fixer — in its "Boundary Review Passes", "Triage & Auto-Fix", a
 "Sub-Skill Dispatch" sections. This file holds the *why*; it does not restate the
 mechanics.
 
-## Mid-cycle findings use the Tier 2 threshold
+## Why mid-cycle findings need a resolved tier
 
 A `NEEDS_CYCLE` follow-up that is acted on as a **net-new scenario** enters a story
 whose scenarios were already sorted by consequence of failure at spec time.
@@ -151,19 +151,9 @@ it, and the sorted set carries no default for a newcomer. Left undefined, the
 newcomer can land where the work is happening — in Tier 1 — and re-bloat the happy
 path with work that was not part of the story's primary promise.
 
-So the marker is resolved immediately — never `Tier: ?`. That form means
-"drafted, awaiting the comparative pass" (`.claude/templates/spec/tier-ladder.md`,
-"The marker"), and `tiering-agent` runs at spec time only; the sole thing that
-re-dispatches it is `/retier`, over a story still at 0%. A net-new review scenario
-never enters Tier 1: that tier remains the story-derived primary happy path. Admit
-the finding to Tier 2 only with concrete evidence that the production case matters,
-is not extraordinarily rare, and has a severe consequence. Otherwise, including
-any doubt, resolve it to Tier 3 with the missing evidence named in the marker.
-
-A BLOCK verdict establishes severity, but not frequency or production relevance by
-itself. It therefore still has to pass the other two parts of the Tier 2 threshold.
-The design-preview hazard scan may add provenance, but provenance records a route and
-never forces implementation.
+Tiering ran before this scenario existed, so its marker must be resolved at admission,
+never left as `Tier: ?`. The default, exceptions, and placement mechanics live in
+`.claude/guidelines/review-findings-detail.md`; do not duplicate them here.
 
 Placement, plan-integrity, reopening, and untiered-story mechanics live in
 `.claude/guidelines/review-findings-detail.md`.
