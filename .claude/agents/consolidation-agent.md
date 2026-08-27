@@ -80,8 +80,7 @@ not a finding to report around.
   the only one whose failure is unrecoverable downstream — nothing after you re-reads
   the deleted scenario.
 - **Every token survives.** The union of tokens over the surviving markers equals the
-  union over the starting markers. A token count that fell is a pinned floor silently
-  defeated for good.
+  union over the starting markers. A token count that fell destroys provenance for good.
 - **Every heading is accounted for.** Each starting `### N.M Title` either still
   exists unchanged, or is named in exactly one merge entry as absorbed. A heading in
   neither is a scenario you deleted rather than merged.
@@ -106,8 +105,8 @@ this is caught cheaply.
 
 **A resolved tier anywhere in the set.** If any marker reads `Tier: 1`, `2` or `3`
 rather than `Tier: ?`, the set has already been tiered and you are running out of
-order. Stop: merging a tiered set makes you a second writer of resolved markers and
-of the floor, which is the whole reason this pass runs before tiering.
+  order. Stop: merging a tiered set makes you a second writer of resolved markers,
+  which is the whole reason this pass runs before tiering.
 
 ## Report
 

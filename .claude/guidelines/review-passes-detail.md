@@ -142,55 +142,28 @@ SAFE-only auto-fixer — in its "Boundary Review Passes", "Triage & Auto-Fix", a
 "Sub-Skill Dispatch" sections. This file holds the *why*; it does not restate the
 mechanics.
 
-## Mid-cycle findings default to Tier 2
+## Mid-cycle findings use the Tier 2 threshold
 
 A `NEEDS_CYCLE` follow-up that is acted on as a **net-new scenario** enters a story
 whose scenarios were already sorted by consequence of failure at spec time.
 `tiering-agent` runs once, at `/test-spec`, so nothing tiers a scenario born after
 it, and the sorted set carries no default for a newcomer. Left undefined, the
-newcomer lands where the work is happening — in Tier 1 — and Tier 1 re-bloats
-mid-flight as far as review findings accumulate: the split undone by the loop that
-runs after it.
+newcomer can land where the work is happening — in Tier 1 — and re-bloat the happy
+path with work that was not part of the story's primary promise.
 
-So the default is **Tier 2**, and resolved — never `Tier: ?`. That form means
+So the marker is resolved immediately — never `Tier: ?`. That form means
 "drafted, awaiting the comparative pass" (`.claude/templates/spec/tier-ladder.md`,
 "The marker"), and `tiering-agent` runs at spec time only; the sole thing that
-re-dispatches it is `/retier`, over a story still at 0%. Tier 2 is *usually* what the
-finding's own content argues for, too: a review pass reads a commit whose tests are
-green, so what it typically reports is not "the feature does not work at all" (Tier 1)
-but "the product is unsafe or incorrect under conditions that will occur in
-production" — Tier 2's definition, verbatim.
+re-dispatches it is `/retier`, over a story still at 0%. A net-new review scenario
+never enters Tier 1: that tier remains the story-derived primary happy path. Admit
+the finding to Tier 2 only with concrete evidence that the production case matters,
+is not extraordinarily rare, and has a severe consequence. Otherwise, including
+any doubt, resolve it to Tier 3 with the missing evidence named in the marker.
 
-**Usually, not always — so re-read the ladder rather than trusting the default.**
-Green tests prove only that the *written* scenarios pass. A deliberately unnarrowed
-cold read finds the feature broken for cases nobody wrote: a wrong response field, a
-500 on a legitimate input. Every **BLOCK** verdict is of this kind by definition —
-data loss, double effect, leak, corruption, a broken core invariant. Those are
-`tier-ladder.md`'s Tier 1 sentence verbatim: the feature does not work for its primary
-user. Such a finding is **Tier 1**, and putting it there is the expected outcome, not a
-deviation that owes an argument — the point of tiering is that Tier 1 is built first,
-so a scenario discovered *during* Tier 1 to belong in Tier 1 simply joins it, with its
-steps in the Tier 1 section where they will be worked now. Deferring a corruption
-finding behind the whole of Tier 2 would also lean on the wrong tie-break: "a wrong
-1-vs-2 call self-corrects the moment someone demos the feature" holds for a broken
-button and not for silent data loss, which no demo surfaces.
-
-**The default is the guard here, because the floor cannot be.** The pinned floor
-reads a provenance token, and a review-pass finding has no route to stamp: the
-passes are deliberately open-ended rather than a closed catalogue, which is exactly
-what makes them complementary to the hazard scan. A token reaches such a scenario
-only if the mid-cycle scan at `/design-preview` step 2a fires a group over it — and
-that scan is also where the scenario gets written with its marker (see "Net-New
-Scenarios Introduced Mid-Cycle" in `.claude/guidelines/workflow-detail.md`). So a
-mis-tier here is not mechanically catchable the way a spec-time one is, and a default
-that already sits above Tier 3 is what stands in for the check.
-
-Both deviations therefore need a stated reason, and they are not symmetric — the
-same asymmetry the ladder's tie-breaks rest on. Promoting to Tier 1 costs ordering
-and self-corrects the moment someone demos the feature. Demoting to `tier3/` means
-the guard is never built, so it needs the positive judgment the ladder requires
-(name the degradation, say why it is acceptable) and is forbidden outright when the
-mid-cycle scan stamped a floor-pinned token.
+A BLOCK verdict establishes severity, but not frequency or production relevance by
+itself. It therefore still has to pass the other two parts of the Tier 2 threshold.
+The design-preview hazard scan may add provenance, but provenance records a route and
+never forces implementation.
 
 Placement, plan-integrity, reopening, and untiered-story mechanics live in
 `.claude/guidelines/review-findings-detail.md`.

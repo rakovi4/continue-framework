@@ -49,10 +49,9 @@ exactly once per story.
 - **Before tiering**, for three reasons pointing the same way. Tiering is comparative
   over the units that actually get built, so it must weigh merged units and not their
   parts. The marker protocol stays intact: consolidation writes only the `?` form, so
-  the tier is still written once, by one pass (`tier-ladder.md`, "The marker"). And
-  the floor is applied by the tiering pass to whatever tokens the marker carries, so
-  merging first puts the floor over the **union** with nothing to re-check and no
-  second implementation of it.
+  the tier is still written once, by one pass (`tier-ladder.md`, "The marker").
+  Provenance is unioned before the tiering pass evaluates the merged scenario, with
+  nothing to re-check and no second implementation of marker handling.
 
 Consolidation therefore never sees a resolved tier and never assigns one. The price is
 that it cannot compare tiers directly — so clause 7 below asks the ladder's own
@@ -135,16 +134,14 @@ The merged scenario is one heading with **exactly one** marker line — the shap
 - **Provenance unions.** The survivor carries every token from every absorbed scenario,
   comma-separated and de-duplicated: a `sec:SQLi` scenario plus a bare one yields
   `Tier: ? (sec:SQLi)`; `(hz-02)` plus `(sec:IDOR)` yields `Tier: ? (hz-02, sec:IDOR)`.
-  Never replace, never elect a primary, never drop a token because another already pins
-  the scenario. The floor is read from these tokens, so one lost in a merge is a floor
-  check silently defeated for good — and downstream nothing can tell a merged scenario
+  Never replace, never elect a primary, and never drop a token. One lost in a merge
+  destroys provenance — downstream nothing can tell a merged scenario
   that shed its token from one no route ever claimed (`tier-ladder.md`, "Provenance").
 - **The tier stays `?`.** Consolidation runs before tiering and resolves nothing.
 - **If a resolved tier is ever merged** — reachable only by a deliberate hand-merge on
   an already-tiered set, never by this pass — **the lower number wins**, because the
   unit is built at the position its most critical part demands. A merged unit is
-  `Tier: 3` only when every part was, and never when any token in the union is pinned:
-  the floor's Tier 3 prohibition applies to a union exactly as to any other marker.
+  `Tier: 3` only when every part was.
 - **Title.** Name the interaction, not the list of facts. A concatenation ("…A and B
   and C") is rewritten the first time someone tidies it, and every downstream key —
   `progress.md` headings, journey summaries, decision records, plan-integrity check 4 —

@@ -68,10 +68,9 @@ write-time check 8 applies to every staged progress edit. Checks 1–7 are greps
    `tier3/` is in scope even though check 4 exempts it, because the two exemptions are
    different quantifiers: check 4 exempts Tier 3 from **plan membership**, which says
    nothing about **marker completeness**. `tier-ladder.md` requires a marker in every tier
-   including `tier3/`, precisely because a scenario that shed its token on the way in is one
-   the pinned floor can never be checked against again — and `tier3/` is where an unchecked
-   mis-tier does its damage, since `bootstrapping.md` never reads it and nothing downstream
-   revisits it. This check is the only thing that ever looks again.
+   including `tier3/`, because provenance is the only durable record of the route that
+   generated a deferred scenario. `bootstrapping.md` never reads that directory and nothing
+   downstream revisits it; this check is the only thing that looks again.
 
    `extended/` is the one genuine exemption: it is a pre-tiering directory `/retier` leaves
    untouched permanently, so its headings carry no markers and never will. Recursing into it

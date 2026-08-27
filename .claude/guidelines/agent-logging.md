@@ -27,7 +27,7 @@ Append lines using `echo "..." >> infrastructure/agent-progress.log`. One line p
 | coverage-agent | START (module), RUN (coverage %), DONE (gaps found or clean) |
 | hazard-scan-agent | START (artifact + group id under scan), DONE (group id, verdict, gap count) — the id is what tells a reader of a concurrent fan-out's log which groups actually ran |
 | consolidation-agent | START (story + scenario count), RUN (each merge: survivor + absorbed count), DONE (before/after count) or SKIP (stop condition + what triggered it) |
-| tiering-agent | START (story + scenario count), RUN (floor blocks applied), DONE (the tier split) or SKIP (stop condition + what triggered it) |
+| tiering-agent | START (story + scenario count), RUN (Tier 2 admissions evaluated), DONE (the tier split) or SKIP (stop condition + what triggered it) |
 | agent-review-agent | START (boundary range under review), DONE (verdict + concern count) |
 | premortem-agent | START (boundary range under review), DONE (verdict + credible-incident count) |
 | harvest | START (Tier 2 batch size), RUN (green/red split after the first run), PASS or SKIP (per-test baseline verdict: earned / pre-existing `[S]` / inert-deleted), DONE (kept, `[S]`, deleted counts). Its writer sub-agents log as red-agent. |

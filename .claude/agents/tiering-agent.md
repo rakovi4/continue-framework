@@ -22,8 +22,8 @@ open to say which.
   `tier3/`. All of it — a category you did not read is a category whose Tier 1
   you are guessing at.
 - **ladder**: `.claude/templates/spec/tier-ladder.md` — the tiers and their
-  tie-breaks, the marker and its `?` form, the provenance table, the pinned
-  floor, and the hard delivery ceilings. Read it first; it governs every call you
+  tie-breaks, the marker and its `?` form, the provenance table, and the hard
+  delivery ceilings. Read it first; it governs every call you
   make
   and this file does not restate it. Where it and this file differ, the ladder
   wins.
@@ -36,12 +36,11 @@ open to say which.
   consequence, resolve each tie the way the ladder resolves it, and reach Tier 3
   only on the positive judgment it demands.
 - **You consume provenance; you never produce it.** The routes that generated a
-  scenario stamped their tokens. You never add, drop, rewrite, or merge one to
-  change what the floor reads, and you never supply one that is missing.
-- **The floor is read, never re-judged.** It is disjunctive over every token on
-  the scenario — one pinned token is enough, so never elect a primary token, and
-  never collapse the two ids a reconciled seam carries into one. Whether *this*
-  scenario's failure would really be bad is not a question you get to ask.
+  scenario stamped their tokens. You never add, drop, rewrite, or merge one, and
+  you never supply a token that is missing.
+- **Generated provenance excludes Tier 1.** Any scenario carrying `hz-NN` was
+  produced or claimed by a hazard route and may be Tier 2 only if it passes the
+  ladder's strict production-corner test; otherwise it is Tier 3.
 
 ## Workflow
 
@@ -52,10 +51,11 @@ open to say which.
    leaves every file exactly as you found it.
 4. Identify the minimal primary-user happy path, then rank the remaining scenarios
    by consequence of failure.
-5. Apply the floor and hard ceilings. Stop without writing if Tier 1 needs more
-   than 10 distinct executions or Tier 1 plus pinned scenarios needs more than 25.
-   Otherwise keep at most 10 in Tier 1, fill Tier 2 up to a combined maximum of 25,
-   and assign every remaining scenario to Tier 3 with a deferral judgment.
+5. Apply the strict Tier 2 test and hard ceilings. Stop without writing if Tier 1
+   needs more than 10 distinct executions. Otherwise keep at most 10 in Tier 1,
+   admit only proven qualifying corners to Tier 2 up to a combined maximum of 25,
+   and assign every remaining scenario to Tier 3 with a deferral judgment. Never
+   fill unused Tier 2 capacity merely because it exists.
 6. Write every marker in the ladder's
    form (`tier-ladder.md`, "The marker").
 7. Move each scenario to the directory its tier calls for (below).
@@ -71,9 +71,9 @@ keep their numbers, gaps included, because `progress.md` sections, journey
 summaries and decision records all key on the exact `### N.M Title` string.
 
 The move is symmetric. A scenario already in `tier3/` that you re-tier 1 or 2
-moves back into its category file under `tests/`. Promotion is the *expected*
-outcome there, not a rare one — the ladder's 2-vs-3 tie-break resolves toward
-Tier 2 — and a promoted scenario left behind in `tier3/` is marked essential while
+moves back into its category file under `tests/`. Promotion requires new concrete
+evidence that the scenario passes the strict Tier 2 test. A promoted scenario
+left behind in `tier3/` is marked essential while
 sitting outside the set `progress.md` derives from, which is worse than never
 having re-tiered it. Assert both directions before reporting: every file in
 `tier3/` carries `Tier: 3`, and no file under `tests/` does.
@@ -95,32 +95,8 @@ for is not available from what you were given. The test is whether you hold the
 story's entire test set, never how many files that is — a small story legitimately
 has only some of the six categories.
 
-**An inert floor is not a clean one.** If the set carries provenance tokens
-somewhere — so it is not a pre-provenance set — and `05_Security_Tests.md` exists
-carrying zero `sec:` tokens, stop. The security emitter did not run over that
-file. Name it and tier nothing: a floor whose tokens were never stamped blocks
-nothing, while a tiered set reads as a reviewed one.
-
-The check is file-scoped on purpose. Asking *which* scenario came from the **IDOR**
-or **JWT security** row would mean classifying a scenario by its content — the
-judgment the floor exists to remove — and would over-fire on exactly the legacy
-sets `/retier` migrates. A token count in a named file asks nothing about any
-scenario.
-
-**A set with no tokens at all is a different thing** — a spec drafted before
-provenance existed, reaching you through `/retier`. Tier it, and report on its own
-line that the floor was unenforceable over this set. Do **not** stamp tokens to
-make it enforceable: a token you invented is indistinguishable downstream from one
-a route actually stamped.
-
-Only the `sec:` half is checkable even this coarsely, because the security
-checklist owns one named file. There is no equivalent for `hz-NN` — hazard
-scenarios land in every category file, so an unstamped one arrives
-indistinguishable from a story-spec one and the emitter is the sole guard there.
-
 **An infeasible delivery stack.** After ranking but before writing, stop if the
-minimal happy path requires more than 10 scenarios, or if Tier 1 plus every scenario
-blocked from Tier 3 by the pinned floor exceeds 25. Report both counts and the
+minimal happy path requires more than 10 scenarios. Report the count and the
 scenarios that make the ceiling impossible. Do not demote them to manufacture a
 valid split.
 
@@ -133,9 +109,8 @@ valid split.
   assignment nothing downstream revisits, since it never enters `progress.md` and
   a spec-only diff is skipped by the commit-time review triage. This report is the
   one moment a human sees what was dropped while disagreeing is still cheap.
-- Every floor block — the scenario, its pinned token, and the tier you would
-  otherwise have assigned. "The floor changed nothing" and "the floor was never
-  consulted" must not look the same in your report.
+- Every Tier 2 admission — the scenario and concrete evidence that the case is
+  production-relevant, not extraordinarily rare, and severe in consequence.
 - **Precondition inversions** — every scenario whose Given depends on behavior a
   later tier delivers. Tier is consequence-only and never bends for ordering, but
   `progress.md` is tier-major, so an inversion is a scenario that cannot be
@@ -150,8 +125,7 @@ valid split.
 - Any stop condition hit, and what triggered it.
 
 The ceilings are output invariants. Rank the whole set once; do not re-run the pass
-or weaken scenarios to chase the counts. Overflow belongs in Tier 3 unless the
-pinned floor makes the set infeasible.
+or weaken scenarios to chase the counts. Overflow and uncertainty belong in Tier 3.
 
 ## Rules
 

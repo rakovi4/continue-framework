@@ -52,43 +52,16 @@ and the observable outcomes. It must not name or prescribe implementation machin
 If a technical constraint affects observable behavior, translate its effect into a
 domain requirement in the main spec and record the technical cause only in Notes.
 
-## Phase 3: Hazard Catalogue Scan
-
-Before output, scan the drafted spec against the hazard catalogue — the spec-time,
-closed-list complement to the open-ended commit-time review passes. Dispatch it exactly
-as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read its "How to apply
-it", "The dispatch shape"); the artifact under scan is the **drafted spec**.
-
-Fold every GAP back into the appropriate artifact so test-spec and design-preview inherit
-it: observable requirements and constraints enter the main spec in domain language;
-implementation mechanisms and rationale enter Notes. At story altitude an observable
-guard is a named requirement, not yet a test — but it must be specific enough that a
-downstream test could go red on it. An unresolved GAP blocks Phase 4: fold every
-fired-trigger GAP in, or explicitly dismiss it with a reason, before output.
-
-**Nothing is stamped here, and nothing is lost by that.** A story draft has no numbered
-scenarios, so a COVERED line names its guard in the spec's own terms and there is no
-marker to carry the group id (`.claude/agents/hazard-scan-agent.md`, "A COVERED class is a
-route too"). The token is recovered one step later: `/test-spec` re-scans the drafted test
-files, reports the same class COVERED against a `### N.M Title`, and stamps the id there.
-That is why a guard which enters as a story-level requirement — one the drafter got
-*right*, so no downstream GAP ever fires on it — still reaches tiering with its provenance
-instead of arriving bare.
-
-## Phase 4: Output
+## Phase 3: Output
 
 1. Use the story folder provided by the caller (see Input) — never re-derive the
    folder name from the story name; the caller is the single folder-resolution
    authority. Create that exact folder if it does not exist yet.
 2. Create both files
 
-## Phase 5: Summary
+## Phase 4: Summary
 
-Report: main spec path + line count, notes file path, confirmation, and the hazard-scan
-result — the group set scanned (the `_index.md` **Groups** list at scan time, so a later
-group addition can re-trigger per `_index.md`'s "A new group obligates a re-scan"), each
-group's verdict, and every GAP's disposition (folded → named requirement, or dismissed
-with reason).
+Report: main spec path + line count, notes file path, and confirmation.
 
 ## Design Constraints
 

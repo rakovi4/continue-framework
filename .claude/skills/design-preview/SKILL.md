@@ -100,23 +100,22 @@ anyway. When you present, surface the scan outcome — the group set scanned, ea
 fired-trigger GAP, and the guard the chosen option carries for it — so the user approves a
 design whose hazards are visible, not hidden.
 
-When a GAP folds in as a **net-new scenario** rather than as a change to the design, write
-that scenario into its category file under `tests/` with a resolved marker —
-`Tier: 2 (hz-NN)` — carrying the scan's group id. This is the only place on the mid-cycle
-path where that id is still known, and the pinned floor can only keep a pinned group out
-of Tier 3 if the token reached the scenario (`.claude/templates/spec/tier-ladder.md`,
-"Provenance").
+When a GAP folds in as a **net-new scenario** rather than as a change to the design,
+classify it immediately using `.claude/templates/spec/tier-ladder.md`. It can never be
+Tier 1. Write `Tier: 2 (hz-NN)` under `tests/` only when the case is concretely important
+in production, not extraordinarily rare, and severe in consequence. Otherwise — including
+any doubt — write `Tier: 3 (hz-NN) — {missing Tier 2 evidence}` under the matching
+`tests/tier3/` category file and do not add it to `progress.md`. Preserve the scan's group
+id; this is the only point on the mid-cycle path where that provenance is known.
 
 A scenario that reaches this gate from a `NEEDS_CYCLE` review finding rather than from a
-GAP is written the same way — resolved `Tier: 2`, carrying whatever tokens this scan
-stamped and a bare `Tier: 2` when it stamped none. A review pass is not a provenance
-route, so there is nothing else to record; never invent a token to make the floor bite.
+GAP uses the review-finding tier policy, carrying whatever tokens this scan stamped and
+no invented token when it stamped none. A review pass is not a provenance route.
 
 Resolved, not `Tier: ?`. The `?` form means "drafted, awaiting the comparative pass", and
 `tiering-agent` runs at spec time only — a `?` written here would sit unresolved on an
-already-tiered story and read to the next person as a pass that got skipped. The tier is
-2 because the scenario is being implemented in the cycle it was born in, which is neither
-the Tier 1 demonstrable-feature set nor a bounded degradation nobody builds.
+already-tiered story and read to the next person as a pass that got skipped. A
+hazard-generated scenario uses the strict Tier 2-or-3 decision above and never Tier 1.
 
 **Consolidation does not reach back.** The pass that merges scenarios sharing one
 execution runs once, at `/test-spec`, over the whole drafted set
@@ -124,9 +123,9 @@ execution runs once, at `/test-spec`, over the whole drafted set
 and is **never retro-merged**: re-running a whole-set pass to absorb one newcomer would
 rewrite scenarios already built or in flight, and their `### N.M Title` headings are what
 `progress.md`, the journey summaries and plan-integrity check 4 key on. So the two
-outcomes above stay the only ones — fold the GAP into the design, which costs no cycle at
-all, or write the net-new scenario, which costs a full one. That asymmetry is a reason to
-fold wherever folding is honest, never a reason to call a scenario a design change.
+outcomes above stay the only ones — fold the GAP into the design, write a qualifying
+Tier 2 scenario that costs a full cycle, or record a Tier 3 scenario that costs none.
+Fold wherever folding is honest; never call a distinct observable behavior a design change.
 
 ### 3. Present Options
 

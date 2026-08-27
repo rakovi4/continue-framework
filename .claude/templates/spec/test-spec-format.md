@@ -1,8 +1,8 @@
 # Test Spec — Category Formats & Ordering
 
 Per-category file formats and ordering *within* a category. **Tier** — the
-consequence-of-failure split that orders scenarios *across* categories, its
-`Tier:` marker, and the pinned floor — is defined in
+consequence-of-failure split that orders scenarios *across* categories and its
+`Tier:` marker — is defined in
 [`tier-ladder.md`](tier-ladder.md). Read that before assigning or reading a tier.
 The counts in the category headings below guide drafting only. The story-wide hard
 ceilings are applied after consolidation: Tier 1 has at most 10 scenarios and Tier 1
@@ -77,7 +77,7 @@ For every operation that **moves money, calls an external system, or mutates per
 
 **Rules:**
 - Both directions are mandatory for any money-moving operation — covering one (e.g. inbound webhooks) does NOT cover the other (e.g. outbound re-charge on retry). This is the exact gap that ships double-charge bugs.
-- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved), never in `tier3/` — a re-run-safety guard for a side effect carries `hz-02` provenance, which the pinned floor keeps out of Tier 3 (`tier-ladder.md`). Tier 1 or Tier 2 is the sorter's call; nice-to-have is not on the menu.
+- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved) with `hz-02` provenance. They never enter Tier 1. The sorter admits one to Tier 2 only when it is production-relevant, not extraordinarily rare, and severe in consequence; otherwise it moves to `tier3/`.
 
 ## 02_UI_Tests.md (5-8 tests)
 
@@ -147,7 +147,7 @@ Generate **only scenarios relevant to the story's actual attack surface**. Do no
 | JWT security | Story issues or validates JWT tokens | Login (algorithm confusion, expiration, revocation) |
 | Input validation | Story accepts user text input | Task title, description |
 
-**Provenance**: every row stamps `sec:{row}` on the scenarios it produces — `sec:SQLi`, `sec:RateLimit`, `sec:IDOR`, and so on. Two of them are **floor rows**: `sec:IDOR` and `sec:JWT` are kept out of Tier 3 by the pinned floor (`tier-ladder.md`); every other row tiers freely. All of them stamp, because the token count in this file is also what tells a downstream pass the checklist ran at all.
+**Provenance**: every row stamps `sec:{row}` on the scenarios it produces — `sec:SQLi`, `sec:RateLimit`, `sec:IDOR`, and so on. Tokens record the generation route; they do not force a tier. Hazard-produced scenarios never enter Tier 1, and Tier 2 still requires the ladder's strict production-corner test.
 
 **Merge related scenarios**: this category is where the practice started — combine
 injection attempts across fields into one scenario, combine input length limits into

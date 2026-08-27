@@ -39,20 +39,19 @@ safe; do not add a checkbox for it.
 a proposed cycle. Do not add its test scenario or `progress.md` block until the user
 explicitly agrees. Declining drops the proposal; silence is not consent.
 
-**A consented NEEDS_CYCLE follow-up that becomes a scenario is Tier 2.** In a tier-major story it goes through
-`/design-preview` step 2a like any mid-cycle scenario, which writes it into its `tests/` category file
-with a **resolved** marker — never `Tier: ?`. `Tier: 2` is the default; it is **Tier 1** when the failure
-mode means the feature does not work for its primary user, which every BLOCK verdict is — promotion is
-expected, not a deviation owing an argument. Its `progress.md` steps go in as a `### {N}.{M} {Title}` block at the **end** of the matching
+**A consented NEEDS_CYCLE follow-up that becomes a scenario is classified immediately.** In a tier-major story it goes through
+`/design-preview` step 2a like any mid-cycle scenario, which writes a **resolved** marker — never `Tier: ?`.
+It never enters Tier 1. Tier 2 requires concrete production importance, a case that is not extraordinarily rare,
+and severe consequence; otherwise, including doubt, it goes to `tests/tier3/` without a progress block. A Tier 2 finding's `progress.md` steps go in as a `### {N}.{M} {Title}` block at the **end** of the matching
 `## Tier N — {Category} Scenarios ({file})` section for its own tier, in the same `review-fix:`
 commit as the test file. Put `<!-- review-origin: boundary -->` immediately below the new block's
 heading; this provenance limits the finding to one review generation without weakening its TDD
 cycle. The passes fire only at a boundary, so no cycle is in flight to strand:
 when that section precedes the cursor, mark the newcomer's first step `[~]` and return the next
-block's `[~]` to `[ ]` (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). If this
-unit already flipped the item to `done/` or the Done table, reopen it in the same `review-fix:`
-commit. Untiered stories are unchanged. Why, and the `tier3/` exit:
-`.claude/guidelines/review-findings-detail.md` "Mid-cycle findings default to Tier 2".
+block's `[~]` to `[ ]` (`workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). If a Tier 2
+finding arrives after the item moved to `done/` or the Done table, reopen it in the same
+`review-fix:` commit. A Tier 3 record never reopens the item. Untiered stories are unchanged. Why, and the `tier3/` exit:
+`.claude/guidelines/review-findings-detail.md` "Mid-cycle findings use the Tier 2 threshold".
 
 **Quiz (NEEDS_CLARIFICATION only) — last resort, gated.** Enforce "Consumer obligations" in
 `.claude/templates/workflow/clarification-escalation-test.md`: **demote to NEEDS_CYCLE** any finding with

@@ -59,20 +59,15 @@ decided here:
 | any row of the security checklist | `Tier: ? (sec:{row})` — `sec:IDOR`, `sec:JWT`, `sec:SQLi`, `sec:RateLimit`, … |
 | any other route — the story spec, the Prerequisite Guard Checklist | `Tier: ?` |
 
-Every security row stamps, not only the two the floor pins. A story whose relevance
-filter excludes IDOR and JWT still has a security file full of scenarios, and if
-only the pinned rows stamped, that correct file would be indistinguishable from one
-the checklist never ran over — which is exactly what the tiering pass's inert-floor
-stop reads. Stamping every row makes the token count mean "the checklist ran"; the
-floor goes on pinning `sec:IDOR` and `sec:JWT` alone.
+Every security row stamps. Provenance records which generation route produced a
+scenario; it does not force implementation or encode importance.
 
 The bare `Tier: ?` of the last row is not optional — it is what makes the Phase 5
 sweep able to catch a scenario the pass never reached (`tier-ladder.md`, "The
 marker").
 
-Stamp `sec:` tokens **in `05_Security_Tests.md`** — the tiering pass's inert-floor
-stop is scoped to that one named file (`tiering-agent.md`, "Stop conditions"), and a
-`sec:` scenario filed under any other category does not count toward it.
+Stamp `sec:` tokens **in `05_Security_Tests.md`**, where the security checklist's
+output belongs.
 
 ### Phase 3: Hazard Catalogue Scan
 
@@ -119,7 +114,7 @@ group must merge. It unions the absorbed provenance tokens onto the survivor, le
 every `Tier: ?` unresolved for Phase 5, and
 reports each merge with what it absorbed. It runs after the scan so a folded GAP is a
 merge candidate, and before tiering so the comparative pass sorts the units that are
-actually built and the floor lands on the merged token union — the argument is in
+actually built and provenance remains on the merged token union — the argument is in
 `consolidation-rules.md`, "Where the pass runs".
 
 On a stop condition, report it and do **not** fall through to Phase 5: a half-merged set
@@ -166,9 +161,7 @@ and they leave the tree in opposite states — read the report, never the `?` co
 Either way, do not fall through to Phase 6: it summarizes a split that does not exist, and
 after a stop the story would read spec-complete while `bootstrapping.md` refuses to derive
 any plan from an unresolved `?`. Report what happened and stop. The resolutions are the
-caller's and they differ: a partial dispatch is re-dispatched whole; an inert floor means
-Phase 2's security emitter did not run over `05_Security_Tests.md`, so that file is
-re-stamped and the pass re-dispatched. A **failed move has no re-dispatch resolution** —
+caller's and they differ: a partial dispatch is re-dispatched whole. A **failed move has no re-dispatch resolution** —
 re-dispatching re-tiers an already-tiered set and silently replaces a split whose only
 record was the failed report. Restore the story's `tests/` tree from the last commit and
 re-dispatch from that state; never hand-repair the duplicate or the loss. Never tier by
@@ -183,13 +176,13 @@ Every remaining eligible scenario belongs in Tier 3.
 ### Phase 6: Summary
 
 Report: folder path, files created, test counts per file, and the hazard-scan result —
-the group set scanned (the `_index.md` **Groups** list at scan time, so a later group
-addition can re-trigger per `_index.md`'s "A new group obligates a re-scan"), each group's
-verdict, and every GAP's disposition (folded → named scenario, or dismissed with reason).
+the group set scanned (the `_index.md` **Groups** list at scan time), each group's verdict,
+and every GAP's disposition (folded → named scenario, or dismissed with reason).
 
 Then Phase 4's consolidation result — the before/after count per file and every merge with
 what it absorbed — and Phase 5's: the Tier 1 / Tier 2 / Tier 3 split, every Tier 3 scenario
-named with the degradation judgment that put it there, and every floor block. Tier 3 never
+named with the degradation judgment that put it there, and every Tier 2 admission with
+the evidence that passed its strict threshold. Tier 3 never
 enters `progress.md` and a merged-away scenario is never re-drafted, so this is the last
 point at which a human sees what was folded or dropped while disagreeing is still cheap.
 
@@ -197,4 +190,4 @@ point at which a human sees what was folded or dropped while disagreeing is stil
 - English, Gherkin in Markdown, DSL only (no technical details in steps)
 - One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. After consolidation, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 4 merges shared executions without dropping checked facts (`.claude/templates/spec/consolidation-rules.md`).
 - **Load tests**: profile-driven against the **Load Challenge Profile** the project declares in `ExpectedLoad.md`. The profile catalog, the relevance filter (including when to skip the file and set `Load = n/a`), the authoring rules and the file layout are all in `.claude/templates/spec/load-test-format.md`
-- **Security**: generate stack-aware scenarios only. The relevance filter, the checklist rows (including the two floor rows Phase 2 stamps), the merge rule and the per-story count are all in `test-spec-format.md` ("05_Security_Tests.md")
+- **Security**: generate stack-aware scenarios only. The relevance filter, checklist rows, merge rule and per-story count are all in `test-spec-format.md` ("05_Security_Tests.md")

@@ -14,12 +14,10 @@ index is the authoritative enumeration of groups.
 
 - **Apply every group file, from scratch, at every step that references the
   catalogue.** "The whole catalogue" means every group in the list below — a group
-  not dispatched is a group not checked. Do not trust an upstream pass to have
-  "already handled" a class. A hazard missed at story must still be catchable at
-  test-spec and at design-preview. There is no register that marks a class
-  resolved — redundant application across steps is the point. Same-kind gates (read
-  the artifact, decide it looks fine) are exactly what let these classes through;
-  re-deriving each class independently is the defense.
+  not dispatched is a group not checked. The story's complete scenario set is
+  scanned exactly once at `/test-spec`. Each `/design-preview` independently scans
+  that scenario's drafted design; this is a different artifact and gate, not a
+  repeat of the story-wide scenario-set scan.
 - **One focused pass per group.** Splitting into groups concentrates attention:
   each pass carries only its group's classes, so no class is starved by the length
   of the others. The cost is that completeness is now *enumerated, not visual* —
@@ -30,8 +28,8 @@ index is the authoritative enumeration of groups.
   newly-added group goes unchecked — dispatched **concurrently**, each carrying three
   inputs and no others: the artifact under scan, this index, and its one group file.
   Then one synthesis pass over the seams ("Reason across the seams", below). A call
-  site supplies only the artifact — a drafted spec, drafted test files, a drafted
-  design, a bug fix's intended change — and points here for the rest rather than
+  site supplies only the artifact — drafted test files, a drafted design, a bug
+  fix's intended change — and points here for the rest rather than
   restating it; four copies of a dispatch shape are four things to drift apart.
 - **It is a lens, not a checklist to clear.** For each class, ask "does the work in
   front of me touch this trigger?" — not "can I tick this box?". A class that does
@@ -56,9 +54,9 @@ index is the authoritative enumeration of groups.
   mandatory — a named test that would go red. *When* it is delivered is then decided
   by the ladder in `.claude/templates/spec/tier-ladder.md`, which can place a guard
   in Tier 2, or in Tier 3 when the impact is a bounded, acceptable degradation.
-  Some groups are pinned above Tier 3 by that file's floor and can never take the
-  Tier 3 exit; `tier-ladder.md` holds the authoritative list. This is a **destination** rule, never a *strictness*
-  rule: a group pass does not soften a verdict, drop a class, or pre-assign a tier
+  Hazard-generated scenarios never enter Tier 1. Tier 2 requires a production-realistic,
+  not extraordinarily rare case with severe consequences; doubt goes to Tier 3. This is
+  a **destination** rule, never a *strictness* rule: a group pass does not soften a verdict, drop a class, or pre-assign a tier
   because a lower tier now exists — it reports the GAP, the fired trigger, and the
   guard, tagged with its group id, and tiering happens afterwards in a separate pass
   that reads the whole scenario set at once. A pass that starts triaging its own
@@ -78,14 +76,10 @@ index is the authoritative enumeration of groups.
 - **The catalogue grows by hand.** When a new scar appears, abstract it to a generic
   class and add it to the right group file (or a new group file plus a line in the
   list below), via `/prompt-update` — never an automated loop.
-- **A new group obligates a re-scan of frozen specs.** Each scan records the group set
-  it covered (the **Groups** list at scan time) in its scan report. Later steps re-scan
-  the whole catalogue from scratch only while a spec is still being worked — so a spec
-  scanned against groups 1–7 and then frozen (its whole spec phase done) is never
-  re-checked against a group 8 added afterward. Adding a group is therefore the trigger
-  to re-scan the specs that were frozen under the old set against the new group; the
-  growth step (`/prompt-update`, above) owns that re-scan. A spec whose recorded group
-  set is a strict subset of the current **Groups** list is stale until re-scanned.
+- **Catalogue growth is prospective.** A new group participates in future `/test-spec`
+  and `/design-preview` scans. Never re-scan an already-tiered story's complete
+  scenario set merely because the catalogue grew; the one-shot story-wide cadence is
+  stronger than retroactive catalogue completeness.
 
 Each entry in a group file: **Trigger** (when the work touches this class),
 **Mitigation** (what the design must do), **Forced guard** (the test/check that

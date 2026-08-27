@@ -77,25 +77,21 @@ SEAM    [hz-NN] {class} ↔ {other group} — {the overlap}
 
 `hz-NN` is your group's id, so it is identical on every line — you scan one group.
 It is not decoration. Whatever the caller turns a finding into carries it onward
-as provenance, and the pinned floor in `.claude/templates/spec/tier-ladder.md`
-reads it to decide what may never be deferred. The scan is the last place that
-still knows which group fired, so an unstamped line reaches that floor
-indistinguishable from work nobody ever scanned. Three consequences:
+as provenance. The scan is the last place that still knows which group fired, so
+an unstamped line loses its generation route. Three consequences:
 
 - **CLEAR's reason clause is mandatory.** A group whose triggers cannot fire at
   this altitude must be dismissed as an explicit block (`_index.md`, "A dead group
   is dismissed as a block"); without the clause it reads exactly like a group that
   was genuinely checked, and the caller's staleness audit trusts that record.
 - **A seam is two routes, so it needs two tokens.** Synthesis unions both groups'
-  ids onto the guard it names and cannot union what it cannot see. One index-named
-  seam spans a group the floor pins and one it deliberately does not, so a bare
-  flag can resolve to the unpinned side and take the Tier 3 exit.
+  ids onto the guard it names and cannot union what it cannot see.
 - **A gap is one route.** Yours. Never guess another group's id onto it.
 
 - **A COVERED class is a route too.** You raise a GAP only where a guard is
   *missing*, so if GAPs were your only stamped output the caller would tag the
-  scenarios nobody thought of and leave the well-drafted ones bare — inverting what
-  the floor reads (`tier-ladder.md`, "Provenance"). Naming the guard you found lets
+  scenarios nobody thought of and leave the well-drafted ones bare. Naming the
+  guard you found lets
   the caller stamp this id onto it. Name it as the artifact names it; where the
   artifact has no numbered scenarios — a design preview, a story draft — name the
   guard in its own terms and the caller stamps nothing yet.

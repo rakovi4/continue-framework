@@ -1,11 +1,11 @@
-# Scenario Tiers — Ladder, Marker & Floor
+# Scenario Tiers — Ladder & Marker
 
 The vocabulary for splitting a story's scenarios by **consequence of failure**, so
 that a story has a point at which it reads "the feature works, the rest is
 hardening".
 
 Definitions only. This file names the tiers, the marker that records them, and the
-classes pinned above the bottom tier. *Which* pass assigns a tier, and how
+provenance of generated scenarios. *Which* pass assigns a tier, and how
 `progress.md` and `stories.md` track it, live elsewhere. Read this file whenever
 you assign, re-assign, or read a tier.
 
@@ -17,12 +17,17 @@ production, then by the delivery ceilings below. Category never decides tier.
 | Tier | If this scenario fails… | Destination |
 |---|---|---|
 | **1** | the primary user's happy path does not work | `progress.md`, before any Tier 2 |
-| **2** | the happy path works, but a selected production corner case is unsafe or incorrect | `progress.md`, after all of Tier 1 |
-| **3** | lower-priority coverage is recorded but deferred | `tier3/` — never enters `progress.md` |
+| **2** | an important, production-realistic corner case has a severe consequence | `progress.md`, after all of Tier 1 |
+| **3** | every other non-happy-path case is recorded but deferred | `tier3/` — never enters `progress.md` |
 
 Tier 1 is "demonstrable feature"; Tier 2 is "trustworthy feature". `tier3/` holds
 what `extended/` has always held — scenarios that are recorded and not built —
 under a name that matches the ladder.
+
+Hazard-catalogue findings never enter Tier 1. Tier 1 is derived only from the
+story's primary-user happy path. If a hazard exposes that the stated happy path is
+incomplete, amend the story requirement first; only the resulting story-derived
+happy-path scenario may be Tier 1.
 
 `extended/` directories that already exist are **not migrated** — they keep their
 name, their `_Extended` filenames, and their standing, and `tier3/` applies to
@@ -41,19 +46,20 @@ Two readings that are **not** the ladder:
 - **Not by difficulty.** Awkward to test is the reason a hazard ships, not a
   reason to demote it.
 
-### Ambiguity resolves toward implementation
+### Tier 2 is a strict exception
 
 The two boundaries do not cost the same, so they do not tie-break the same way:
 
-- **Unsure between 1 and 2 → choose 2.** Both tiers get implemented; a wrong call
-  costs ordering only, and it is self-correcting the moment someone tries to demo
-  the feature.
-- **Unsure between 2 and 3 → prefer 2 while capacity remains.** Once the combined
-  ceiling is reached, compare the candidates and keep the higher-consequence one
-  in Tier 2. Pinned scenarios always outrank unpinned candidates.
+- **Unsure whether a scenario is happy path → choose 2.** Tier 1 contains only the
+  unambiguous minimum needed for the primary user to complete the story's promise.
+- **Unsure between 2 and 3 → choose 3.** Tier 2 requires all three facts to be
+  concrete: the case matters in production, it is not extraordinarily rare, and
+  failure has a severe consequence. Missing or doubtful evidence for any fact
+  sends the scenario to Tier 3.
 
-Tier 3 therefore requires a judgment: name the degradation or corner case being
-deferred and why it ranks below the Tier 2 scenarios selected for this story.
+Tier 3 is the default destination for non-happy-path coverage. Its marker names
+the degradation or corner case being deferred and which Tier 2 condition was not
+established.
 
 ## The marker
 
@@ -101,11 +107,8 @@ Tier: 3 (hz-06) — export is an admin convenience; truncation is visible in the
 and the full data stays reachable through the API.
 ```
 
-Provenance is what the floor below is read from, so a scenario that shed its
-token on the way into `tier3/` is one the floor can never be checked against
-again — and `tier3/` is exactly where an unchecked mis-tier does its damage,
-because nothing there is ever built. Keeping the marker makes auditing the bucket
-a grep instead of a re-reading.
+Provenance preserves why a generated scenario exists. Keeping it on Tier 3
+markers makes the deferred bucket auditable without re-running the catalogue.
 
 ### Provenance
 
@@ -115,53 +118,24 @@ found it. Every route stamps its token at the moment it generates the scenario.
 | Token | Stamped by |
 |---|---|
 | `hz-NN` | the hazard-catalogue group the scenario belongs to, whether a scan GAP raised it or a checklist rule mapping to that group generated it — `hz-01` … `hz-08`, enumerated in `.claude/guidelines/hazard-catalogue/_index.md` |
-| `sec:{row}` | the security-checklist row in `test-spec-format.md` that produced it — every row stamps; `sec:IDOR` and `sec:JWT` are the two the floor pins |
+| `sec:{row}` | the security-checklist row in `test-spec-format.md` that produced it — every row stamps |
 | *(absent)* | derived from the story spec, matching no checklist row and no hazard group |
 
-Multiple tokens are comma-separated: `Tier: 1 (hz-02, sec:IDOR)`.
+Multiple tokens are comma-separated: `Tier: 2 (hz-02, sec:IDOR)`.
 
 Absent means **no route claimed it**, not that its route is unknown: a route that
 fired always stamps. Silence is therefore not permission — it is the story-spec
 case, and nothing more.
 
-A scan raises a GAP only where a guard is *missing*. If scan GAPs were the only
-emitter, provenance would tag the scenarios nobody thought of and leave the
-well-drafted ones bare — inverting exactly what the floor needs. This is why
-checklists stamp too: the Side-Effect & Idempotency checklist stamps `hz-02`, the
+A scan raises a GAP only where a guard is *missing*. Checklists stamp too so
+provenance describes every route that generated a scenario, not only omissions
+found by the scan: the Side-Effect & Idempotency checklist stamps `hz-02`, and the
 security checklist stamps `sec:{row}`.
 
 The two producers are independent and their coverage overlaps — `hz-05` also owns
 authorization/IDOR. A scenario reached through the security checklist carries
 `sec:{row}`, one reached through a hazard scan carries `hz-NN`, one found by both
 carries both. Record every route; never collapse two routes into one token.
-
-## The pinned floor
-
-A tier assignment is a judgment call, and the reviewers who would catch a bad one
-are correlated — they read this same ladder under the same "keep Tier 1 small"
-pressure. So the classes where a mis-tier is catastrophic *and* mechanically
-identifiable are not left to judgment at all:
-
-> **Cannot be Tier 3:** any scenario whose provenance includes `hz-01` (money,
-> numbers & representation), `hz-02` (re-run safety, ordering & atomicity),
-> `hz-05` (request boundary & input — authorization/IDOR, mass assignment,
-> fail-open defaults), `sec:IDOR`, or `sec:JWT`.
-
-Two properties make this worth having:
-
-- **It is mechanical.** The check reads a token that is already on the scenario.
-  It never asks whether *this particular* money bug would be bad.
-- **It forbids Tier 3 only.** Tier 1 versus Tier 2 stays a free choice for these
-  scenarios. The floor guarantees the guard gets *built*, not that it is built
-  first.
-
-**What the floor does not cover.** It is a backstop over the classes a token can
-identify, not a complete guard over everything irreversible. `hz-03` (lost update)
-and `hz-04` (destructive ops, schema evolution) can fail unrecoverably and are
-deliberately *not* pinned — a destructive-op guard on an admin-only path is a
-plausible Tier 3, and pinning the whole group would swallow the exit. Those rest
-on the ladder itself, where comparative consequence determines which scenarios
-fit in Tier 2 before the combined ceiling is reached.
 
 ## Hard delivery ceilings
 
@@ -171,16 +145,15 @@ consolidation across every category:
 - **Tier 1: at most 10 scenarios.** Keep only distinct
   executions needed to demonstrate the primary user's happy path.
 - **Tier 1 + Tier 2: at most 25 scenarios.** Fill the
-  remaining slots with the highest-consequence happy-path variants and corner
-  cases. Move every other eligible scenario to Tier 3.
+  remaining slots only with corner cases that pass Tier 2's strict three-part
+  test. Capacity is a ceiling, not a target; never fill it with doubtful cases.
+  Move every other eligible scenario to Tier 3.
 
 These are hard output constraints, not diagnostic targets. Never weaken or delete
 an assertion to meet them. Consolidate only genuinely shared executions, rank
 distinct executions comparatively, and place overflow in Tier 3 with its explicit
 deferral judgment.
 
-The pinned floor still wins over the Tier 3 exit. If more than ten distinct
-executions are genuinely required for the primary happy path, or Tier 1 plus all
-pinned scenarios exceeds 25, the set is infeasible: write nothing and report that
-the story must be narrowed. Never hide an infeasible story by misclassifying a
-happy-path execution or a pinned guard.
+If more than ten distinct executions are genuinely required for the primary
+happy path, the set is infeasible: write nothing and report that the story must be
+narrowed. Never hide an infeasible story by misclassifying a happy-path execution.

@@ -72,11 +72,9 @@ uniformity.
 2. **No hazard re-scan.** Never fan out `hazard-scan-agent` here. The scan is
    `/test-spec`'s *authoring* step, and run over an already-drafted set it folds new
    GAPs in as **new scenarios** — that is drafting, not migration, and it grows
-   exactly the set the user invoked this skill to order. So a pre-tiering set
-   arrives token-less, `tiering-agent` tiers it and reports the pinned floor
-   unenforceable over it (its "a set with no tokens at all" branch names this path
-   by name). That report is the honest outcome. **Never stamp a token** to make the
-   floor bite: an invented token is indistinguishable downstream from one a route
+   exactly the set the user invoked this skill to order. A pre-tiering set arrives
+   token-less and `tiering-agent` tiers it from the scenarios as written. **Never
+   invent a token**: it would be indistinguishable downstream from one a route
    actually emitted.
 
    **No consolidation either**, for the same reason from the other direction. The pass
@@ -176,7 +174,7 @@ one commit there is no way to separate the user's work in progress from the
 migration's.
 
 Report per story: its state, the action taken, the split, **every Tier 3 scenario
-named** with the degradation judgment quoted from its marker, every floor block,
+named** with the degradation judgment quoted from its marker, every Tier 2 admission,
 every stop condition hit, and every story skipped with the reason. A skipped story
 has to be visible in the report — silence reads as migrated.
 
