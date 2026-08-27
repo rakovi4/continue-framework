@@ -68,7 +68,7 @@ and the concerns covered:
 
 ## Net-New Scenarios Introduced Mid-Cycle
 
-The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the TDD-task `steps discovery` gate; both are the seams where net-new, never-scanned behaviour enters a spec-skipping path, and both reuse the existing per-group fan-out rather than adding a new scan mechanism.
+The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the task `design` gate; both reuse the existing per-group fan-out rather than adding a new scan mechanism.
 
 A scenario a `NEEDS_CYCLE` review finding turns into new work is one of these, whatever surfaced it — so it enters through the same gate, and in a tier-major story it is written with a **resolved `Tier: 2`** marker rather than left untiered. The reasoning and the two ways out of that default are in `.claude/guidelines/review-passes-detail.md` "Mid-cycle findings default to Tier 2".
 
@@ -80,8 +80,8 @@ Appending *below* the cursor instead is the alternative, and it fails in kind: i
 
 ## Boundary Review Passes
 
-The work unit that **closes a block** — a story scenario, a task step, a bugfix task's whole fix,
-the spec section, the harvest checkbox — is followed by two **fresh-context** passes
+The story work unit that **closes a block** — a scenario, spec section, or harvest
+checkbox — is followed by two **fresh-context** passes
 (`agent-review-agent`, `premortem-agent`) reading every commit of that block, a deterministic
 triage predicate that may SKIP them, and a three-way partition of their findings into SAFE /
 NEEDS_CYCLE / NEEDS_CLARIFICATION. A mid-block unit runs its sequence through `/refactor` and stops
@@ -156,21 +156,17 @@ Only `behavior-change` and `bugfix` use TDD. Both run `/test-review` after RED a
 `/refactor` after RED/GREEN phases where the atomic-unit rule requires it.
 
 **Behavior change (design-first):** `spec` → `design` → `steps discovery`. The spec
-states current and expected observable behavior. Discovery scopes affected layers,
-runs the hazard scan, and inserts named RED-to-GREEN pairs.
+states current and expected observable behavior. Discovery scopes affected layers
+and inserts named RED-to-GREEN pairs.
 
 **Bugfix (discovery-first):** optional `reproduce in prod-copy` → `root cause
 analysis` → `design` → `steps discovery`. Creation records symptoms and reproduction,
 never an assumed cause or solution. RCA writes evidence-backed cause and key files;
-design settles the fix; discovery inserts the TDD plan. Design may be `[S]` only for
-a mechanically unambiguous fix.
+design settles the fix; discovery inserts the TDD plan.
 
-For both types, `steps discovery` is a blocking gate. Run every hazard group per
-`.claude/guidelines/hazard-catalogue/_index.md`, resolve every GAP into a RED guard or
-a reasoned dismissal, and store full `hz-NN` dispositions in the active work log.
-Render the gate as `[x] steps discovery (scan: worklog; GAPs: N)`; a bare completed
-gate is invalid. If behavior is externally observable, include acceptance RED/GREEN.
-All RED steps precede the production change that resolves them.
+For both types, `steps discovery` is a blocking plan-expansion gate. If behavior is
+externally observable, include acceptance RED/GREEN. All RED steps precede the
+production change that resolves them.
 
 ## No-TDD Tasks
 
@@ -181,17 +177,22 @@ Discovery reconciles the approved design and current repository into direct,
 behavior-preserving `## Work` steps. Record `plan: +N/-N/~N`; at least one count must
 be non-zero. Existing focused and affected suites verify behavior preservation.
 
-**Infra and general:** `/task` creates direct `### Step N` work units from the spec.
+**Infra and general:** `spec` → `design` → direct `### Step N` work units from the spec.
 Each step runs relevant tests, structural checks, or validators. Infra work changes
 only repository-managed infrastructure-as-code; never mutate remote state manually.
 
 If any no-TDD task reveals a required executable behavior change, stop before that
 change and reclassify the task or split it into `behavior-change` or `bugfix`.
 
-**QA:** cases are reusable manual checklist items, not `/continue` work units.
+**QA:** `spec` → `design` → serial reusable manual checklist items.
 `/continue` reports the next unchecked case; `/qa-run` drives it in a watched browser.
 For a new session, revive the archived task and reset progress without changing the
 spec. A failed case stays unchecked and produces a separate `bugfix` task. Multiple
-passed cases may land in one `task:` commit; boundary reviews do not run.
+passed cases may land in one `task:` commit.
+
+For every task type, `design` is one atomic multi-lane work unit: freeze one input,
+draft the design while all hazard groups scan concurrently, reconcile the results,
+then request one approval. Task steps do not run review passes; after all planned
+work completes, run one concurrent `agent-review` + `premortem` batch over the task.
 
 Operational details live in `/task`, `/continue`, and `/qa-run`.

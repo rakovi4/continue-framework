@@ -6,9 +6,8 @@ the triage predicate that may skip them, the three-way partition of their findin
 tier a mid-cycle finding's scenario defaults to. `/continue` owns the mechanics. Read it
 before running or triaging a review pass.
 
-Every **completed block** — a story scenario in any sequence (backend, frontend,
-integration, security, load, infra), a task step, a bugfix task's whole fix — is
-followed by two **fresh-context** review passes that differ *in kind* from the
+Every completed story scenario, spec section, or harvest step—and every completed
+task—is followed by two **fresh-context** review passes that differ *in kind* from the
 in-loop `/test-review` and `/refactor`. Those read the work as it is built and
 within the author's framing; these read the finished diff cold:
 
@@ -18,12 +17,11 @@ within the author's framing; these read the finished diff cold:
   back to the *missing* guard.
 
 They are independent reads of the same diff, so they run **concurrently with each
-other**, and alongside `/refactor` when the route owes one. The boundary behavior
-commit lands first; the passes read the block's **immutable committed range** while
-any `/refactor` mutates the tree toward a separate commit, so there is no race. A
-direct no-TDD route has no refactor batch, but its boundary still receives both passes.
+other**. At a story boundary they may also overlap an owed `/refactor`; a task waits
+until all work joins, then reviews its immutable whole-task range.
 
-They run **before the refactor commit** but are **not a gate**: a CONCERNS or BLOCK
+At story boundaries they run **before the refactor commit**. In both cadences they
+are **not a gate**: a CONCERNS or BLOCK
 verdict surfaces as a follow-up and never blocks, reverts, or amends either commit — the
 work always lands. This layer exists so a defect that every same-kind gate read past still
 meets one reader who did not — the gap that defense-in-depth-by-kind closes. Overlapping
@@ -32,15 +30,14 @@ behavior/correctness altitude, and `/refactor` preserves behavior, so a cold rea
 range is identical whether it lands a second before or a second after the refactor
 commit — we take the second that overlaps `/refactor`.
 
-**The cadence is one pass per block, not one per work unit.** These two passes are the
+**Stories review once per block; tasks review once in total.** These two passes are the
 heaviest single cost in the loop — about 28% of a gated backend scenario's agent-work,
 more than every code-writing phase combined — and they used to charge it on *every*
 commit. A scenario is six to ten work units, so it was read cold six to ten times, each
 read spending the user twice: on the pass's own latency, and on decoding its findings
 and working the follow-up steps they generate. Multiplied by every unit, the review
-layer cost more than the work it reviewed. So the passes now fire **once, at the moment
-a block closes** — a story scenario, a task step, a bugfix task's whole fix — over every
-commit of that block at once.
+layer cost more than the work it reviewed. So stories review when a block closes,
+while tasks wait until all planned work joins and review the whole task once.
 
 **The wider diff is the better read, not merely the cheaper one.** A per-unit pass
 sees one slice of a scenario: a red test with no implementation, or an implementation

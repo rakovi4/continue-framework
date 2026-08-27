@@ -11,16 +11,16 @@ description: Continue story or task work from compact progress state, recording 
 2. **Backlog promotion** -- if the story row is in the **Backlog** table in `ProductSpecification/stories.md`, move it to **In Progress** before proceeding
 3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`). **Missing means both locations came back empty** — resolve `ProductSpecification/stories/NN-story-name/` *and* `ProductSpecification/stories/done/NN-story-name/` before the bootstrap may fire (`.claude/rules/workflow.md`, "Resolving a story folder"); a hit in either is the story, so read its `progress.md` and bootstrap nothing. What an unchecked bootstrap does to an already-shipped story is in the template's "Precondition: the story genuinely has no folder"
    For an existing task, normalize legacy `Type: bug` to `bugfix` and `Type: refactoring` to `refactor` in memory; do not rewrite its type or folder merely to migrate terminology.
-4. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the next step is the first `[~]` or `[ ]` entry
+4. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the next step is the first `[~]` or `[ ]` entry. A task with none runs its unconsumed terminal review, or archives immediately when its work log already records `Task review: consumed`.
 5. **Read relevant context** -- read `carryover.md` (if present), the current scenario's summary, and only `worklog/` records matching the current heading/step or named by its compact pointer. Do not load the directory wholesale. `/continue` never writes journey files (`/handoff` is their sole writer).
 6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
 7. **Execute one work unit** -- dispatch sub-skills per tables below. If no named row matches, execute the checkbox intent directly in the main agent.
-8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, map usecase ports to adapters (see `.claude/guidelines/workflow-detail.md`), then insert concrete steps. A TDD task's `steps discovery` runs its hazard fan-out, stores the full scan in the active work-log record, and resolves as `[x] steps discovery (scan: worklog; GAPs: N)`. A refactor task's `refactor (steps discovery)` reconciles direct `## Work` checkboxes, not merely a companion artifact.
+8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, map usecase ports to adapters (see `.claude/guidelines/workflow-detail.md`), then insert concrete steps. A TDD task's `steps discovery` inserts its scoped TDD plan; a refactor task's `refactor (steps discovery)` reconciles direct `## Work` checkboxes, not merely a companion artifact.
 9. **Update records** -- create one `worklog/` Markdown record for this invocation (maximum 200 lines) and keep routine evidence, notes, coordinator plans, checkpoints, and proposals there. Composite stages update this active record while in flight. Keep `progress.md` to headings, permitted compact tokens, and one-line checkboxes of at most 200 characters: mark completed and advance next. Add a work-log pointer only when a later decision must consume that exact record. **Any new checkbox must pass `.claude/templates/workflow/finding-admission-test.md`**; a failing finding is reported and stored nowhere.
 10. **Update stories.md** -- for stories only, update the phase columns in `ProductSpecification/stories.md` (see below)
-11. **Behavior commit** -- include `progress.md`, the invocation's work-log record, and `ProductSpecification/stories.md` for stories. Before **every** progress commit, stage it and run plan-integrity check 8 against its zero-context staged diff; only added lines are checked, so legacy prose is grandfathered. Re-home any rejected evidence in the active work-log record and re-stage. For completion, also confirm the staged advance and zero `[ ]`/`[~]` entries before archiving; a story's folder move and **In Progress** → **Done** move land together. See `stories-md-format.md` for archive mechanics.
-12. **Refactor batch (+ review passes at a boundary)** -- when a RED/GREEN route owes `/refactor`, dispatch it and land its changes separately; skip it for direct and progress-only units. If this unit is a **boundary** and triage says RUN, dispatch `agent-review-agent` and `premortem-agent` concurrently over the boundary range; collect both non-gating verdicts.
-13. **Triage & auto-fix (boundary units only)** -- when triage RUNS the passes, partition findings per `triage-and-auto-fix.md`, resolve any permitted quiz, and append every verdict/disposition to the active work-log record. Land it with SAFE fixes in `review-fix:`; if none survives, land the record alone in `worklog:`. Triage SKIP owes no trailing commit. Fold every verdict into the report.
+11. **Behavior commit** -- include `progress.md`, the invocation's work-log record, and `ProductSpecification/stories.md` for stories. Before **every** progress commit, stage it and run plan-integrity check 8 against its zero-context staged diff; only added lines are checked, so legacy prose is grandfathered. Re-home any rejected evidence in the active work-log record and re-stage. For completion, also confirm the staged advance and zero `[ ]`/`[~]` entries. Stories archive in that commit; tasks remain active until terminal review.
+12. **Refactor and review** -- land any owed `/refactor` separately. Stories review at block boundaries. Tasks skip per-step review and, once all planned work joins, dispatch `agent-review-agent` and `premortem-agent` concurrently over the whole task history before archive.
+13. **Triage & auto-fix** -- partition findings per `triage-and-auto-fix.md`, resolve any permitted quiz, and append every verdict/disposition to the active work log. A task record also adds `Task review: consumed`; findings never trigger a second terminal batch. Land SAFE fixes in `review-fix:` and records without fixes in `worklog:`.
 
 The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/rules/workflow.md`; the detailed scenario sequences, adapter-discovery procedure, progress mechanics, and task sequences are in `.claude/guidelines/workflow-detail.md`. Progress file format examples are in `.claude/templates/workflow/progress-format.md`.
 
@@ -28,7 +28,7 @@ The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/r
 
 | Argument | Resolution |
 |----------|------------|
-| `task N` | Find `ProductSpecification/tasks/N-*/progress.md`, then `ProductSpecification/tasks/done/N-*/progress.md`. A **QA** task resolved from the archive is a *revival*, not a resume: move its folder back out of `tasks/done/` and reset its checkboxes before dispatching (`.claude/guidelines/workflow-detail.md`, "QA Task Sequence"). Any other work item that resolves with no `[ ]`/`[~]` left is complete -- report that and STOP without dispatching |
+| `task N` | Find `ProductSpecification/tasks/N-*/progress.md`, then `ProductSpecification/tasks/done/N-*/progress.md`. A **QA** task resolved from the archive is a *revival*, not a resume: move its folder back out of `tasks/done/` and reset its checkboxes before dispatching (`.claude/guidelines/workflow-detail.md`, "QA Task Sequence"). An active task with no `[ ]`/`[~]` runs or resumes terminal review before archive |
 | Bare number or name | Resolve story via `ProductSpecification/stories.md`, then `ProductSpecification/stories/NN-story-name/progress.md`, then `ProductSpecification/stories/done/NN-story-name/progress.md` |
 | No argument | Scan recent git log for `Story N` or `Task N` references; most recent wins |
 
@@ -54,13 +54,14 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | Spec items (`interview`, `mockups`, `api-spec`, `test-spec`) | `/{item}` then commit |
 | `story` (spec item) | **Inline** — no subagent. The template's hazard scan fans out its own `hazard-scan-agent`s, which must not nest inside a wrapper agent. Load `.claude/templates/spec/story-spec-generation.md` (internal template — NOT the `/story` skill) with the story number, name, and folder already resolved, execute its phases, then commit |
 | `root cause analysis` (bugfix tasks) | **Inline** — no subagent. Run `/rca`, record confirmed findings in `spec.md`, routine evidence in the active work-log record, and mark `[x]` → commit records |
-| `design` | `/design-preview` → user approves (optionally with ADR) or `/architecture` → commit (if ADR produced) |
+| task `design` | **Inline coordinator.** Freeze one input; dispatch every group per `hazard-catalogue/_index.md`, draft design options concurrently, reconcile and record all GAPs, then ask for one approval and commit |
+| story `design` | `/design-preview` → user approves (optionally with ADR) or `/architecture` → commit (if ADR produced) |
 | `red-*` (usecase, adapter, selenium, frontend, frontend-api) | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `green-usecase`, `green-adapter X` | `green-agent.md` → `/test-coverage {module} --focus` → commit → `/refactor` → commit |
 | `red-workflow` | `red-agent.md` (layer `workflow`) → `/test-review` → commit → `/refactor` → commit |
 | `green-workflow` | `green-agent.md` (layer `workflow`) → commit → `/refactor` → commit |
 | `adapters-discovery` | Run all 3 checks in `adapter-discovery-checklist.md`, log evidence, mark `[x]`, insert concrete adapter steps (or `[S]`) → commit records |
-| `steps discovery` (`behavior-change`, `bugfix`) | **Inline** — no subagent. Run the hazard fan-out per `workflow-detail.md`; resolve every GAP, put the full scan record in the active work log, render `[x] steps discovery (scan: worklog; GAPs: N)`, insert scoped TDD steps, then commit both records |
+| `steps discovery` (`behavior-change`, `bugfix`) | **Inline** — no subagent. Insert scoped TDD steps from the approved design, then commit |
 | `refactor (steps discovery)` (`refactor`) | Reconcile approved design and discovered evidence against committed `progress.md`; update direct behavior-preserving `## Work` steps and append `(plan: +N/-N/~N)`. Refuse zero-change completion or any RED/GREEN step → run affected checks → commit |
 | `green-acceptance` | **Inline** — no subagent. Read `green-agent.md` workflow, load acceptance implementation template, enable the scenario's complete disabled target (remove its marker or markers — only allowed test change), run acceptance tests, verify every case GREEN → commit |
 | `green-frontend`, `green-frontend-api` | `green-agent.md` → commit → `/refactor` → commit |
@@ -79,7 +80,7 @@ serial progress checkboxes.
 
 ## Stop and Report
 
-A single `/continue` invocation executes exactly ONE work unit. Do not pause between sub-skills. A `/refactor` work unit ends with behavior then optional refactor commits. When boundary passes RUN, finish with `review-fix:` if SAFE fixes survive or `worklog:` otherwise; triage SKIP owes neither. STOP only after the last owed commit. Then report the completed step, tests, boundary verdicts, next step, fraction, and how to continue; do not execute the next step.
+A single `/continue` invocation executes exactly ONE work unit. Do not pause between sub-skills except for the joined task-design approval. A `/refactor` work unit ends with behavior then optional refactor commits. When boundary passes RUN, finish with `review-fix:` if SAFE fixes survive or `worklog:` otherwise; triage SKIP owes neither. STOP only after the last owed commit. Then report the completed step, tests, boundary verdicts, next step, fraction, and how to continue; do not execute the next step.
 
 **Re-orientation block (mandatory, last):** close the report with the re-orientation block specified in `.claude/templates/workflow/continue-report-format.md` -- work item type/number/name, scenario or step, step just done, next step, position, and a two-sentence plain-language summary. It goes below everything else and immediately above the `/plain` hint: a terminal scrolls, and a user running several parallel `/continue` sessions must recover which work item this one is without reading back up. Emit it on both stop points, including a sub-skill failure.
 
@@ -91,33 +92,20 @@ End the report with a one-line `/plain` hint (e.g. `Press /plain to have this re
 
 **Review-pass findings (mandatory in a boundary unit when triage RAN the passes):** include the `agent-review` and `premortem` verdicts. PASS → one line each (`agent-review: PASS`, `premortem: PASS`). CONCERNS/BLOCK → list each finding with its place in the diff and the named missing guard. SAFE findings applied by the auto-fixer → `review-fix: applied N SAFE finding(s) [<sha>]` plus one line per fix; NEEDS_CYCLE findings → follow-ups the user can act on; NEEDS_CLARIFICATION → the quiz question and the routed outcome. When triage SKIPped, report `Review passes: SKIPPED (triage — <reason>)`. **Report every dropped finding** -- NO_FIX-tagged, or admission-test-failed -- as one line naming what it was and why it was let go. Drops are the point of the filter, not an embarrassment: a silent drop is indistinguishable from not looking, and this line is the user's only chance to overrule one. In a non-boundary unit report nothing about them. The passes and the auto-fix never revert the behavior commit.
 
-## Boundary Review Passes
+## Review Passes
 
-The two **fresh-context** passes — `agent-review-agent` (audits what the work *contains*) and
-`premortem-agent` (imagines what it is *missing*) — run **once per boundary**, not once per unit.
+Tasks review once after all work completes, from creation through `HEAD`; record
+`Task review: consumed`, then archive unless triage adds approved follow-up work.
 
-**Is this unit a boundary, and what range do the passes read?** Both are computed off the
-**staged** `progress.md` (`git show :<path>` — the blob step 11 committed, never your
-recollection of the edit) by `.claude/templates/workflow/progress-format.md`, "Blocks and
-boundaries": slice out the **block** holding the step just completed; the unit is a **boundary**
-iff that slice has zero `- [ ]` and zero `- [~]` lines; the **boundary range** is the block's first
-commit `~1..HEAD`, found by walking `git log --follow` over `progress.md` for the oldest blob whose
-slice already carries an `[x]`/`[S]` step — so no commit needs tagging and `progress.md` needs no new
-syntax. If the walk cannot resolve it, review `HEAD` alone and report `range unresolved — reviewed HEAD
-only`: it degrades to the old single-commit read, loudly, never to nothing. A **mid-block** unit runs
-`/refactor`, skips the passes, and ends at two commits.
+For stories, run `agent-review-agent` and `premortem-agent` concurrently when the
+staged progress shows that the current scenario, spec section, or harvest step has
+no open checkbox. Review its commits from the first completed checkbox through
+`HEAD`; if that range cannot be found, review `HEAD` and report the fallback.
 
-Before dispatch, inspect that same block for `<!-- review-origin: boundary -->`. If present, skip
-both passes with `review-depth guard — review-origin block`: the complete TDD and `/refactor`
-sequence still runs, but work commissioned by a boundary review cannot recursively commission a
-fresh review generation. Whether marked or not, a boundary batch is consumed once; its trailing
-`review-fix:` or `worklog:` commit never triggers another batch in the same work unit.
-
-**Input is committed history, not a working-tree snapshot.** Pass both review agents the range,
-changed paths, and one line of intent; dispatch them concurrently and await both. Consume every
-finding per "Triage & Auto-Fix" below. The passes stay non-gating; a QA task dispatches nothing and
-has no boundary. Why this layer exists and why the cadence is per boundary:
-`.claude/guidelines/review-passes-detail.md`.
+Skip the batch when the section carries `<!-- review-origin: boundary -->`, and
+never review its trailing record commit. Pass both agents the committed range,
+changed paths, and intent. Exact range and recursion rules are in
+`progress-format.md` and `triage-and-auto-fix.md`.
 
 ## Triage & Auto-Fix
 
@@ -150,7 +138,7 @@ Sub-skills use named agent dispatch for context isolation, following `.claude/gu
 
 Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`, any `red-workflow (...)` → layer `workflow`). Both red-agent and green-agent receive: layer, work-item folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow. The triage predicate and the SAFE-only auto-fixer are **inline in `/continue`** — no subagent, no new dispatch row (see "Triage & Auto-Fix").
 
-**CHAINING: After each sub-step's awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Do NOT wait for user input between sub-steps — the echo is informational only. Dispatch the two boundary review agents in one concurrent wave and await both.**
+**CHAINING: After each sub-step's awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Only joined task-design approval may pause. Dispatch each review pair in one concurrent wave and await both.**
 
 **AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. In a boundary unit the two review passes log too (they run in the `/refactor` batch); after the last commit, include the log contents in the stop-and-report summary.**
 

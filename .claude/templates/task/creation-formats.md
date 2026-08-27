@@ -89,8 +89,8 @@ Type: behavior-change
 ## Change
 ```
 
-`steps discovery` runs the hazard scan and fills `## Change` with scoped,
-named RED-to-GREEN pairs for every affected layer.
+`steps discovery` fills `## Change` with scoped, named RED-to-GREEN pairs for every
+affected layer.
 
 ### Bugfix
 
@@ -109,7 +109,7 @@ Type: bugfix
 - [ ] steps discovery
 ```
 
-`steps discovery` runs the hazard scan and appends scoped RED-to-GREEN pairs.
+`steps discovery` appends scoped RED-to-GREEN pairs.
 
 ### Refactor
 
@@ -137,11 +137,12 @@ Type: {infra|general}
 
 ## Spec
 - [x] spec
+- [~] design
 
 ## Work
 
 ### Step 1: {work-unit title}
-- [~] {direct implementation intent and verification}
+- [ ] {direct implementation intent and verification}
 ```
 
 Each `spec.md` Work item becomes one step. Infra work changes repository-managed
@@ -156,6 +157,7 @@ Type: qa
 
 ## Spec
 - [x] spec
+- [~] design
 
 ## Cases
 - [ ] {case 1 -- short intent}

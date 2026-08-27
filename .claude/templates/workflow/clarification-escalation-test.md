@@ -49,7 +49,7 @@ reason**, so the answer can be a single keystroke.
   gets the same treatment. The reviewer owed that sentence; a quiz is not the place
   to discover it is missing.
 - **One quiz per boundary**, batching every surviving finding — never one call per
-  finding. The passes run once per completed scenario or task step, so this is also one
+  finding. The passes run once per completed story block or whole task, so this is also one
   quiz per scenario, not one per work unit.
 - If the user **declines or skips** the quiz, take each finding's recommended option,
   route it, and say so in the report. A declined quiz is an answer: *you decide*.

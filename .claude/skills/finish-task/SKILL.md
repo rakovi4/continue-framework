@@ -10,8 +10,9 @@ archive without requiring repeated task-execution commands.
 
 ## Workflow
 
-1. Resolve `task N` with `/continue`'s task lookup rules. If it is complete, report
-   its archived location. Read its type and the workflow that owns that type.
+1. Resolve `task N` with `/continue`'s task lookup rules. If already archived, report
+   its location; an active task with no open checkbox still owes terminal review.
+   Read its type and the workflow that owns that type.
 2. Read `.claude/templates/workflow/finish-task-coordination.md` completely and run
    its initial scheduling pass.
 3. Read `references/platform-monitoring.md`, then start its single five-minute
@@ -34,7 +35,7 @@ archive without requiring repeated task-execution commands.
 - Do not parallelize merely because agent capacity exists. Simple, short, dependent,
   or overlapping work stays in the parent.
 - Do not overlook frontend/backend concurrency after their shared contract is frozen.
-- QA execution is always serial. Never dispatch parallel agents for a QA task.
+- QA cases are serial; only their design hazards and terminal reviews fan out.
 - Give workers full available history and the complete task-specific context packet;
   never delegate from a thin summary.
 - Preserve every owning workflow's authorization boundaries and explicit user

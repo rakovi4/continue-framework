@@ -14,12 +14,15 @@ review, or human-observation sequence.
 3. Build a dependency graph for all remaining work units. Mark user decisions,
    discovery results, contracts, tests, generated artifacts, and shared writable
    files that unblock later work.
-   For a QA task, record one serial `/qa-run` route and skip lane preparation.
-4. Where parallel work is plausible, prepare the seam first: settle required design
+   For a QA task, record one serial `/qa-run` route and skip implementation lanes.
+4. If `design` is incomplete, complete it as one multi-lane unit: freeze one input, draft the design
+   while the hazard groups scan concurrently, join, reconcile, and ask for one
+   approval. This fixed gate is separate from opportunistic implementation lanes.
+5. Where parallel work is plausible, prepare the seam first: settle required design
    decisions, freeze interfaces and data shapes, declare disjoint writable-path
    manifests, record baseline blobs, and name the combined verification at the join.
    Do not dispatch a lane that still needs an unfrozen result from another lane.
-5. Compare likely critical-path time saved with the cost of preparing the lane,
+6. Compare likely critical-path time saved with the cost of preparing the lane,
    transferring context, gaining traction, joining, reviewing, and re-running
    checks. Keep work in the parent when there is only one meaningful ready unit,
    the units are tiny, ownership overlaps, or delegation is unlikely to finish
@@ -65,6 +68,9 @@ workers may prepare both concurrently. The parent validates and publishes them o
 at a time, rechecking the later result against the new `HEAD` before advancing it.
 A result invalidated by an earlier publication is revised or rerun, never recorded
 as complete from its old baseline.
+
+After all implementation lanes join, run the task's one terminal review batch over
+the whole task; never review individual task steps or lanes.
 
 ## Five-Minute Readiness Monitor
 
@@ -115,8 +121,8 @@ workflow and resume the same coordinator after the answer; do not ask the user t
 invoke another task-execution skill. On a sub-skill failure or a QA case requiring
 tester acknowledgement, preserve the current item and follow its owning workflow.
 
-Completion requires zero `[ ]` and `[~]` checkboxes, a staged completion check, the
-task folder moved to `ProductSpecification/tasks/done/`, and all required commits
-present. Then stop the recurrent wake-up and emit one aggregate report covering
+Completion requires zero `[ ]` and `[~]` checkboxes, the terminal review consumed,
+a staged completion check, the task folder moved to `ProductSpecification/tasks/done/`,
+and all required commits present. Then stop the recurrent wake-up and emit one aggregate report covering
 every completed item and every report field required by its owning workflow,
 including checks, verdicts, findings, commits, and the archived task location.

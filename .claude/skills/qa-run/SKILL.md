@@ -45,7 +45,7 @@ defect, which becomes a `/task bugfix`.
 ## Workflow
 
 1. Read the QA task `spec.md` (case intent) and `progress.md` (which cases remain
-   `[ ]`). Identify the next unchecked case.
+   `[ ]`). Complete its `design` step through `/continue`, then identify the next case.
 2. Resolve the environment base URL and the harness debug port from the task config —
    do not hardcode either.
 3. Start or attach to the watched harness (see Templates) — connect to an already-open
@@ -65,6 +65,7 @@ defect, which becomes a `/task bugfix`.
 7. Repeat for the next case, or stop when the tester ends the session.
 8. Commit ticked cases with the `task:` prefix (multiple cases may share one commit —
    a smoke session is not work-unit-atomic the way a TDD cycle is).
+9. After the last case, run the task's one terminal review batch before archive.
 
 ## Rules
 

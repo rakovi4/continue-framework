@@ -38,8 +38,8 @@ description: Create a behavior-change, bugfix, refactor, infra, general, or QA t
    - `behavior-change`: `design` then `steps discovery`; discovery inserts TDD.
    - `bugfix`: root-cause-first discovery; discovery inserts TDD.
    - `refactor`: design and discovery insert direct behavior-preserving steps.
-   - `infra` and `general`: one direct progress step per Work item.
-   - `qa`: one manual checkbox per case.
+   - `infra` and `general`: `design`, then one direct step per Work item.
+   - `qa`: `design`, then one manual checkbox per case.
 6. Show both files for review, then commit them as
    `task: spec (Task {N}, {title})`.
 

@@ -117,12 +117,12 @@ Type: behavior-change
 ## Change
 ```
 
-Design-first discovery runs the hazard scan and inserts named RED-to-GREEN pairs
-for every affected layer. Its resolved marker points to the work-log scan record.
+After the approved design, discovery inserts named RED-to-GREEN pairs for every
+affected layer.
 
 ## Task (bugfix)
 Bugfix tasks start with root-cause discovery. Prod-copy fixes prepend `reproduce in
-prod-copy`; `steps discovery` runs the hazard scan and inserts scoped TDD steps.
+prod-copy`; `steps discovery` inserts scoped TDD steps.
 
 ```markdown
 # Task N: Title — Progress
@@ -139,7 +139,6 @@ Type: bugfix
 - [ ] steps discovery
 ```
 
-Both TDD types resolve the gate as `[x] steps discovery (scan: worklog; GAPs: N)`.
 Every red step precedes the production change that makes it green. Externally
 observable changes include an acceptance RED/GREEN pair.
 
@@ -169,11 +168,12 @@ Type: infra
 
 ## Spec
 - [x] spec
+- [~] design
 
 ## Work
 
 ### Step 1: Work-unit title
-- [~] direct implementation intent and verification
+- [ ] direct implementation intent and verification
 ```
 
 `general` uses the same shape with `Type: general`. Each spec Work item becomes one
@@ -182,9 +182,8 @@ Choose all task shapes with [`steps-discovery-shapes.md`](steps-discovery-shapes
 
 ## Blocks and boundaries
 
-A **block** is the unit the commit-time review passes fire at the end of (`.claude/skills/continue/SKILL.md`, "Boundary Review Passes"), and it is read straight off the shapes above. A block is a story scenario's `### N.M {Title}`
-heading and its steps; a task's `### Step N: …` and its steps; a bugfix task's whole
-`## Fix: …` section (its steps carry no `### ` heading); or a `## Spec` / `## Harvest — Tier 1
+A story **block** is the unit its review passes fire at the end of (`.claude/skills/continue/SKILL.md`, "Review Passes"). It is a scenario's `### N.M {Title}`
+heading and its steps, or a `## Spec` / `## Harvest — Tier 1
 → Tier 2` section. Slice one from its heading to the next heading of same or higher level.
 
 A block introduced by a boundary review's admitted `NEEDS_CYCLE` finding places `<!-- review-origin: boundary -->` below its heading. It still runs full TDD and `/refactor`, but its closing boundary dispatches no review batch.
