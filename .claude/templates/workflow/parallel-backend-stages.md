@@ -87,14 +87,23 @@ not `[x]`.
 
 ## Stage 2 — Implementation Lanes
 
-After approval, dispatch one complete RED-to-GREEN lane for the use case and one
-for each discovered adapter. Start all independent lanes together, bounded by the
-platform's available agent capacity; queue surplus lanes. Each lane owns its test
-and production files and runs this sequence without an internal user pause:
+After approval, the coordinator advances one lane for the use case and one for each
+discovered adapter. Each is a coordinator-owned state machine, not one autonomous
+worker; the coordinator dispatches every phase so no worker must nest a fan-out.
 
-1. RED, test review, and behavior commit
-2. GREEN, focused coverage, and behavior commit
-3. refactor and refactor commit when that lane changed executable code
+For each lane:
+1. Dispatch its RED writer. Require the predicted raw failure and test-only owned
+   paths before any production writer starts.
+2. After raw RED is observed, start the GREEN writer and `/test-review` as sibling
+   work, bounded by available capacity. Test-review may complete validation omitted
+   by the RED writer; GREEN owns production paths only.
+3. Join the reviewed test and production candidate. Reject overlapping writes;
+   commit the reviewed disabled test from explicit test paths while production edits
+   remain unstaged, then enable and run it against the candidate. A test defect
+   returns to test-review; an implementation failure returns to GREEN.
+4. When the complete reviewed target and module suite pass, commit the production
+   paths plus the marker-only enable delta as GREEN. Run the lane's required focused
+   coverage and refactor work, publishing any refactor separately.
 
 Stage 1 contracts are read-only in every Stage 2 ownership declaration. A lane that
 finds a contract defect fails with evidence; it never edits the frozen interface.
@@ -114,10 +123,9 @@ Only publication is serialized. A shared worktree, build visibility, or the
 version-control index never justifies serial implementation; disjoint manifests bound
 edits, and the publication lock serializes index writes.
 
-Every lane returns its commit identities, checks, status, and owned paths. As part
-of each successful publication lock, the coordinator immediately stores that lane
-in the active work-log entry and commits the checkpoint before releasing the lock;
-lane agents still edit neither tracking file. This closes the interruption window.
+Every lane checkpoint records RED, GREEN, and refactor commit identities or its
+current phase, checks, and owned paths. The coordinator stores each published phase
+in the active work log before releasing the lock; workers edit neither tracking file.
 
 On resume, require the recorded commit to be an ancestor of `HEAD` and compare each
 owned path at `HEAD` with that lane's committed tree. Preserve the lane only when
@@ -125,27 +133,25 @@ both checks match; dispatch failed, missing, reverted, or invalidated lanes. A f
 lane leaves the stage `[~]`, names itself and its failure, and does not cancel or
 roll back successful independent lanes.
 
-`<!-- lanes: usecase=abc123 PASS; storage=def456 PASS; rest=FAILED timeout -->`
+`<!-- lanes: usecase={red:a1,green:b2,refactor:NO_CHANGE} PASS; storage={red:c3,green:PENDING} -->`
 
 ### Commit Publication Lock
 
 Implementation and tests remain concurrent. Only publication is serialized:
 
-1. A lane finishes changes and checks without staging.
-2. It requests the coordinator's commit lock.
-3. Under the lock it verifies its owned-path diff, stages explicit owned paths, and
-   commits. Unrelated unstaged paths do not block publication and are never staged.
-4. The coordinator commits that lane's active work-log record, then releases the
-   lock.
-5. The lane never uses a shared catch-all stage command or edits `progress.md`.
+1. A worker finishes its phase without staging.
+2. After joining that phase's prerequisites, the coordinator takes the commit lock.
+3. Under the lock the coordinator verifies ownership, stages explicit phase paths,
+   commits, and records the checkpoint. Unrelated paths are never staged.
+4. Workers never commit, use a shared catch-all stage command, or edit tracking state.
 
-The coordinator grants one publisher at a time. A failed commit releases the lock,
-leaves the lane incomplete, and cannot expose stage completion. After every required
-implementation lane succeeds, run targeted coverage follow-up lanes concurrently
-only for concrete gaps reported by their focused coverage runs. Coalesce gaps that
-target the same test file into one lane; never create serial follow-up lanes for one
-path. Concurrent writers never share a path. A follow-up owns the named test file,
-commits under the same lock, and must pass before Stage 2 advances.
+The coordinator grants one publisher at a time. A failed commit releases the lock
+and leaves the phase incomplete. After every required implementation lane succeeds,
+run targeted coverage follow-up lanes concurrently only for concrete gaps reported
+by focused coverage. Coalesce gaps that target the same test file into one lane;
+never create serial follow-up lanes for one path. Concurrent writers never share a
+path. A follow-up owns the named test file, publishes under the same lock, and must
+pass before Stage 2 advances.
 
 Only the coordinator marks Stage 2 done after all required lanes and admitted
 coverage follow-ups have durable commits. It advances directly to Stage 3 in the

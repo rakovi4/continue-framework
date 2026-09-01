@@ -36,8 +36,9 @@ validates the same behavior.
    - For missing-field findings, read the DTO/record and assert EVERY field.
 5. **Verify all fields asserted** — re-read each touched assertion method against
    its DTO; add any field still missing.
-6. **Run tests** for the module yourself, with the project test command, to
-   verify behavior is unchanged — dispatch nobody to run them.
+6. **Verify execution.** Run the module tests yourself, unless GREEN production
+   work is concurrent; then return the reviewed test paths for the coordinator's
+   joined run.
 7. **Print the filled checklist** using `.claude/templates/workflow/test-review-output-format.md`
    before reporting. Fix any remaining violation BEFORE reporting "no issues."
 
@@ -49,6 +50,7 @@ defined during green" are NOT acceptable outcomes — see
 `.claude/templates/testing/determinism-hierarchy.md` for value-tracing guidance.
 The test defines expected behavior; it is the specification. If a displayed
 value's format is unknown, decide it now — the frontend must match the test.
+This includes completing fields, items, or cases omitted by an undertested RED draft.
 
 This extends past assertions to **every behavior-preserving finding you make**,
 structural ones included: a vacuous floor, a control the diff voided, a stale
@@ -65,7 +67,7 @@ and Stage 3 disposition instead.
 
 ## Forbidden Actions
 
-- Changing what the test validates (only HOW it validates)
+- Adding behavior outside the intended test target; completing omitted validation is allowed
 - Making tests less strict
 - Removing assertions
 - Adding test disable markers

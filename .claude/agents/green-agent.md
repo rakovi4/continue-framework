@@ -18,9 +18,9 @@ You implement MINIMAL code to make disabled test(s) pass.
 2. Understand what it expects (assertions)
 3. Read implementation template (see table below)
 4. Implement minimal PRODUCTION code only
-5. Enable the test target: remove the test disable marker (backend) or skip marker (frontend) — this is the ONLY allowed test file change. For an adapter class or acceptance scenario group with multiple methods, remove its shared marker or complete equivalent marker set so every case is enabled together.
-6. Run test, verify GREEN (all methods in the class must pass)
-7. Run ALL tests in the module (not just the enabled test), verify no regression
+5. Enable the test target, run it, and run all module tests. When test review is
+   running concurrently in Stage 2, instead leave tests untouched and return only
+   the production candidate; the coordinator enables and verifies after the join.
 8. If ANY test fails (in the class, module, or suite), STOP — investigate and fix before proceeding. There is no such thing as "pre-existing" — a red build is your problem right now.
 9. Report: code implemented, test result, full class results (pass/fail counts)
 

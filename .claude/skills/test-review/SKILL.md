@@ -1,15 +1,14 @@
 ---
 name: test-review
-description: Review tests to replace loose validation (contains, isNotNull, isNotEmpty) with strict validation (isEqualTo on parsed fields). Use when user wants to improve test assertions or mentions /test-review command.
+description: Review tests for strict assertions and complete omitted validation. Use when the user wants to improve test assertions or mentions /test-review.
 ---
 
 # /test-review - Improve Test Assertions
 
 ## Usage
-```
-/test-review                           # Review all tests
-/test-review LoginControllerTest  # Specific test file
-```
+
+- `/test-review` — review all tests
+- `/test-review {TestTarget}` — review one test target
 
 ## Available Templates
 
@@ -41,8 +40,10 @@ file at a time — so there are no concurrent writes to shared Statements files.
    - `test-review-statements-agent` — cluster S (Statements internal quality)
    - `test-review-selenium-agent` — cluster Se — **only for selenium/frontend tests**; skip for pure backend tests.
 3. **Gather + fix:** hand all findings to `.claude/agents/test-review-agent.md`
-   (the serial fixer). It merges, dedups, applies fixes one file at a time, runs
-   `/test-runner`, and prints the filled `test-review-output-format.md`.
+   (the serial fixer). It merges, dedups, applies fixes one file at a time, and
+   prints the filled `test-review-output-format.md`. It runs `/test-runner` unless
+   Stage 2 production work is concurrent; in that case the coordinator runs the
+   joined test and implementation.
 
 ### Small-file shortcut
 
