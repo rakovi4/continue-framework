@@ -38,7 +38,9 @@ genuinely absent from the path it was given.
    the two must not be conflated (the untiered branch below is for a *specced* set
    with no markers).
 2. **Read the test specs** — `tests/NN_*.md`, whichever of the six categories the
-   story has. Never `tests/tier3/` (below).
+   story has. Each complete journey heading is one progress block even when it crosses
+   topic sections in the source drafts or RED uses separate executable cases for its
+   checkpoints. Never `tests/tier3/` (below).
 3. **Scan existing test classes and production code** for steps already done.
 4. **Emit the sections** in tier order (below), marking completed steps `[x]`, the
    next `[~]`, the rest `[ ]`.

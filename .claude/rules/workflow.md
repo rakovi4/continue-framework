@@ -20,6 +20,14 @@ Spec phase: `/interview` → story spec (dispatched by `/continue` via its inter
 
 **Hazard cadence has two distinct gates.** Scan the story's complete drafted scenario set against the hazard catalogue exactly once, in `/test-spec`, before consolidation and tiering; story-spec generation never runs that whole-set scan. Separately, every `/design-preview` scans that scenario's drafted design while design options are prepared. Keep the per-design scan: it validates implementation choices and does not repeat the story-wide scenario-set pass.
 
+**Stack the complete primary-user journey, not its checkpoints.** Before tiering,
+trace the earliest in-scope entry through first value, any constraint the user reaches,
+value capture when it is in scope, and restored or continued value. Within each test
+category, every checkpoint on that same journey is one heading and one delivery cycle,
+even when drafts put the checkpoints in different sections or restate state between
+them. Keep executable cases small, and keep hardening branches separate when combining
+them would change the journey's tier. Implementation similarity is irrelevant.
+
 ## Where the Current State Lives
 
 **The acceptance suite is the current-state documentation of what the product does.** It is grouped by functionality rather than by story, each test carries its Gherkin scenario in its scenario description (a display annotation, a subtest name, or a docstring — per the tech binding), it is black-box (HTTP and browser only, so it describes externally observable behavior), and it is self-correcting: when a later increment changes a behavior, the earlier test is rewritten or the build goes red — an outdated behavior makes the build red, never a document quietly stale. So a reader asking *what does this area do today* reads the acceptance tests **of the area it is about to touch** — test class names, scenario descriptions, Statements — and never sweeps story folders to reconstruct the present.

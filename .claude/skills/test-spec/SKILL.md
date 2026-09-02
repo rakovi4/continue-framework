@@ -121,6 +121,11 @@ On a stop condition, report it and do **not** fall through to Phase 5: a half-me
 holds one assertion under two headings. Do not re-dispatch or force extra merges to hit
 the delivery ceilings; Phase 5 places distinct overflow scenarios in Tier 3.
 
+Before tiering, apply `.claude/templates/spec/journey-stacking-rules.md`. Trace the
+complete primary journey first, stack its checkpoints across sections and later-state
+preconditions, and split tier-changing hardening. Produce its journey ledger; stop if
+one category still gives consecutive primary checkpoints multiple headings.
+
 ### Phase 5: Tier the Set
 
 Dispatch `tiering-agent` (`.claude/agents/tiering-agent.md`) **once**, for the whole
@@ -179,8 +184,9 @@ Report: folder path, files created, test counts per file, and the hazard-scan re
 the group set scanned (the `_index.md` **Groups** list at scan time), each group's verdict,
 and every GAP's disposition (folded → named scenario, or dismissed with reason).
 
-Then Phase 4's consolidation result — the before/after count per file and every merge with
-what it absorbed — and Phase 5's: the Tier 1 / Tier 2 / Tier 3 split, every Tier 3 scenario
+Then Phase 4's consolidation and journey-stacking result — the before/after count per
+file, the journey ledger, and every combined heading with what it absorbed — and Phase
+5's Tier 1 / Tier 2 / Tier 3 split, every Tier 3 scenario
 named with the degradation judgment that put it there, and every Tier 2 admission with
 the evidence that passed its strict threshold. Tier 3 never
 enters `progress.md` and a merged-away scenario is never re-drafted, so this is the last
@@ -188,6 +194,6 @@ point at which a human sees what was folded or dropped while disagreeing is stil
 
 ## Rules
 - English, Gherkin in Markdown, DSL only (no technical details in steps)
-- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. After consolidation, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 4 merges shared executions without dropping checked facts (`.claude/templates/spec/consolidation-rules.md`).
+- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. After consolidation and journey stacking, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 4 preserves every checked fact (`.claude/templates/spec/consolidation-rules.md`).
 - **Load tests**: profile-driven against the **Load Challenge Profile** the project declares in `ExpectedLoad.md`. The profile catalog, the relevance filter (including when to skip the file and set `Load = n/a`), the authoring rules and the file layout are all in `.claude/templates/spec/load-test-format.md`
 - **Security**: generate stack-aware scenarios only. The relevance filter, checklist rows, merge rule and per-story count are all in `test-spec-format.md` ("05_Security_Tests.md")
