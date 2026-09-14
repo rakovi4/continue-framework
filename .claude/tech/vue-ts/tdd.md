@@ -7,7 +7,7 @@
 
 ## Test Skip Marker
 
-- `.skip` is the test skip marker. Comment above `.skip` documents failure reason.
+- `.skip` is the test skip marker. Encode the failure reason in the skipped test or suite name.
 
 ## Base URL Configuration
 

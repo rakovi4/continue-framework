@@ -2,7 +2,7 @@
 
 Use this template only from `/finish-task`. It coordinates every remaining item in
 any tracked task; it does not redefine the task type's internal execution, testing,
-review, or human-observation sequence.
+or human-observation sequence.
 
 ## Initial Scheduling Pass
 
@@ -15,9 +15,9 @@ review, or human-observation sequence.
    discovery results, contracts, tests, generated artifacts, and shared writable
    files that unblock later work.
    For a QA task, record one serial `/qa-run` route and skip implementation lanes.
-4. If `design` is incomplete, complete it as one multi-lane unit: freeze one input, draft the design
-   while the hazard groups scan concurrently, join, reconcile, and ask for one
-   approval. This fixed gate is separate from opportunistic implementation lanes.
+4. If `design` is incomplete, complete it as one unit: freeze one input, draft the
+   design, and ask for one approval. This fixed gate is separate from opportunistic
+   implementation lanes.
 5. Where parallel work is plausible, prepare the seam first: settle required design
    decisions, freeze interfaces and data shapes, declare disjoint writable-path
    manifests, record baseline blobs, and name the combined verification at the join.
@@ -69,9 +69,6 @@ at a time, rechecking the later result against the new `HEAD` before advancing i
 A result invalidated by an earlier publication is revised or rerun, never recorded
 as complete from its old baseline.
 
-After all implementation lanes join, run the task's one terminal review batch over
-the whole task; never review individual task steps or lanes.
-
 ## Five-Minute Readiness Monitor
 
 Start exactly one recurrent wake-up after the initial scheduling pass and keep it
@@ -95,7 +92,7 @@ creating another.
 - **Behavior change and bugfix:** execute `/continue task N` semantics with the
   required discovery and TDD routes through the last owed commit.
 - **Refactor, infra, and general:** execute direct `/continue task N` work units
-  with affected verification and boundary review, but no RED/GREEN or TDD refactor
+  with affected verification, but no RED/GREEN or TDD refactor
   batch. Stop and reclassify or split if executable behavior must change.
 - **QA:** execute `/qa-run task N` as the owning workflow and continue through every
   remaining case while the tester keeps the watched session active. Preserve its
@@ -114,15 +111,15 @@ Execute the task-type route for the next item through its last owed commit or ve
 On success, retain its required report facts, skip only the owning workflow's normal
 intermediate stop, re-run plan integrity, refresh the dependency graph, and execute
 the next item or ready parallel batch. Do not skip any route-specific approval,
-review, test, observation, evidence, or record to keep the outer loop moving.
+test, observation, evidence, or record to keep the outer loop moving.
 
 When a genuine user decision is required, ask it within the active `/finish-task`
 workflow and resume the same coordinator after the answer; do not ask the user to
 invoke another task-execution skill. On a sub-skill failure or a QA case requiring
 tester acknowledgement, preserve the current item and follow its owning workflow.
 
-Completion requires zero `[ ]` and `[~]` checkboxes, the terminal review consumed,
-a staged completion check, the task folder moved to `ProductSpecification/tasks/done/`,
+Completion requires zero `[ ]` and `[~]` checkboxes, a staged completion check,
+the task folder moved to `ProductSpecification/tasks/done/`,
 and all required commits present. Then stop the recurrent wake-up and emit one aggregate report covering
 every completed item and every report field required by its owning workflow,
-including checks, verdicts, findings, commits, and the archived task location.
+including checks, commits, and the archived task location.

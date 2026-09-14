@@ -87,7 +87,7 @@ Zero NOs -- add the test disable marker. Any NO -- do NOT disable, fix and re-ru
 
 ## Frontend Skip Convention
 
-For frontend layers, use `it.skip(...)` instead of the backend test disable marker. Add a comment above with the actual failure reason.
+For frontend layers, use `it.skip(...)` instead of the backend test disable marker. Encode the actual failure reason in the skipped test or suite name; never add a comment.
 
 ## Test Disable Marker Rules
 

@@ -25,7 +25,7 @@ what `extended/` has always held — scenarios that are recorded and not built �
 under a name that matches the ladder.
 
 Tier 1 is derived only from the story's primary-user happy path. Scenarios generated
-by hazard or security routes never enter it. If a finding exposes an incomplete happy
+by checklist routes never enter it. If a finding exposes an incomplete happy
 path, amend the story requirement first; only the resulting story-derived scenario
 may be Tier 1.
 
@@ -74,7 +74,7 @@ after the `### N.M Title` heading and separated from it by one blank line:
 ```markdown
 ### 3.2 A duplicate webhook delivery charges once
 
-Tier: 2 (hz-02)
+Tier: 2 (idem)
 ```
 
 The marker is written in two moves by two different passes, because the two halves
@@ -85,7 +85,7 @@ exists. So authoring stamps its tokens against a literal `?`:
 ```markdown
 ### 3.2 A duplicate webhook delivery charges once
 
-Tier: ? (hz-02)
+Tier: ? (idem)
 ```
 
 and the tiering pass substitutes the tier, keeping every token verbatim. Every
@@ -103,12 +103,12 @@ the judgment that put it there:
 ```markdown
 ### 4.1 Board export truncates past 10 000 rows
 
-Tier: 3 (hz-06) — export is an admin convenience; truncation is visible in the UI
+Tier: 3 — export is an admin convenience; truncation is visible in the UI
 and the full data stays reachable through the API.
 ```
 
 Provenance preserves why a generated scenario exists. Keeping it on Tier 3
-markers makes the deferred bucket auditable without re-running the catalogue.
+markers makes the deferred bucket auditable.
 
 ### Provenance
 
@@ -117,25 +117,18 @@ found it. Every route stamps its token at the moment it generates the scenario.
 
 | Token | Stamped by |
 |---|---|
-| `hz-NN` | the hazard-catalogue group the scenario belongs to, whether a scan GAP raised it or a checklist rule mapping to that group generated it — `hz-01` … `hz-08`, enumerated in `.claude/guidelines/hazard-catalogue/_index.md` |
+| `idem` | the Side-Effect & Idempotency Guard Checklist produced it |
 | `sec:{row}` | the security-checklist row in `test-spec-format.md` that produced it — every row stamps |
-| *(absent)* | derived from the story spec, matching no checklist row and no hazard group |
+| *(absent)* | derived from the story spec, matching no checklist row |
 
-Multiple tokens are comma-separated: `Tier: 2 (hz-02, sec:IDOR)`.
+Multiple tokens are comma-separated: `Tier: 2 (idem, sec:IDOR)`.
 
 Absent means **no route claimed it**, not that its route is unknown: a route that
 fired always stamps. Silence is therefore not permission — it is the story-spec
 case, and nothing more.
 
-A scan raises a GAP only where a guard is *missing*. Checklists stamp too so
-provenance describes every route that generated a scenario, not only omissions
-found by the scan: the Side-Effect & Idempotency checklist stamps `hz-02`, and the
-security checklist stamps `sec:{row}`.
-
-The two producers are independent and their coverage overlaps — `hz-05` also owns
-authorization/IDOR. A scenario reached through the security checklist carries
-`sec:{row}`, one reached through a hazard scan carries `hz-NN`, one found by both
-carries both. Record every route; never collapse two routes into one token.
+The Side-Effect & Idempotency checklist stamps `idem`, and the security checklist
+stamps `sec:{row}`. When both produced one consolidated scenario, keep both tokens.
 
 ## Hard delivery ceilings
 

@@ -77,7 +77,7 @@ For every operation that **moves money, calls an external system, or mutates per
 
 **Rules:**
 - Both directions are mandatory for any money-moving operation — covering one (e.g. inbound webhooks) does NOT cover the other (e.g. outbound re-charge on retry). This is the exact gap that ships double-charge bugs.
-- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved) with `hz-02` provenance, then tier them by `tier-ladder.md`.
+- Place these in `01_API_Tests.md` (and `06_Integration_Tests.md` when an external system is involved) with `idem` provenance, then tier them by `tier-ladder.md`.
 
 ## 02_UI_Tests.md (5-8 tests)
 

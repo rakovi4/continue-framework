@@ -27,17 +27,10 @@ writing or refactoring code in any backend layer.
 ## Code Style
 
 - Prefer code that reveals intent through names, cohesive methods, and explicit
-  abstractions. Remove comments that merely narrate what the code does or label
-  sections that can be named in code. Keep comments only when they preserve
-  information the code cannot express: rationale, external constraints,
-  contracts, tooling directives, or safety hazards.
-- "Rationale" is not a blanket exemption from cleanup. Delete implementation
-  history, migration stories, test anecdotes, and essays defending the current
-  shape. A retained rationale must still affect a maintainer's present decision,
-  must not be recoverable from names, types, tests, or version control, and must
-  state that irreducible fact in at most two source lines. Multi-paragraph
-  production comments are always comment bloat: relocate a durable external
-  contract to its owning documentation and delete the in-code essay.
+  abstractions. Source comments are forbidden by the always-on coding rules.
+  When a comment carries useful information, preserve that information in
+  names, types, tests, executable configuration, or the owning documentation,
+  then delete the comment. No category of comment is exempt.
 - Use code generation for boilerplate: DTOs get data accessors, builders for construction, constructor injection for DI, immutability markers for value types.
 - Naming: value objects = simple noun, DTOs = `{Name}Dto`, requests = `{Action}Request`, responses = `{Action}Response`, fakes = `Fake{Interface}`, persistence entities = `{Name}Entity`. Variables: name by source when disambiguating same-typed values in one scope.
 - Methods: usecases = verb+noun (`registerUser`), factory = `create`/`of`/`from`, converters = `toDto`/`toEntity`/`toDomain`.

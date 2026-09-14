@@ -67,7 +67,7 @@ file was touched.
 - `simplify-expressions.md` - Static imports, method references, inline variables
 - `flatten-control-flow.md` - Flatten conditionals, Optional patterns, child delegation
 - `extract-method.md` - Named computations, guards, long method decomposition
-- `replace-comment-with-code.md` - Replace narrative comments with intention-revealing code
+- `replace-comment-with-code.md` - Preserve essential information elsewhere and delete every source comment
 - `extract-class.md` - Split large class by concern, extract superclass for shared infra
 - `adapter-query.md` - Extract typed AdapterQuery for Specification/CriteriaQuery logic
 - `subselect-read-model.md` - Consolidate multiple repositories into single query with ORM relationships

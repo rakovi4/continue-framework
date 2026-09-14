@@ -36,7 +36,6 @@ The always-on rules (`.claude/rules/*.md`) hold only the high-level map, invaria
 | Write or refactor frontend code or browser (Selenium/Cypress/Playwright) tests | `.claude/guidelines/frontend-rules.md` |
 | Write or run TDD tests (red/green cycles, assertions, stop-on-failure) | `.claude/guidelines/tdd-rules.md` |
 | Execute a scenario/task work unit (sequences, adapter-discovery, progress, resuming) | `.claude/guidelines/workflow-detail.md` |
-| Understand *why* the commit-time review passes exist (triage, three-way partition, mid-cycle tiering) | `.claude/guidelines/review-passes-detail.md` |
 | Start/stop services, touch CI runners, or run load tests | `.claude/guidelines/infrastructure-detail.md` |
 | Edit prompt-library docs (agents/skills classification, structure) | `.claude/guidelines/prompt-rules.md` |
 | Load or wire a technology binding (two-layer tech structure) | `.claude/guidelines/technology-loading.md` |

@@ -45,8 +45,7 @@ write-time check 8 applies to every staged progress edit. Checks 1–7 are greps
    plan.
 
    **No sub-case is exempt.** A mid-cycle newcomer's `progress.md` block always lands in
-   the same `review-fix:` commit as its test file, because the review passes fire only at a
-   block boundary, where nothing is in flight to strand
+   the same commit as its test file
    (`.claude/guidelines/workflow-detail.md`, "Net-New Scenarios Introduced Mid-Cycle"). So
    a heading in the tests with no steps in the plan is never a legitimate transient state —
    every form of it stops.
@@ -83,8 +82,7 @@ write-time check 8 applies to every staged progress edit. Checks 1–7 are greps
 
 8. **New progress content is structural.** Before every commit containing
    `progress.md`, inspect its zero-context staged diff. Every added non-blank line
-   must be an H1/H2/H3 heading, `Type:` line, checkbox line, or the exact
-   `<!-- review-origin: boundary -->` marker. A checkbox must occupy one physical
+   must be an H1/H2/H3 heading, `Type:` line, or checkbox line. A checkbox must occupy one physical
    line; compact dispatch/audit tokens are allowed, but an indented continuation,
    prose paragraph, test output, verdict, lane checkpoint, or other HTML comment
    fails. Any added checkbox over 200 characters also fails. Put the rejected content

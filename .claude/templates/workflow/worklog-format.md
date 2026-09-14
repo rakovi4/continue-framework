@@ -9,8 +9,8 @@ must stay within the repository's 200-line file limit.
 
 - `progress.md` answers only: what is the plan, what is done, and what runs next?
 - `worklog/` records what happened while a work unit ran: outcomes, test counts,
-  red predictions, review verdicts, approval/rejection context, lane manifests and
-  checkpoints, discovery evidence, skip reasons, and cycle proposals.
+  red predictions, approval/rejection context, lane manifests and checkpoints,
+  discovery evidence, and skip reasons.
 - `summaries/` and `carryover.md` preserve noteworthy cross-conversation context.
   `/handoff` remains their sole writer; routine work-log entries never replace them.
 - Decision records remain the authority for architectural choices. A work-log entry
@@ -45,7 +45,7 @@ storage: unit={boundary}; writes=[{path}: {delta}]; frozen-surfaces=[...]
 Use only the fields the work unit produced. `Outcome` is required (`in-progress` or
 `completed`); prose bullets and
 machine-readable HTML comments are optional. Keep resumable coordinator state in
-the active entry, including partial lane publication and joined-review checkpoints.
+the active entry, including partial lane publication and joined checkpoints.
 
 ## Progress references
 

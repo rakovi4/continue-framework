@@ -65,7 +65,9 @@ Framework layers (no technology binding — do not resolve a `tech-profile:` for
 - Prediction must match actual failure (validates understanding)
 - Follow layer-specific patterns from template
 - No implementation code (in production classes). Statements must be fully functional (see `.claude/guidelines/tdd-rules.md` "Statements are test infrastructure" rule).
-- No comments in code
+- Never write comments. Delete every source comment encountered in files within
+  the edit scope after preserving any essential information in code, tests,
+  configuration, or owning documentation.
 - **Selenium: assertions must cover all spec-mentioned sub-elements** — when the spec says "cards with title, status, assignee, and priority", each sub-element needs its own locator and assertion in the Statements method. A shallow count-only check misses the spec's intent. Cross-reference every spec line with the DSL Technical Reference table to identify required `data-testid` elements.
 - **Selenium: NEVER navigate via URL** — see `.claude/guidelines/frontend-rules.md` "FORBIDDEN in-app navigation via URL" rule. Find or create a Statements `navigate*` method that clicks through the UI.
 - **NEVER inject storage Fakes into Statements** — Statements must set up data through usecases, not by pre-seeding Fake storage directly. This applies to ALL storage ports including read-only, count-only, and aggregation ports. If setup through usecases is complex, extract compound Statements methods. See `.claude/guidelines/tdd-rules.md` Assertion Rules.

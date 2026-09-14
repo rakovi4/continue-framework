@@ -16,7 +16,7 @@
 #     never emit SubagentStart (observed live: typeless, dispatch-less
 #     stops while the start hook was provably active). Consumers must
 #     classify stop-without-start instead of assuming pairing symmetry
-#     (Step 2 premortem Incident 1); busy-time totals under-count these
+#     (observed during instrumentation testing); busy-time totals under-count these
 #     untracked spawns.
 #
 # Usage: agent-timing.sh <event-kind>   (hook JSON on stdin)
@@ -30,7 +30,7 @@
 #                payload's top-level agent_id; on tool events it comes
 #                ONLY from tool_response.agentId — NEVER from the
 #                top-level agent_id, which on tool events is the CALLING
-#                agent's id (premortem Incident A). Empty when the
+#                agent's id. Empty when the
 #                payload has no dispatched id (dispatch, return_failure,
 #                array-shaped responses): an honest empty joins nothing,
 #                a silent caller-id fallback joins the WRONG lifecycle
@@ -51,12 +51,12 @@ mkdir -p "$log_dir"
 
 # jq preflight: the hook registration wraps this script in
 # `2>/dev/null || true`, so without this check a missing jq kills every
-# event invisibly and the session silently produces no timing data
-# (agent-review Finding 2). stdout is NOT suppressed by the wrapper, so
+# event invisibly and the session silently produces no timing data.
+# stdout is NOT suppressed by the wrapper, so
 # a systemMessage on stdout surfaces in the UI. The marker is keyed by
 # SESSION (crude bash-regex extraction — jq is exactly what is missing
 # here) so every new session re-warns; a single per-project marker
-# would warn once ever, then go silent forever (premortem Incident 1).
+# would warn once ever, then go silent forever.
 if ! command -v jq >/dev/null 2>&1; then
   sid="unknown"
   [[ "$input" =~ \"session_id\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]] \

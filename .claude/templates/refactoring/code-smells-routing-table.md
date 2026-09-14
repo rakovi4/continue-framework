@@ -61,11 +61,10 @@ All templates live in `.claude/templates/refactoring/`.
 | Single-value parameter (all callers pass same value) | Remove Parameter -- inline the constant | `simplify-expressions.md` |
 | Parameter derivable from sibling parameter (value accessible via another param's accessor) | Remove redundant parameter, use accessor inside method | `simplify-expressions.md` |
 | Unused code | Delete it | (inline -- just delete) |
-| `// Unreachable` comment (left by coverage agent) | Remove the dead code branch and simplify the condition | (inline -- delete branch, simplify) |
+| Unreachable branch reported by coverage | Remove the dead code branch and simplify the condition | (inline -- delete branch, simplify) |
 | Long method (>10 lines) | Extract private methods per concern | `extract-method.md` |
-| Commented block sections (`// comment` + code + blank) | Extract each block, use comment as method name | `extract-method.md` |
-| Narrative comment or section label that restates code | Rename, extract, or simplify until the code expresses the intent; then delete the comment | `replace-comment-with-code.md` |
-| Comment bloat: implementation history, test anecdote, multi-paragraph prose, rationale longer than two lines, or rationale with no present decision impact | Delete obsolete prose; move a durable external contract to its owning documentation; compress only irreducible current rationale to at most two source lines | `replace-comment-with-code.md` |
+| Commented block sections (`// comment` + code + blank) | Extract each block, use its intent as the method name, then delete the comment | `extract-method.md` |
+| Any source comment | Preserve essential information through clearer code, tests, executable configuration, or owning documentation; then delete the comment | `replace-comment-with-code.md` |
 | Blank line wrapped sections (blank line + code + blank) | Extract each block, derive method name from purpose | `extract-method.md` |
 | Sequential independent blocks (3+ small operations, no shared state, each a distinct concern) | Extract each block into named method -- parent becomes table of contents | `extract-method.md` |
 | Single-use local: simple pass-through (accessor result used once, NOT a call to an injected dependency) | Inline variable | `simplify-expressions.md` |

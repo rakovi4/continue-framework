@@ -69,15 +69,7 @@ uniformity.
    `tier3/`, and the story spec (`.claude/agents/tiering-agent.md`, "Input"). One
    per story, dispatched concurrently across stories: each writes only inside its
    own folder.
-2. **No hazard re-scan.** Never fan out `hazard-scan-agent` here. The scan is
-   `/test-spec`'s *authoring* step, and run over an already-drafted set it folds new
-   GAPs in as **new scenarios** — that is drafting, not migration, and it grows
-   exactly the set the user invoked this skill to order. A pre-tiering set arrives
-   token-less and `tiering-agent` tiers it from the scenarios as written. **Never
-   invent a token**: it would be indistinguishable downstream from one a route
-   actually emitted.
-
-   **No consolidation either**, for the same reason from the other direction. The pass
+2. **No consolidation.** The pass
    that merges scenarios sharing one execution
    (`.claude/templates/spec/consolidation-rules.md`) rewrites scenario bodies and
    retires headings — authoring, not migration — and every `### N.M Title` it retires

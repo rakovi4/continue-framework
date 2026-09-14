@@ -40,12 +40,8 @@ where it would otherwise be eligible.
 
 ## Where the pass runs
 
-Over the drafted set, **after** the hazard-catalogue scan and **before** tiering,
-exactly once per story.
+Over the drafted set, **before** tiering, exactly once per story.
 
-- **After the scan**, because a GAP folded in as a scenario is a scenario like any
-  other. A pass running earlier would leave the newest scenarios — the ones nobody
-  drafted deliberately — as the only un-consolidated ones.
 - **Before tiering**, for three reasons pointing the same way. Tiering is comparative
   over the units that actually get built, so it must weigh merged units and not their
   parts. The marker protocol stays intact: consolidation writes only the `?` form, so
@@ -137,7 +133,7 @@ The merged scenario is one heading with **exactly one** marker line — the shap
 
 - **Provenance unions.** The survivor carries every token from every absorbed scenario,
   comma-separated and de-duplicated: a `sec:SQLi` scenario plus a bare one yields
-  `Tier: ? (sec:SQLi)`; `(hz-02)` plus `(sec:IDOR)` yields `Tier: ? (hz-02, sec:IDOR)`.
+  `Tier: ? (sec:SQLi)`; `(idem)` plus `(sec:IDOR)` yields `Tier: ? (idem, sec:IDOR)`.
   Never replace, never elect a primary, and never drop a token. One lost in a merge
   destroys provenance — downstream nothing can tell a merged scenario
   that shed its token from one no route ever claimed (`tier-ladder.md`, "Provenance").
@@ -159,13 +155,13 @@ The merged scenario is one heading with **exactly one** marker line — the shap
 
 Independent facts about one result — eligible under every clause. `2.1 Creating an
 {Entity} returns its identifier` + `2.2 … returns its creation time` + `2.3 A created
-{Entity} starts in the default state` (`hz-04`) become one scenario at the lowest
+{Entity} starts in the default state` become one scenario at the lowest
 number, carrying all three Thens:
 
 ```markdown
 ### 2.1 A created {Entity} is returned in full
 
-Tier: ? (hz-04)
+Tier: ?
 
 Given {Actor} is authenticated
 When {Actor} submits a valid {Entity}

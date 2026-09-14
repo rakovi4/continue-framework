@@ -59,12 +59,11 @@ export interface ValidationResult {
 
 ## .skip Convention
 
-After verified failure, add .skip with comment:
+After verified failure, add `.skip` and encode the failure reason in the test name:
 
 ```typescript
-// TDD Red Phase - validateEmail not implemented
-it.skip('should return valid for correct email format', () => {
-  // ... test unchanged ...
+it.skip('TDD Red: validateEmail not implemented — returns valid for correct email format', () => {
+  expect(validateEmail('valid@example.com')).toBe(true)
 })
 ```
 

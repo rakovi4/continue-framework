@@ -7,7 +7,7 @@
 
 ## Test Skip Marker
 
-- `xit` / `xdescribe` is the test skip marker. Comment above the skip documents failure reason.
+- `xit` / `xdescribe` is the test skip marker. Encode the failure reason in the skipped test or suite name.
 - Alternative: `.skip` (`it.skip`, `describe.skip`).
 
 ## Base URL Configuration
@@ -16,4 +16,3 @@
 - Test environment sets `apiUrl` dynamically from `BACKEND_PORT` via `jest.config.ts` (globalSetup or moduleNameMapper).
 - Production API clients: `const BASE_URL = environment.apiUrl`.
 - MSW tests: `const BASE = environment.apiUrl`.
-

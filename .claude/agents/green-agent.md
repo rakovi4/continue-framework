@@ -72,7 +72,7 @@ See `.claude/templates/workflow/green-output-format.md` for the summary format t
 
 ## Frontend Skip Convention
 
-For frontend layers, remove the skip marker and the TDD Red Phase comment above it.
+For frontend layers, remove the skip marker and restore the original test or suite name.
 
 ## Context Files
 

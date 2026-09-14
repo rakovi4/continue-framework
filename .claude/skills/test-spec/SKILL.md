@@ -27,13 +27,13 @@ For what the product already does in the areas this story touches — so a draft
 
 If `interview.md` exists, extract:
 - Business rules and constraints → map to API test scenarios
-- Explicit edge cases (state transitions, ordering, concurrent edits) → map to scenarios like any other; whether one is a bounded, acceptable degradation is Phase 5's call, not a decision made while reading the interview
+- Explicit edge cases (state transitions, ordering, concurrent edits) → map to scenarios like any other; whether one is a bounded, acceptable degradation is Phase 4's call, not a decision made while reading the interview
 - External API error modes → map to integration tests
 - Rate limits and performance constraints → map to load tests when they exercise the project's declared **Load Challenge Profile** (read `ExpectedLoad.md` to identify it); skip constraints that don't match the project's profile
 
 **Prerequisite analysis** (mandatory): Read the story's Prerequisites section and Validation Rules table. For each prerequisite, generate guard scenarios in BOTH API and UI tests following the Prerequisite Guard Checklist in `test-spec-format.md` — its rules cover extraction, per-endpoint coverage, and which two sources an established blocker pattern is read from — never a sweep of the other story folders.
 
-**Side-effect & idempotency analysis** (mandatory): Scan the story spec and `interview.md` for operations that move money, call an external system, send email, or mutate persisted state in a batch. For each one that can be re-run (scheduled job, webhook, user retry), generate re-run-safety scenarios in BOTH directions — inbound duplicate-event and outbound re-attempt-after-partial-failure — following the Side-Effect & Idempotency Guard Checklist in `test-spec-format.md`. Phase 2 stamps their `hz-02` provenance; the tier itself is Phase 5's call.
+**Side-effect & idempotency analysis** (mandatory): Scan the story spec and `interview.md` for operations that move money, call an external system, send email, or mutate persisted state in a batch. For each one that can be re-run (scheduled job, webhook, user retry), generate re-run-safety scenarios in BOTH directions — inbound duplicate-event and outbound re-attempt-after-partial-failure — following the Side-Effect & Idempotency Guard Checklist in `test-spec-format.md`. Phase 2 stamps their `idem` provenance; the tier itself is Phase 4's call.
 
 ### Phase 2: Generate Test Files
 
@@ -44,63 +44,32 @@ Create files in the `tests/` directory of the folder the story resolved to — `
 - `04_Infrastructure_Tests.md`, `05_Security_Tests.md`, `06_Integration_Tests.md`
 
 Author no `extended/` file. A nice-to-have scenario is drafted into its category
-file like every other one and reaches `tests/tier3/` only if Phase 5's comparative
+file like every other one and reaches `tests/tier3/` only if Phase 4's comparative
 pass puts it there. Existing `extended/` directories are left exactly as they are.
 
 **Stamp a `Tier: ?` marker on every scenario as you write it.** The tier is
 comparative — it cannot be settled until the whole set exists — so authoring writes
-the pre-tier form and Phase 5 substitutes the tier. Placement and token vocabulary
+the pre-tier form and Phase 4 substitutes the tier. Placement and token vocabulary
 are in `tier-ladder.md` ("The marker", "Provenance"); *which* token you stamp is
 decided here:
 
 | Scenario produced by | Marker |
 |---|---|
-| the Side-Effect & Idempotency Guard Checklist | `Tier: ? (hz-02)` |
+| the Side-Effect & Idempotency Guard Checklist | `Tier: ? (idem)` |
 | any row of the security checklist | `Tier: ? (sec:{row})` — `sec:IDOR`, `sec:JWT`, `sec:SQLi`, `sec:RateLimit`, … |
 | any other route — the story spec, the Prerequisite Guard Checklist | `Tier: ?` |
 
 Every security row stamps. Provenance records which generation route produced a
 scenario; it does not force implementation or encode importance.
 
-The bare `Tier: ?` of the last row is not optional — it is what makes the Phase 5
+The bare `Tier: ?` of the last row is not optional — it is what makes the Phase 4
 sweep able to catch a scenario the pass never reached (`tier-ladder.md`, "The
 marker").
 
 Stamp `sec:` tokens **in `05_Security_Tests.md`**, where the security checklist's
 output belongs.
 
-### Phase 3: Hazard Catalogue Scan
-
-After the test files are drafted, scan them against the hazard catalogue — the spec-time,
-closed-list complement to the open-ended commit-time review passes, and the
-generalization of the Phase 1 side-effect/idempotency analysis to every hazard class.
-Dispatch it exactly as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read
-its "How to apply it", "The dispatch shape"); the artifact under scan is the **drafted
-test files**.
-
-Fold every GAP back into the matching category file as the forced-guard scenario it
-names, carrying the GAP's own id in its marker: `Tier: ? (hz-02)`. An unresolved GAP blocks
-Phase 4 and everything after it — a folded GAP is a merge candidate, so it must exist
-before consolidation runs. Fold or dismiss every fired trigger, with a reason, first.
-
-Then stamp the pass's **COVERED** lines too. Each one names a scenario already in the
-files that is the forced guard for its class; add that group's id to that scenario's
-marker. A scan raises a GAP only where a guard is missing, so GAP-only stamping would tag
-the scenarios nobody thought of and leave the well-drafted ones bare — the inversion
-`tier-ladder.md` ("Provenance") names, and the reason `hz-01` and `hz-05` have no
-authoring-time checklist to stamp them.
-
-A folded GAP is tiered in Phase 5 like every other scenario, and is never pre-assigned a
-tier here (`_index.md`, "A fired GAP is tiered, not automatically critical-path"). Two
-rules on the token:
-
-- **Union, never replace.** A GAP folded into a scenario Phase 2 already stamped adds its
-  id: `Tier: ? (hz-02, sec:IDOR)`. A guard the synthesis pass reconciled across a seam
-  carries both groups' ids, exactly as that pass reported them.
-- **Stamp only what fired.** The id comes from the scan that raised the GAP. Never guess a
-  group id onto a scenario, and never stamp one on a scenario no route produced.
-
-### Phase 4: Consolidate the Set
+### Phase 3: Consolidate the Set
 
 Two scenarios that need the same actor, the same entry point and the same Given state,
 and whose outcomes can all be true of one execution, are one execution wearing two
@@ -111,22 +80,21 @@ Dispatch `consolidation-agent` (`.claude/agents/consolidation-agent.md`) **once*
 the whole story, over every `tests/*.md`. It merges only what
 `.claude/templates/spec/consolidation-rules.md` makes eligible; every eligible maximal
 group must merge. It unions the absorbed provenance tokens onto the survivor, leaves
-every `Tier: ?` unresolved for Phase 5, and
-reports each merge with what it absorbed. It runs after the scan so a folded GAP is a
-merge candidate, and before tiering so the comparative pass sorts the units that are
+every `Tier: ?` unresolved for Phase 4, and
+reports each merge with what it absorbed. It runs before tiering so the comparative pass sorts the units that are
 actually built and provenance remains on the merged token union — the argument is in
 `consolidation-rules.md`, "Where the pass runs".
 
-On a stop condition, report it and do **not** fall through to Phase 5: a half-merged set
+On a stop condition, report it and do **not** fall through to Phase 4: a half-merged set
 holds one assertion under two headings. Do not re-dispatch or force extra merges to hit
-the delivery ceilings; Phase 5 places distinct overflow scenarios in Tier 3.
+the delivery ceilings; Phase 4 places distinct overflow scenarios in Tier 3.
 
 Before tiering, apply `.claude/templates/spec/journey-stacking-rules.md`. Trace the
 complete primary journey first, stack its checkpoints across sections and later-state
 preconditions, and split tier-changing hardening. Produce its journey ledger; stop if
 one category still gives consecutive primary checkpoints multiple headings.
 
-### Phase 5: Tier the Set
+### Phase 4: Tier the Set
 
 Dispatch `tiering-agent` (`.claude/agents/tiering-agent.md`) **once**, for the whole
 story. Hand it every `tests/*.md` file, any `tests/tier3/` that already exists, and the
@@ -145,10 +113,10 @@ scenario carrying **no marker line at all**, the one state the stamping rule nam
 undetectable by grep. Assert what `bootstrapping.md` and plan-integrity check 6 both
 assert: every `^### [0-9]` heading is followed by **exactly one** `^Tier: ` line before the
 next heading. A heading with none is stamped before the dispatch; a heading with two is
-unioned into one line per Phase 3's "Union, never replace". Do *not* settle for equal counts per
+  unioned into one line. Do *not* settle for equal counts per
 file — one bare scenario and one doubled marker net to equality and pass, and that pair is
-not exotic: the same Phase 2 pass that emits a second `Tier:` line while folding a GAP into
-an already-stamped scenario is the one that leaves a route-less scenario unstamped. Without
+not exotic: one authoring route can emit a second `Tier:` line while another leaves a
+route-less scenario unstamped. Without
 this the sweep proves only that the markers which existed got substituted, and says nothing
 about the ones that never did.
 
@@ -163,7 +131,7 @@ and they leave the tree in opposite states — read the report, never the `?` co
   post-dispatch `grep -rF 'Tier: ?' tests/` is **clean** for it — the mechanical sweep
   cannot see this one at all.
 
-Either way, do not fall through to Phase 6: it summarizes a split that does not exist, and
+Either way, do not fall through to Phase 5: it summarizes a split that does not exist, and
 after a stop the story would read spec-complete while `bootstrapping.md` refuses to derive
 any plan from an unresolved `?`. Report what happened and stop. The resolutions are the
 caller's and they differ: a partial dispatch is re-dispatched whole. A **failed move has no re-dispatch resolution** —
@@ -175,16 +143,13 @@ unreviewed-but-tiered set the stop exists to prevent.
 
 Count resolved `Tier: 1` and `Tier: 2` markers in `tests/*.md` after the dispatch;
 require Tier 1 <= 10 and Tier 1 + Tier 2 <= 25. Do not trust the report alone. A
-violation or an infeasible-stack report blocks Phase 6; never hand-demote scenarios.
+violation or an infeasible-stack report blocks Phase 5; never hand-demote scenarios.
 Every remaining eligible scenario belongs in Tier 3.
 
-### Phase 6: Summary
+### Phase 5: Summary
 
-Report: folder path, files created, test counts per file, and the hazard-scan result —
-the group set scanned (the `_index.md` **Groups** list at scan time), each group's verdict,
-and every GAP's disposition (folded → named scenario, or dismissed with reason).
-
-Then Phase 4's consolidation and journey-stacking result — the before/after count per
+Report the folder path, files created, and test counts per file. Then Phase 3's
+consolidation and journey-stacking result — the before/after count per
 file, the journey ledger, and every combined heading with what it absorbed — and Phase
 5's Tier 1 / Tier 2 / Tier 3 split, every Tier 3 scenario
 named with the degradation judgment that put it there, and every Tier 2 admission with
@@ -194,6 +159,6 @@ point at which a human sees what was folded or dropped while disagreeing is stil
 
 ## Rules
 - English, Gherkin in Markdown, DSL only (no technical details in steps)
-- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 5 resolves. After consolidation and journey stacking, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 4 preserves every checked fact (`.claude/templates/spec/consolidation-rules.md`).
+- One file per category under `tests/`, every scenario carrying the `Tier: ?` marker Phase 4 resolves. After consolidation and journey stacking, the story-wide implemented stack is capped at 10 Tier 1 scenarios and 25 Tier 1 + Tier 2 scenarios; every other eligible scenario goes to Tier 3. Phase 3 preserves every checked fact (`.claude/templates/spec/consolidation-rules.md`).
 - **Load tests**: profile-driven against the **Load Challenge Profile** the project declares in `ExpectedLoad.md`. The profile catalog, the relevance filter (including when to skip the file and set `Load = n/a`), the authoring rules and the file layout are all in `.claude/templates/spec/load-test-format.md`
 - **Security**: generate stack-aware scenarios only. The relevance filter, checklist rows, merge rule and per-story count are all in `test-spec-format.md` ("05_Security_Tests.md")

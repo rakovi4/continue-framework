@@ -57,8 +57,8 @@ re-scan after each change.
 6. **Never defer a fix you could apply** — if a candidate is a real violation, fix
    it this session, not a future phase or conversation. This covers **every**
    behavior-preserving finding you make, not only the detectors' in-layer smells:
-   a rename, dead code, a stale anchor or roster, a comment that outlived its
-   subject. Fix it wherever it lives. The one exception is a **file-domain lock**
+   a rename, dead code, a stale anchor or roster, or any source comment. Fix it
+   wherever it lives. The one exception is a **file-domain lock**
    in force for this dispatch — under a lock, report and name the locked file,
    because a concurrent writer would collide.
 7. **Reporting a finding is not a free action** — a report becomes a plan step,

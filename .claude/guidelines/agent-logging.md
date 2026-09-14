@@ -25,11 +25,8 @@ Append lines using `echo "..." >> infrastructure/agent-progress.log`. One line p
 | test-review-agent | START (test file), SCAN (issues found or clean), FIX (each assertion tightened), RUN (test result), DONE |
 | test-review detector clusters (`test-review-assertions-agent`, `test-review-placement-agent`, `test-review-selenium-agent`, `test-review-statements-agent`) | START (cluster + target scope), SCAN (violation count or `none`), DONE |
 | coverage-agent | START (module), RUN (coverage %), DONE (gaps found or clean) |
-| hazard-scan-agent | START (artifact + group id under scan), DONE (group id, verdict, gap count) — the id is what tells a reader of a concurrent fan-out's log which groups actually ran |
 | consolidation-agent | START (story + scenario count), RUN (each merge: survivor + absorbed count), DONE (before/after count) or SKIP (stop condition + what triggered it) |
 | tiering-agent | START (story + scenario count), RUN (Tier 2 admissions evaluated), DONE (the tier split) or SKIP (stop condition + what triggered it) |
-| agent-review-agent | START (boundary range under review), DONE (verdict + concern count) |
-| premortem-agent | START (boundary range under review), DONE (verdict + credible-incident count) |
 | harvest | START (Tier 2 batch size), RUN (green/red split after the first run), PASS or SKIP (per-test baseline verdict: earned / pre-existing `[S]` / inert-deleted), DONE (kept, `[S]`, deleted counts). Its writer sub-agents log as red-agent. |
 | test-runner | START (module/class), READY (context read, command chosen), INVOKE (immediately before launching the test command), RUN (first test-task output seen), DONE (pass/fail counts) |
 
@@ -63,30 +60,6 @@ audit surface for "did the fan-out run", so an agent that logs and is absent fro
 the log unreadable. But absence is correct for an agent that logs nothing at all:
 `prompt-refactor-agent` and `design-review-agent` carry no logging instruction, so they owe
 no milestones and get no row. Add a row when you add logging to an agent, not before.
-
-## Inline orchestrator steps (no agent)
-
-Some `/continue` steps run **inline in the orchestrator**, not as sub-agents — the
-review-pass triage predicate and the SAFE-only auto-fixer. They add **no row** to
-the table above and define **no new milestone set**: they are not agents. `/continue`
-still writes their progress to the same log so `tail -f` stays complete. It logs under
-the fixed `AGENT_NAME` slot `[continue]`, using existing phase tokens (see the format
-template above):
-
-- `SKIP` — triage skipped both review passes (with the reason):
-  `[14:03:12] [continue] SKIP: review passes skipped (triage — progress-only diff)`
-- `FIX` — one line per applied SAFE finding (the inline auto-fixer):
-  `[14:03:40] [continue] FIX: agent-review workflow-detail.md — dead-code note removed`
-- `DONE` — a NEEDS_CLARIFICATION boundary quiz was raised, with how it routed:
-  `[14:04:05] [continue] DONE: quiz — <question> → routed SAFE`
-- `SKIP` — a NEEDS_CLARIFICATION finding was **demoted instead of asked**, naming the
-  check of `.claude/templates/workflow/clarification-escalation-test.md` it failed.
-  Without this line a gated quiz is indistinguishable from a unit where no
-  clarification arose, and the bar becomes unauditable:
-  `[14:04:02] [continue] SKIP: clarification demoted (no recommended option) → NEEDS_CYCLE`
-
-These lines are emitted by the orchestrator itself, not by any agent, and are folded
-into the stop-and-report.
 
 ## Rules
 

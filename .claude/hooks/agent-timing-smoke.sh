@@ -32,10 +32,10 @@ run_case() {
 # tool_response.agentId, not the caller's top-level agent_id
 run_case "return-uses-dispatched-id" return \
   '{"session_id":"smoke-session","tool_use_id":"tu_1","agent_id":"caller-id",
-    "tool_input":{"subagent_type":"premortem-agent","description":"d"},
+    "tool_input":{"subagent_type":"red-agent","description":"d"},
     "tool_response":{"agentId":"dispatched-id"}}' \
   '.event=="return" and .agent_id=="dispatched-id" and .caller_id=="caller-id"
-   and .agent_type=="premortem-agent" and .tool_use_id=="tu_1"
+   and .agent_type=="red-agent" and .tool_use_id=="tu_1"
    and (.ts|test("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"))'
 
 # dispatch record: no tool_response yet — agent_id must be an HONEST

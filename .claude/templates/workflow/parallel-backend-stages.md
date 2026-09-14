@@ -1,6 +1,6 @@
 # Parallel Backend Scenario Stages
 
-Backend-style scenarios use three human-reviewed stages. This applies to backend,
+Backend-style scenarios use three stages. This applies to backend,
 integration, security, load, and infrastructure scenarios. The coordinator alone
 owns `progress.md`; every lane owns only its declared files.
 
@@ -157,34 +157,13 @@ Only the coordinator marks Stage 2 done after all required lanes and admitted
 coverage follow-ups have durable commits. It advances directly to Stage 3 in the
 coordinator commit and stops at that work-unit boundary.
 
-## Stage 3 — Acceptance GREEN and Independent Review
+## Stage 3 — Acceptance GREEN
 
-Dispatch these read/write-independent lanes concurrently:
-
-- Acceptance GREEN enables only the scenario's complete disabled black-box target and runs the acceptance
-  suite. It writes no production code.
-- `agent-review-agent` and `premortem-agent` read the immutable Stage 1 and Stage 2
-  commit range. They do not wait for acceptance GREEN and do not edit files.
-
-Join all three results before changing progress. On acceptance failure, mark Stage 3
+Enable only the scenario's complete disabled black-box target and run the acceptance
+suite. This stage writes no production code. On acceptance failure, mark Stage 3
 pending, reset the implicated Stage 2 lane and Stage 2 checkbox to current, and
 invalidate that lane's checkpoint. The acceptance lane
-never repairs production code. After acceptance succeeds, partition review
-findings with `triage-and-auto-fix.md` and apply admitted SAFE fixes only after the
-join, so they cannot race the acceptance lane.
-
-An admitted `NEEDS_CYCLE` is a proposal, not cycle plan state. Complete and commit
-Stage 3, append a `resolve stage-3 cycle proposals` decision checkbox, and store the
-proposals in the Stage 3 work-log entry. This ends the Stage 3 work unit at a legal
-commit boundary. The later decision work unit adds cycle checkboxes only after
-explicit agreement; rejection completes the decision without adding them. With no
-proposal, Stage 3 completes the scenario directly.
-
-Stage 3's review agents intentionally read the immutable Stage 1+2 range while
-acceptance GREEN enables the test concurrently. This is the staged-backend exception
-to the ordinary completed-block range: Stage 1 already reviewed the test content,
-and Stage 3's suite execution guards the remove-marker-only change. Consume this
-review batch once; closure does not dispatch a duplicate boundary batch.
+never repairs production code. Acceptance success completes the scenario.
 
 ## Progress Shape
 
@@ -193,7 +172,7 @@ review batch once; closure does not dispatch a duplicate boundary batch.
 - [~] stage-1 acceptance RED + contract design
 - [ ] approve stage-1 contracts
 - [ ] stage-2 implementation lanes
-- [ ] stage-3 acceptance GREEN + review
+- [ ] stage-3 acceptance GREEN
 ```
 
 Legacy scenarios already started with the serial checkbox shape keep that shape.

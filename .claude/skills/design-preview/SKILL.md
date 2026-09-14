@@ -16,7 +16,7 @@ description: Preview the planned design for a scenario before writing tests. Sho
 
 Before writing any test code, present the planned implementation design to the user for approval. This catches design disagreements early — before red-usecase locks in the approach.
 
-This is also the reuse gate for a scenario invented mid-cycle (see `.claude/guidelines/workflow-detail.md` "Net-New Scenarios Introduced Mid-Cycle"): a scenario not traceable to a scanned `tests/*` scenario must pass through here so step 2a scans its hazards before its red phase locks.
+This is also the design gate for a scenario invented mid-cycle (see `.claude/guidelines/workflow-detail.md` "Net-New Scenarios Introduced Mid-Cycle").
 
 ## Workflow
 
@@ -82,49 +82,13 @@ Think through 2-3 viable approaches. For each option, capture:
 
 Mark one option as **Recommended** with a one-line rationale ("why this over the others"). For trivial scenarios (validation, error handling, mechanical CRUD) where alternatives would be contrived, present a single option labelled "Only viable approach" instead of forcing artificial alternatives.
 
-### 2a. Hazard Catalogue Scan (before presenting)
+### 2a. Place a Net-New Mid-Cycle Scenario
 
-Before presenting the options, scan the drafted design against the hazard catalogue —
-the spec-time, closed-list complement to the open-ended commit-time review passes.
-Dispatch it exactly as `.claude/guidelines/hazard-catalogue/_index.md` prescribes (read
-its "How to apply it", "The dispatch shape"); the artifact under scan is the **drafted
-design**. At this altitude an entire group's triggers often cannot fire — `hz-08` (client
-/ frontend) above all — which is a block dismissal, never a silent pass (`_index.md`, "A
-dead group is dismissed as a block").
-
-Fold every GAP back into the design before presenting: the option the user approves must
-already carry the forced guard (a domain method, a port contract, a specific check), not a
-vague mitigation. Do not proceed to step 3 with an open GAP — a hazard the design can't
-yet guard is a reason to widen the options or escalate to `/architecture`, not to present
-anyway. When you present, surface the scan outcome — the group set scanned, each
-fired-trigger GAP, and the guard the chosen option carries for it — so the user approves a
-design whose hazards are visible, not hidden.
-
-When a GAP folds in as a **net-new scenario** rather than as a change to the design,
-classify it immediately using `.claude/templates/spec/tier-ladder.md`. It can never be
-Tier 1. Write a qualifying Tier 2 scenario under `tests/`; otherwise write its Tier 3
-marker under the matching `tests/tier3/` category file and do not add it to
-`progress.md`. Preserve the scan's group id; this is the only point on the mid-cycle
-path where that provenance is known.
-
-A scenario that reaches this gate from a `NEEDS_CYCLE` review finding rather than from a
-GAP uses the review-finding tier policy, carrying whatever tokens this scan stamped and
-no invented token when it stamped none. A review pass is not a provenance route.
-
-Resolved, not `Tier: ?`. The `?` form means "drafted, awaiting the comparative pass", and
-`tiering-agent` runs at spec time only — a `?` written here would sit unresolved on an
-already-tiered story and read to the next person as a pass that got skipped. A
-hazard-generated scenario uses the strict Tier 2-or-3 decision above and never Tier 1.
-
-**Consolidation does not reach back.** The pass that merges scenarios sharing one
-execution runs once, at `/test-spec`, over the whole drafted set
-(`.claude/templates/spec/consolidation-rules.md`). A scenario born here arrives after it
-and is **never retro-merged**: re-running a whole-set pass to absorb one newcomer would
-rewrite scenarios already built or in flight, and their `### N.M Title` headings are what
-`progress.md`, the journey summaries and plan-integrity check 4 key on. So the two
-outcomes above stay the only ones — fold the GAP into the design, write a qualifying
-Tier 2 scenario that costs a full cycle, or record a Tier 3 scenario that costs none.
-Fold wherever folding is honest; never call a distinct observable behavior a design change.
+When this preview was invoked for a scenario invented after `/test-spec`, classify it
+immediately with `.claude/templates/spec/tier-ladder.md`. Write a resolved Tier 1 or
+Tier 2 marker under `tests/`, or a Tier 3 marker under `tests/tier3/`; never write
+`Tier: ?`, because the story-wide comparative pass has already run. Do not rerun
+consolidation over scenarios already built or in flight.
 
 ### 3. Present Options
 

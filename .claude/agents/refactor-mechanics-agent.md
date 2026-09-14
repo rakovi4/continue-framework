@@ -30,11 +30,9 @@ duplication, frontend, all of Section B).
 2. **Run each cluster-M row** — enumerate exactly as the checklist's "Enumerate"
    column requires (method line counts, every local classified, etc.). Show the
    enumerated data; write `→ clean` when it shows no violation.
-   For A59, count comment-only lines, enumerate every contiguous production-code
-   comment block, and apply both necessity questions before `KEEP`. Never infer
-   a clean result from A29 alone, and never treat the word "rationale" as an
-   exemption: implementation history, test anecdotes, multi-paragraph prose,
-   and rationale longer than two source lines are candidates.
+   For A59, count comment-only lines and enumerate every contiguous source
+   comment block. Every block is a candidate; there is no `KEEP` classification.
+   Never infer a clean result from A29 alone.
 3. **Report candidates** — no edits. Apply the restraint guardrails in
    `.claude/templates/refactoring/restraint.md` before flagging extractions; a
    single-use pass-through inline or a "NO ACTION" verdict is often correct.

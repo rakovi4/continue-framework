@@ -37,9 +37,7 @@ not auto-loaded). Target the file that owns the topic:
 | documentation, prompt, agent, skill, template, layer placement | `.claude/guidelines/prompt-rules.md` |
 | workflow lifecycle, status markers, atomic-unit rule, task types (high-level) | `.claude/rules/workflow.md` |
 | scenario sequences, adapter/steps discovery, bug/QA task detail, resuming/handoff mechanics | `.claude/guidelines/workflow-detail.md` |
-| boundary review passes, boundary cadence, boundary range, block boundary, agent-review/premortem rationale, triage SKIP/RUN, SAFE/NEEDS_CYCLE/NEEDS_CLARIFICATION partition, why escalation is last-resort, mid-cycle finding tier | `.claude/guidelines/review-passes-detail.md` |
 | scenario consolidation, merge eligibility, assertion-preservation invariant, provenance union | `.claude/templates/spec/consolidation-rules.md` |
-| when a review pass may escalate instead of deciding, quiz form and consumer gating | `.claude/templates/workflow/clarification-escalation-test.md` |
 | tech profile, tech binding, technology loading, conventions table | `.claude/guidelines/technology-loading.md` |
 
 Tech bindings (`.claude/tech/{concern-value}/`) — framework-specific idioms:
@@ -166,7 +164,6 @@ After writing, determine whether the update changes **expected behavior** of any
 | `agents/green-agent.md`, `tech/{concern-value}/templates/*` | `green-agent` |
 | `guidelines/frontend-rules.md`, `tech/{concern-value}/templates/frontend/*` | `red-agent`, `green-agent` (frontend layers), `/mockups` |
 | `rules/workflow.md`, `guidelines/workflow-detail.md`, `guidelines/technology-loading.md` | `/continue`, `/task`, `/qa-run`, `/story` (Backlog-table lifecycle rules) |
-| `guidelines/review-passes-detail.md` | `/continue` (triage + auto-fix), `/agent-review`, `/premortem` |
 | `skills/qa-run/SKILL.md`, `tech/{browser-testing}/templates/qa-prod-copy-harness.md` | `/qa-run` |
 | `templates/spec/*` | `/interview`, `/continue` (story spec dispatch), `/api-spec`, `/test-spec`, `/design-preview`, `/architecture`, `/harvest` + `/retier` (`tier-ladder.md`) |
 | `agents/consolidation-agent.md` | `/test-spec` (Phase 4), `/retier` (explicitly declines to dispatch it), `/design-preview` (mid-cycle scenarios are not retro-merged) |

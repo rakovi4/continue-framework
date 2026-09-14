@@ -34,7 +34,7 @@ Mockups contain placeholder values (`user@example.com`, fake dates, sample price
 
 - Logic tests: pure functions, no DOM, no framework rendering. Use the frontend test runner (see technology.md Conventions).
 - API client tests: frontend test runner + HTTP mock library.
-- The test skip marker (see technology.md Conventions) is the frontend equivalent of the backend test disable marker. Comment above the skip documents failure reason.
+- The test skip marker (see technology.md Conventions) is the frontend equivalent of the backend test disable marker. Encode the actual failure reason in the skipped test or suite name; never add a comment.
 - Use the native `fetch` API (not axios). Base URL from the backend URL environment variable.
 - **NEVER hardcode `http://localhost:8080`** in HTTP mock handlers or production code. Use the backend URL environment variable -- the test runner sets it dynamically from the backend port. Production API clients read the variable with a fallback to empty string. HTTP mock tests read the variable for handler URLs.
 

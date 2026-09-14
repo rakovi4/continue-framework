@@ -54,7 +54,7 @@ Replace only the matching checkbox lines. A backend-style candidate becomes:
 - [ ] stage-1 acceptance RED + contract design
 - [ ] approve stage-1 contracts
 - [ ] stage-2 implementation lanes
-- [ ] stage-3 acceptance GREEN + review
+- [ ] stage-3 acceptance GREEN
 ```
 
 A frontend candidate becomes:
@@ -62,7 +62,7 @@ A frontend candidate becomes:
 ```markdown
 - [ ] stage-1 frontend acceptance RED + interface design
 - [ ] stage-2 frontend implementation lanes
-- [ ] stage-3 frontend acceptance GREEN + review
+- [ ] stage-3 frontend acceptance GREEN + demo
 ```
 
 Keep headings, comments, blank lines, ordering, and every other block byte-for-byte.

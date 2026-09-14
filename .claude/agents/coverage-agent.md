@@ -47,9 +47,10 @@ Coverage steps use the same layer as the current green phase:
 - After `green-adapter rest` → `red-adapter rest` + `green-adapter rest`
 - After `green-adapter storage` → `red-adapter storage` + `green-adapter storage`
 
-## Dead Code Marking
+## Dead Code Reporting
 
-See `.claude/templates/workflow/coverage-formats.md` for dead code comment format. The refactor agent will detect and remove these lines.
+See `.claude/templates/workflow/coverage-formats.md` for dead-code reporting. Do
+not mark source with comments; the refactor agent receives the reported lines.
 
 ## Rules
 

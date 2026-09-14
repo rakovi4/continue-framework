@@ -20,11 +20,10 @@ Insert coverage steps immediately after the current `green-{layer}` line in the 
 
 The `(coverage: ...)` annotation is a short description of the uncovered behavior — enough for the red phase to know what test to write.
 
-## Dead Code Marking
+## Dead Code Reporting
 
-When dead code is found, add an unreachable comment on the dead code line in the source file. The comment format is language-specific — see tech binding for syntax.
-
-The refactor agent will detect and remove these lines.
+When dead code is found, report its exact file and line to the refactor agent.
+Never mark source with a comment.
 
 ## Gap-to-Scenario Mapping (--focus mode only)
 
@@ -74,8 +73,8 @@ Reachable — added to progress.md:
   L12: null/undefined check true branch → red/green-usecase (coverage: Title rejects null value)
   L12: empty-string check false branch → red/green-usecase (coverage: Title accepts valid value)
 
-Dead code — marked with unreachable comment in source, will be removed in refactor:
-  L45: `default` in exhaustive switch → added unreachable comment
+Dead code — reported for removal in refactor:
+  L45: `default` in exhaustive switch → report exact file and line
 
 Steps added to progress.md: 4
 ```

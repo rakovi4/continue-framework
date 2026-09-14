@@ -18,8 +18,6 @@ Those six scenario types are the **categories**, not the delivery order. In a ti
 
 Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding). The interview may capture technical constraints needed to understand feasibility, but the generated main story spec uses domain language exclusively. Implementation choices, architecture, technology, and integration mechanics belong in the story's Notes file. When a technical limitation changes externally observable behavior, state that behavior in domain terms in the main spec and keep the mechanism in Notes.
 
-**Hazard cadence has two distinct gates.** Scan the story's complete drafted scenario set against the hazard catalogue exactly once, in `/test-spec`, before consolidation and tiering; story-spec generation never runs that whole-set scan. Separately, every `/design-preview` scans that scenario's drafted design while design options are prepared. Keep the per-design scan: it validates implementation choices and does not repeat the story-wide scenario-set pass.
-
 **Stack the complete primary-user journey, not its checkpoints.** Before tiering,
 trace the earliest in-scope entry through first value, any constraint the user reaches,
 value capture when it is in scope, and restored or continued value. Within each test
@@ -38,7 +36,7 @@ them would change the journey's tier. Implementation similarity is irrelevant.
 
 **A story folder is a delta plus its rationale**, not a description of the present. It holds one increment: the story spec, `interview.md`, `mockups/`, `endpoints.md`, `decisions/*-decision.md`, and `tests/` (including `tier3/`). When the same functionality is extended by a later story, no single folder answers "what does this do now" — the later delta supersedes the earlier one and neither says so. Read a story folder for a **named** precedent (the decision behind a specific rule, the interview behind a specific constraint), never as a sweep. The one artifact in there that is *not* frozen at story close is `mockups/`, which later work backports into — see the table below.
 
-**Resolving a story folder: `stories/` first, then `stories/done/`.** A story is archived the moment it completes, but the behavior it shipped stays live and its rationale stays the answer to "why is this rule *that* rule". So every reader that resolves one story — `/continue`, `red-agent`, `/handoff`, `/mockups`, `/align-design`, `/design-review`, `/screenshot`, and the spec skills and templates that open an earlier story — checks `ProductSpecification/stories/NN-story-name/` and then `ProductSpecification/stories/done/NN-story-name/`, and treats a hit in either as the story. **Not-found means both came back empty** — never one; anything that fires on absence (most sharply `/continue`'s bootstrap, which would re-create a shipped story's folder and re-run its spec phase) must check both before it fires. Writing is the one asymmetry: a story is archived only once complete, so its own spec phase always writes under `stories/`, while work that reaches back into a closed story — backporting a mockup, appending a journey summary about it — writes where that story resolved. A review finding that reopens a story is not that case: the reopen moves the folder back out of `done/` first, so its writes land under `stories/` (`.claude/skills/continue/SKILL.md`, "Triage & Auto-Fix"). `/retier` is the single deliberate exclusion: it classifies folders under `stories/` and must not descend into `stories/done/` or treat `done/` itself as a story folder.
+**Resolving a story folder: `stories/` first, then `stories/done/`.** A story is archived the moment it completes, but the behavior it shipped stays live and its rationale stays the answer to "why is this rule *that* rule". So every reader that resolves one story — `/continue`, `red-agent`, `/handoff`, `/mockups`, `/align-design`, `/design-review`, `/screenshot`, and the spec skills and templates that open an earlier story — checks `ProductSpecification/stories/NN-story-name/` and then `ProductSpecification/stories/done/NN-story-name/`, and treats a hit in either as the story. **Not-found means both came back empty** — never one; anything that fires on absence (most sharply `/continue`'s bootstrap, which would re-create a shipped story's folder and re-run its spec phase) must check both before it fires. Writing is the one asymmetry: a story is archived only once complete, so its own spec phase always writes under `stories/`, while work that reaches back into a closed story — backporting a mockup, appending a journey summary about it — writes where that story resolved. `/retier` is the single deliberate exclusion: it classifies folders under `stories/` and must not descend into `stories/done/` or treat `done/` itself as a story folder.
 
 What the suite genuinely cannot hold, each with an existing home:
 
@@ -57,10 +55,10 @@ What the suite genuinely cannot hold, each with an existing home:
 
 Backend, integration, security, load, and infrastructure scenarios use three
 human-reviewed stages: acceptance RED beside contract design; concurrent complete
-RED-to-GREEN use-case and adapter lanes; then acceptance GREEN beside independent
-review. Frontend scenarios also use three stages: Selenium RED beside interface
+RED-to-GREEN use-case and adapter lanes; then acceptance GREEN verification.
+Frontend scenarios also use three stages: Selenium RED beside interface
 design; concurrent complete frontend-logic, API-client, and design-alignment lanes;
-then Selenium GREEN beside independent review. `/refactor` lands separately inside
+then Selenium GREEN and demo. `/refactor` lands separately inside
 every lane that requires it. Exact mechanics and legacy in-flight behavior live in
 **`.claude/guidelines/workflow-detail.md`**.
 
@@ -71,7 +69,7 @@ Each story has a progress file at `ProductSpecification/stories/NN-story-name/pr
 **Progress files are plans, not journals.** They contain headings, status checkboxes,
 and only compact tokens required to dispatch or audit the plan; each checkbox is one
 physical line and at most 200 characters. Never append work
-summaries, test evidence, review verdicts, implementation discoveries, approval
+summaries, test evidence, implementation discoveries, approval
 history, lane manifests, or multi-line commentary to a checkbox. `/continue` writes
 one bounded record per invocation under `worklog/` beside the progress file, following
 `.claude/templates/workflow/worklog-format.md`. Journey summaries remain the separate
@@ -91,21 +89,9 @@ Story sections are **tier-major** — they mirror the tier-first delivery order 
 
 ## Atomic Work Units
 
-A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pauses are the task design's joined approval and the NEEDS_CLARIFICATION review quiz. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
+A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
 
-**Stories review at block boundaries; tasks review once at completion.** The two fresh-context passes (`agent-review` + `premortem`) run concurrently and remain non-gating. Story mechanics keep the block boundary defined in `progress-format.md`; task steps never dispatch reviews, and the terminal batch reads the whole task before archive. Verdicts land in the active work log, with SAFE fixes in `review-fix:` and records without fixes in `worklog:` (mechanics: `/continue`; rationale: `.claude/guidelines/review-passes-detail.md`).
-
-The staged backend and frontend sequences have one explicit range exception: their
-Stage 3 review runs concurrently with acceptance GREEN and reads the immutable Stage
-1+2 range. Stage 1 already reviewed the acceptance-test content; Stage 3 suite
-execution guards the remove-marker-only delta. That batch is consumed once and
-scenario closure does not dispatch a duplicate review.
-
-**Boundary review is depth-limited to one generation.** A block created from a boundary review's `NEEDS_CYCLE` finding carries the durable `<!-- review-origin: boundary -->` marker defined by `progress-format.md`. It still runs its complete TDD work unit and `/refactor`, but its closing boundary skips `agent-review` and `premortem`; findings from review must not recursively commission another review generation. The original boundary's required review is unchanged, and its trailing `review-fix:` or `worklog:` commit is terminal — validating it never starts another review batch.
-
-**The boundary quiz:** when a review pass tags a finding NEEDS_CLARIFICATION, `/continue` may call `AskUserQuestion` once — in that boundary unit, after the passes finish and before the trailing record commit — to resolve the fix direction. This is the only sanctioned pause for user input inside a work unit, and it never lets the unit stop early. **A quiz is the last resort, not the neutral option:** a review pass that can name the better fix direction must name it and own the decision, and `/continue` demotes an ill-formed clarification to a follow-up rather than asking. The escalation bar is in `.claude/templates/workflow/clarification-escalation-test.md`.
-
-STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor`, a boundary's passes, or the quiz is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
+STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor` is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
 
 ## Task Workflow
 
@@ -120,9 +106,9 @@ Tasks are standalone work items that don't need the full story lifecycle. Six ty
 
 Only `behavior-change` and `bugfix` tasks may contain RED-to-GREEN work units. If a no-TDD task reveals a required behavior change, reclassify it or split out a TDD task before implementing that change.
 
-Every task runs one `design` work unit before implementation. It drafts the design and scans task-level hazards concurrently from the same input, reconciles them, then asks for one approval. `steps discovery` remains the separate plan-expansion step for TDD tasks; refactors keep `refactor (steps discovery)`.
+Every task runs one `design` work unit before implementation. It drafts the design and asks for one approval. `steps discovery` remains the separate plan-expansion step for TDD tasks; refactors keep `refactor (steps discovery)`.
 
-Tasks live in `ProductSpecification/tasks/{N}-{type}-{slug}/`. When all checkboxes are complete, run the task's one terminal review batch, then move the folder to `ProductSpecification/tasks/done/`. Task commits use the `task:` prefix. The type-specific sequences, QA session lifecycle, and scoped-steps rules are in `.claude/guidelines/workflow-detail.md`.
+Tasks live in `ProductSpecification/tasks/{N}-{type}-{slug}/`. When all checkboxes are complete, move the folder to `ProductSpecification/tasks/done/`. Task commits use the `task:` prefix. The type-specific sequences, QA session lifecycle, and scoped-steps rules are in `.claude/guidelines/workflow-detail.md`.
 
 **Don't offer to file a task as a substitute for action.** When analysis surfaces a genuine, concrete, fixable defect, either fix it directly, or — if it is outside the current work unit / TDD phase — state that plainly and stop. Do NOT end with "want me to file a task / capture this?": the user reads a deferral offer on a real finding as dodging the work. Let the user ask for a task if they want one.
 

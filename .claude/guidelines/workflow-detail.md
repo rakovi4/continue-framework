@@ -9,7 +9,7 @@ sequence in `.claude/templates/workflow/parallel-backend-stages.md`. Stage 1 run
 acceptance RED beside contract design and adapter discovery, then freezes the
 interfaces at a user-review boundary. Stage 2 runs complete use-case and adapter
 RED-to-GREEN lanes concurrently, then concurrent gap-driven coverage follow-ups.
-The final stage closes acceptance with independent review.
+The final stage closes acceptance with GREEN verification.
 
 Scenarios whose serial sequence is already in progress keep the legacy
 `red-acceptance` through `green-acceptance` shape. Its `adapters-discovery` remains
@@ -28,9 +28,9 @@ For each scenario in `tests/02_UI_Tests.md`, use this shared-worktree contract:
    API-client, and design-alignment lanes concurrently. Each lane preserves its own
    RED-before-GREEN and refactor sequence and owns a disjoint file set; Stage 1
    interfaces are read-only.
-3. `stage-3 frontend acceptance GREEN + review` starts only after every Stage 2 lane
-   joins successfully. It runs remove-marker-only Selenium GREEN beside
-   `agent-review` and `premortem`, then performs the headed demo after GREEN.
+3. `stage-3 frontend acceptance GREEN + demo` starts only after every Stage 2 lane
+   joins successfully. It runs remove-marker-only Selenium GREEN, then performs
+   the headed demo after GREEN.
 
 Workers share the worktree but never stage, commit, or edit `progress.md`. The
 orchestrator alone declares ownership, rejects overlapping paths, joins every lane
@@ -60,37 +60,25 @@ and the concerns covered:
 
 ## Why Delivery Is Ordered by Tier
 
-**The ratchet, and what it cost.** Before tiering, every authoring route pointed one way: a hazard GAP folded in as critical-path, a security checklist row produced a critical-path scenario, and the only place below critical path — `extended/` — was reachable by an explicit authoring decision nobody was ever instructed to make. Each route was individually right, and none could ever move a scenario down. Ratchets accumulate: the routes fire on every story, so the critical path grew monotonically until a single story carried 100 cases and nobody could say which of them had to work for the feature to work at all. The failure was not over-thoroughness — the scenarios were real — but the absence of a **default destination**. Tier 3 is that destination for generated non-happy-path coverage; Tier 2 admits only the exceptions defined by `tier-ladder.md`.
+**The ratchet, and what it cost.** Before tiering, generated edge-case scenarios and security checklist rows defaulted to the critical path, and the only place below it — `extended/` — was reachable by an explicit authoring decision nobody was ever instructed to make. Each route was individually right, and none could ever move a scenario down. Ratchets accumulate: the routes fire on every story, so the critical path grew monotonically until a single story carried 100 cases and nobody could say which of them had to work for the feature to work at all. The failure was not over-thoroughness — the scenarios were real — but the absence of a **default destination**. Tier 3 is that destination for generated non-happy-path coverage; Tier 2 admits only the exceptions defined by `tier-ladder.md`.
 
 **Tier outranks category, deliberately.** The ordering axis is tier first, category second — all of Tier 1 in category order, then all of Tier 2 in the same order — which means one category file feeds two sections and the plan no longer reads top-to-bottom as `01_API`, `02_UI`, `03_Load`. That is intentional and is not a bug to be tidied later. Category is a property of how a scenario is *written* (which harness, which spec file); tier is a property of what its failure *costs*. Only the second one answers "what do we build next", so only the second one can be the outer axis. Category-major with a tier column would leave the reader deriving the delivery order themselves on every resume, and a derived order is one nobody can be held to. The one thing tiering never changes is a scenario's steps: it reorders work, it does not redefine it.
 
-**The commit-time passes do not re-tier existing scenarios.** `agent-review-agent` and `premortem-agent` read one completed block's commits. A tier call is comparative and belongs to the whole-set pass; a reviewer reading one scenario has no comparand. Where a pass does touch tiers is a net-new scenario it creates. Hazard-generated newcomers follow the ladder's strict Tier 2-or-3 rule and never enter Tier 1; open-ended review findings follow `.claude/guidelines/review-passes-detail.md`.
-
 ## Net-New Scenarios Introduced Mid-Cycle
 
-The spec-time hazard scan (at `/test-spec`) covers the scenarios that existed when it ran. A scenario invented *during* implementation — added in a red phase, not traceable to a scanned `tests/*` scenario — never crossed that gate. Before its red phase locks, route it through `/design-preview`, whose step 2a runs the same per-group hazard fan-out over the new scenario. The design gate is the reuse point: a mid-cycle scenario is not "designed" — and not scanned-clean — until it has passed `/design-preview`. This is the story-side twin of the task `design` gate; both reuse the existing per-group fan-out rather than adding a new scan mechanism.
+A scenario invented *during* implementation — added in a red phase and not traceable
+to an existing `tests/*` scenario — must pass through `/design-preview` before its red
+phase locks. Classify it immediately with `.claude/templates/spec/tier-ladder.md` and
+write a resolved marker; the story-wide comparative tiering pass has already run.
 
-A scenario a `NEEDS_CYCLE` review finding turns into new work is one of these, whatever surfaced it — so it enters through the same gate and receives a resolved marker rather than being left untiered. Its separate default and exceptions are in `.claude/guidelines/review-findings-detail.md` "Mid-cycle findings default to Tier 2".
+**Placement.** A Tier 3 newcomer is recorded under `tests/tier3/` and never enters
+`progress.md`. For Tier 1 or Tier 2, `/continue` appends the block to the matching
+tier/category section in the same commit that writes the test file, creating the
+section in `bootstrapping.md` order if needed.
 
-**Placement, and why nothing waits.** A Tier 3 newcomer is recorded under `tests/tier3/` and never enters `progress.md`. For Tier 1 or Tier 2, `/continue` appends the block to the matching tier/category section in the same `review-fix:` commit that writes the test file, creating the section in `bootstrapping.md` order if needed. The block can land above the current `[~]`; no cycle is stranded because review passes fire only at a boundary.
-
-**The cursor still moves onto an implemented newcomer.** Check 3 of the plan-integrity check is purely syntactic — no `[ ]` above the file's first `[~]` — so a `[ ]` block dropped into an earlier section fails it even at a boundary. Insert the block, mark its first step `[~]`, and return the previously-`[~]` step to `[ ]`. On a work item's last boundary, reopen it as described in `review-findings-detail.md`.
+**The cursor still moves onto an implemented newcomer.** Check 3 of the plan-integrity check is purely syntactic — no `[ ]` above the file's first `[~]` — so a `[ ]` block dropped into an earlier section fails it. Insert the block, mark its first step `[~]`, and return the previously-`[~]` step to `[ ]`.
 
 Appending below the cursor instead can file the scenario under the wrong category and falsify the `stories.md` per-category cells.
-
-## Boundary Review Passes
-
-The story work unit that **closes a block** — a scenario, spec section, or harvest
-checkbox — is followed by two **fresh-context** passes
-(`agent-review-agent`, `premortem-agent`) reading every commit of that block, a deterministic
-triage predicate that may SKIP them, and a three-way partition of their findings into SAFE /
-NEEDS_CYCLE / NEEDS_CLARIFICATION. A mid-block unit runs its sequence through `/refactor` and stops
-there — no passes, no triage, no `review-fix:` commit. The *why* —
-why this layer differs *in kind* from the in-loop `/test-review` and `/refactor`, why the cadence
-is per block rather than per work unit, why the passes overlap `/refactor` and are non-gating,
-what triage is still for, and why a scenario introduced by a `NEEDS_CYCLE` finding defaults to
-Tier 2 — is in `.claude/guidelines/review-passes-detail.md`. `/continue` owns the mechanics; the
-block shapes are in `.claude/templates/workflow/progress-format.md`, "Blocks and boundaries".
 
 ## Infrastructure & Port Configuration
 
@@ -102,7 +90,7 @@ See `.claude/rules/infrastructure.md` (rules) and `.claude/tech/{backend}/templa
 
 Named checkbox kinds select their specialized routes. Any other checkbox text is a
 free-form work-unit intent: `/continue` executes it inline in the main agent without
-inventing red, green, coverage, or review gates.
+inventing red, green, coverage, or extra gates.
 The direct route still runs affected tests, advances progress, and follows the normal
 commit and stop rules. The fallback is an explicit `/continue` route.
 
@@ -190,9 +178,7 @@ For a new session, revive the archived task and reset progress without changing 
 spec. A failed case stays unchecked and produces a separate `bugfix` task. Multiple
 passed cases may land in one `task:` commit.
 
-For every task type, `design` is one atomic multi-lane work unit: freeze one input,
-draft the design while all hazard groups scan concurrently, reconcile the results,
-then request one approval. Task steps do not run review passes; after all planned
-work completes, run one concurrent `agent-review` + `premortem` batch over the task.
+For every task type, `design` is one atomic work unit: draft the design from the
+task's frozen input, then request one approval.
 
 Operational details live in `/task`, `/continue`, and `/qa-run`.

@@ -51,7 +51,7 @@ A7.  Repeated expressions: toDo.getTasks() ×2 (L47, L48) → VIOLATION
 A7b. Near-duplicate blocks: stubSucceeded ≈ stubCanceled → VIOLATION
 A8.  Locals: orderId (pass-through, 1 use) → inline; result (side-effect) → KEEP
 A9.  Lambda→ref: L55 x -> new Foo(x) → VIOLATION
-A59. Production comments: L32 section label → VIOLATION; L80 rationale/constraint → KEEP
+A59. Source comments: L32 section label → VIOLATION; L80 rationale → VIOLATION
 A10. Enum qualification: TaskStatus.DONE L30 → VIOLATION
 A11–A14. Null args L18 → VIOLATION; sibling duplication → VIOLATION; rest: none found
 A20. Thin wrappers: none → clean

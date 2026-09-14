@@ -94,8 +94,7 @@ row in **Done** also archives the story folder:
 under the same staged-`progress.md` gate the task archive uses (`/continue` SKILL.md step 11).
 Both halves or neither: a row in **Done** whose folder still sits beside the active ones, or an
 archived folder whose row still reads In Progress, is a half-closed story that no single file
-reports as wrong. A mid-cycle review finding that reopens the story reverses both in its
-`review-fix:` commit.
+reports as wrong.
 
 **Backfilling an adopting repo.** The move above fires only on a completion commit, so every
 story already in **Done** when a repo adopts the rule predates it and keeps its folder under

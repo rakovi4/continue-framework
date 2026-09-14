@@ -23,3 +23,15 @@ in any backend layer.
 ## File Size
 
 - **Hard limit: 200 lines per file.** After any creation or refactoring, verify with `wc -l`. If a file exceeds 200 lines, split it further. This applies to **every source file regardless of type** — production code, test classes, Statements classes, API clients, stylesheets, and config files. The limit is not class-specific: a file with no classes (a stylesheet, a config file) is still capped at 200 lines. Third-party generated files (shadcn/ui) are exempt.
+
+## Source Comments
+
+- **NEVER WRITE COMMENTS.** Source files must express intent through names,
+  types, structure, tests, and executable configuration instead of comments.
+  This includes comments in production code, tests, stylesheets, markup, and
+  configuration, including documentation comments, TODOs, commented-out code,
+  rationale, section labels, and comment-based tool directives.
+- **DELETE COMMENTS WHEN YOU ENCOUNTER THEM.** Every source comment in a file
+  within the current task's edit scope is mandatory cleanup. Preserve essential
+  information in clearer code, tests, or the owning documentation, replace
+  comment-based directives with configuration or code, then delete the comment.

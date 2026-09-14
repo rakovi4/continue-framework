@@ -19,7 +19,7 @@ Tech binding for `frontend-rules.md` CSS concerns. Shared section structure: `.c
 
 ## Responsive Patterns
 
-- Use CSS media queries for responsive breakpoints. Define breakpoint values as custom properties or comments at the top of the theme stylesheet.
+- Use CSS media queries for responsive breakpoints. Define breakpoint values as custom properties at the top of the theme stylesheet.
 - Mobile-first: base styles for small screens, `@media (min-width: ...)` for larger screens.
 - Use `clamp()`, `min()`, `max()` for fluid typography and spacing where appropriate.
 

@@ -62,36 +62,12 @@ Focused coverage runs in report-only lane mode: it returns gaps without editing
 `progress.md`. After the join, the coordinator applies the finding-admission test
 and alone records any admitted follow-up.
 
-## Stage 3 — Selenium GREEN and Independent Review
+## Stage 3 — Selenium GREEN and Demo
 
-Require the committed Stage 2 join, then dispatch three independent reads of that
-state concurrently:
-
-- Selenium GREEN removes only the test skip marker and runs the browser suite.
-- `agent-review-agent` and `premortem-agent` read the immutable Stage 1+2 range.
-
-Join all three exactly once before changing progress. Review workers never edit the
-tree. On Selenium failure, keep Stage 3 current and identify the responsible Stage 2
-lane or integration seam; the verification lane never repairs production code.
-After GREEN, run the headed demo, then partition review findings. Apply SAFE fixes
-only after the join so they cannot race verification.
-
-Persist the joined review result with the exact Stage 2 commit as a coordinator
-checkpoint in the active work-log record. A retry against that commit reuses it
-and dispatches only Selenium. If failure requires a Stage 2 repair, invalidate the
-old checkpoint; after the repaired Stage 2 join, dispatch a new review generation
-once over the updated range. Late results from an invalidated generation are ignored.
-
-An admitted `NEEDS_CYCLE` remains a proposal. Complete Stage 3 and append a
-`resolve stage-3 cycle proposals` decision checkpoint with a durable pointer to its
-work-log record; insert no implementation steps until the user explicitly agrees. Rejection
-completes the checkpoint without insertion, and silence never advances it. With no
-proposal, Stage 3 closes the scenario.
-
-This review batch reads Stage 1+2 because Stage 1 already reviewed the Selenium test
-content and Stage 3 guards the remove-marker-only delta by running it. Consume the
-batch once per Stage 2 commit; scenario closure must not dispatch a duplicate
-boundary review.
+Require the committed Stage 2 join. Selenium GREEN removes only the test skip marker
+and runs the browser suite. On failure, keep Stage 3 current and identify the
+responsible Stage 2 lane or integration seam; the verification step never repairs
+production code. After GREEN, run the headed demo and complete the scenario.
 
 ## Progress Shape
 
@@ -99,7 +75,7 @@ boundary review.
 ### 1.1 Scenario title
 - [~] stage-1 frontend acceptance RED + interface design
 - [ ] stage-2 frontend implementation lanes
-- [ ] stage-3 frontend acceptance GREEN + review
+- [ ] stage-3 frontend acceptance GREEN + demo
 ```
 
 Legacy frontend scenarios already started with the serial shape keep that shape.

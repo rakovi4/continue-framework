@@ -11,7 +11,7 @@ being read end to end. The block answers it in six lines.
 
 ## Placement
 
-Emit it **after** the test results, review-pass verdicts, red-prediction sections, and
+Emit it **after** the test results, red-prediction sections, and
 next-step line — and **immediately before** the `/plain` hint. A terminal scrolls: the
 last thing written is the only thing still on screen when the engineer returns, so the
 re-orientation must sit at the bottom. Anything appended after it steals that position.
@@ -104,7 +104,7 @@ understanding it requires the context the engineer came back to recover.
 ## No duplication
 
 The block restates **identity and position only**. It must not re-print test pass/fail
-counts, the `agent-review` / `premortem` verdicts, the `review-fix:` findings, or the
+counts or the
 red-phase **Predicted failure** / **Actual failure** / **Comparison** sections. Each of
 those has a mandated form higher in the report (`/continue`'s "Stop and Report", and
 `.claude/templates/workflow/red-phase-formats.md`); a second, looser rendering of the

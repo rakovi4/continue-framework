@@ -65,7 +65,7 @@ defect, which becomes a `/task bugfix`.
 7. Repeat for the next case, or stop when the tester ends the session.
 8. Commit ticked cases with the `task:` prefix (multiple cases may share one commit —
    a smoke session is not work-unit-atomic the way a TDD cycle is).
-9. After the last case, run the task's one terminal review batch before archive.
+9. After the last case, archive the completed task.
 
 ## Rules
 

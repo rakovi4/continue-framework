@@ -72,7 +72,7 @@ deeper prefix from the start.
 
 **Rules:**
 - Always show all 4 stat cards. Use `0` for unavailable values, descriptive sub-text for context.
-- Read each component's doc comment (top of `.js` file) for the full attribute API.
+- Read each component's API documentation for the full attribute API.
 - Never duplicate component CSS inline — it will drift.
 - After generating mockups, if a new structural pattern appears in 2+ places, extract it into a new component and backport to existing stories — `stories/*/mockups/` **and** `stories/done/*/mockups/`, since a closed story's mockups are still the design reference for its screens and a single `stories/*` glob silently skips every archived one. Write each backport at the prefix depth of the folder it lands in (see "Script import path").
 
@@ -106,7 +106,8 @@ deeper prefix from the start.
 - If `interview.md` exists, apply its design notes
 - Extract UI-relevant details from `interview.md`: field names and data displayed, user flow steps that imply distinct screen states, business rules that affect UI
 - Apply these to mockup content and field labels
-- Add HTML comments referencing external docs if applicable
+- Record external documentation references in the owning design documentation,
+  never in HTML comments.
 
 ## Completion Check
 

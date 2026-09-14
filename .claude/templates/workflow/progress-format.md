@@ -41,14 +41,14 @@ tier's scenarios are the gaps — and that is correct.
 - [~] stage-1 acceptance RED + contract design
 - [ ] approve stage-1 contracts
 - [ ] stage-2 implementation lanes
-- [ ] stage-3 acceptance GREEN + review
+- [ ] stage-3 acceptance GREEN
 
 ## Tier 1 — Frontend Scenarios (02_UI_Tests.md)
 
 ### 1.1 The board renders its columns
 - [ ] stage-1 frontend acceptance RED + interface design
 - [ ] stage-2 frontend implementation lanes
-- [ ] stage-3 frontend acceptance GREEN + review
+- [ ] stage-3 frontend acceptance GREEN + demo
 
 ## Harvest — Tier 1 → Tier 2
 
@@ -60,7 +60,7 @@ tier's scenarios are the gaps — and that is correct.
 - [ ] stage-1 acceptance RED + contract design
 - [ ] approve stage-1 contracts
 - [ ] stage-2 implementation lanes
-- [ ] stage-3 acceptance GREEN + review
+- [ ] stage-3 acceptance GREEN
 
 ## Tier 2 — Security Scenarios (05_Security_Tests.md)
 
@@ -68,7 +68,7 @@ tier's scenarios are the gaps — and that is correct.
 - [ ] stage-1 acceptance RED + contract design
 - [ ] approve stage-1 contracts
 - [ ] stage-2 implementation lanes
-- [ ] stage-3 acceptance GREEN + review
+- [ ] stage-3 acceptance GREEN
 ```
 
 Integration (`06_Integration_Tests.md`), Load (`03_Load_Tests.md`) and
@@ -77,7 +77,7 @@ shape, under whichever tier their scenarios landed in.
 
 Frontend sections use the staged frontend shape shown above. Stage 1 freezes shared
 interfaces, Stage 2 joins disjoint shared-worktree lanes, and Stage 3 owns final
-Selenium verification, independent review, and demo. Frontend scenarios whose
+Selenium verification and demo. Frontend scenarios whose
 legacy `red-selenium` through `demo` sequence already started keep that shape; never
 replace checkboxes underneath an active cursor.
 
@@ -179,21 +179,3 @@ Type: infra
 `general` uses the same shape with `Type: general`. Each spec Work item becomes one
 direct step. Infra steps operate through repository-managed infrastructure-as-code.
 Choose all task shapes with [`steps-discovery-shapes.md`](steps-discovery-shapes.md).
-
-## Blocks and boundaries
-
-A story **block** is the unit its review passes fire at the end of (`.claude/skills/continue/SKILL.md`, "Review Passes"). It is a scenario's `### N.M {Title}`
-heading and its steps, or a `## Spec` / `## Harvest — Tier 1
-→ Tier 2` section. Slice one from its heading to the next heading of same or higher level.
-
-A block introduced by a boundary review's admitted `NEEDS_CYCLE` finding places `<!-- review-origin: boundary -->` below its heading. It still runs full TDD and `/refactor`, but its closing boundary dispatches no review batch.
-A staged backend or frontend scenario may temporarily append `resolve stage-3 cycle proposals`
-after Stage 3. It is a decision checkpoint, not an implementation cycle; the proposal
-is durable state under `worklog/`, and consent is required before concrete cycle blocks
-are inserted.
-A block is **closed** when that slice holds no `- [ ]` and no `- [~]` line — every step reads
-`[x]` or `[S]` — and the work unit whose commit closes it is a **boundary**. The block's
-**first commit** is the oldest commit whose `progress.md` already shows one of its steps
-`[x]`/`[S]`; walking `git log --follow` over `progress.md` newest-to-oldest finds it, and
-`{that commit}~1..HEAD` is everything the block cost — the range a boundary reviews. Apart from the
-review-origin marker, closure and range are recomputed from the checkboxes each time, so a plan written before boundaries existed reads identically and no actor can leave a stale one behind.

@@ -13,7 +13,7 @@ Tech binding for `tdd-rules.md`. Load alongside the universal rules.
 ## Test Description
 
 - Google Test provides test names as descriptions. Use descriptive `snake_case` test names that document the scenario.
-- For additional context, use comments above the test or `SCOPED_TRACE("description")` inside.
+- For additional context, use `SCOPED_TRACE("description")` inside the test.
 
 ## Stub Pattern
 
