@@ -47,9 +47,21 @@ Based on story and mockups, identify the **minimum** endpoints needed.
 - Create `endpoints.md` in story folder
 - Create OpenAPI YAML in `ProductSpecification/api-specs/[resource]_[action].yaml`
 
-### Phase 3: Summary
+### Phase 3: Validate Specifications
 
-Report: created files, endpoints generated, design decisions.
+Run an OpenAPI 3.0.3 validator against every created or changed API document,
+resolving local and external `$ref` values from each file's location. When shared
+components change, also validate the documents that reference them. YAML parsing
+alone does not verify OpenAPI structure or required fields.
+
+Fix validation errors and rerun before completing this step. If validation cannot
+run, report the blocker and leave the API-spec step incomplete. Record the
+validator command and result in the summary (or the worklog when dispatched by
+`/continue`).
+
+### Phase 4: Summary
+
+Report: created or changed files, endpoints generated, design decisions, validation result.
 
 ## Design Constraints
 

@@ -16,32 +16,36 @@
 
 ## OpenAPI YAML Format
 
+This is a valid generic example. Adapt the path, operation, schemas, and status
+codes to the endpoint. Omit `requestBody` for operations that do not accept one.
+Keep string fields as strings; square brackets in YAML introduce arrays.
+
 ```yaml
 openapi: 3.0.3
 info:
-  title: [Endpoint Title]
+  title: Resource API
   version: 1.0.0
 
 paths:
-  /api/v1/[resource]:
-    [method]:
-      summary: [Brief description]
-      operationId: [operationId]
+  /api/v1/resources:
+    post:
+      summary: Create a resource
+      operationId: createResource
       tags:
-        - [resource-tag]
-      requestBody:  # if applicable
+        - resources
+      requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/[RequestSchema]'
+              $ref: '#/components/schemas/CreateResourceRequest'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/[ResponseSchema]'
+                $ref: '#/components/schemas/ResourceResponse'
         '400':
           description: Validation error
         '401':
@@ -51,15 +55,15 @@ paths:
 
 components:
   schemas:
-    [RequestSchema]:
+    CreateResourceRequest:
       type: object
-      required: [required-fields]
+      required: [value]
       properties:
-        [field]:
-          type: [type]
-    [ResponseSchema]:
+        value:
+          type: string
+    ResourceResponse:
       type: object
       properties:
-        [field]:
-          type: [type]
+        value:
+          type: string
 ```
