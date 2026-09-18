@@ -46,6 +46,8 @@ Based on story and mockups, identify the **minimum** endpoints needed.
 
 - Create `endpoints.md` in story folder
 - Create OpenAPI YAML in `ProductSpecification/api-specs/[resource]_[action].yaml`
+- Include realistic request and response examples following the template's
+  payload-example requirements.
 
 ### Phase 3: Validate Specifications
 
@@ -53,6 +55,10 @@ Run an OpenAPI 3.0.3 validator against every created or changed API document,
 resolving local and external `$ref` values from each file's location. When shared
 components change, also validate the documents that reference them. YAML parsing
 alone does not verify OpenAPI structure or required fields.
+
+Also check every payload example against its resolved schema and the documented
+scenario, including required fields, types, formats, enums, and variant selection.
+Do not assume structural OpenAPI validation validates example payloads.
 
 Fix validation errors and rerun before completing this step. If validation cannot
 run, report the blocker and leave the API-spec step incomplete. Record the
