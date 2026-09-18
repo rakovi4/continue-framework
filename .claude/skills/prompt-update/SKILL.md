@@ -18,19 +18,12 @@ Classify a piece of new content and write it to the correct file(s) in the proje
 
 1. **Parse input.** If no content provided, ask the user what to add.
 2. **Understand the content.** What does it mean? Is it a principle, a detection pattern, a code example, a workflow step?
-3. **Classify targets** using `.claude/templates/documentation/prompt-update-classification.md`. Walk ALL 4 decision questions explicitly — principle, detection pattern, code example, layer-specific context. Show the classification before writing:
-   ```
-   1. Principle? → .claude/guidelines/frontend-rules.md (new section)
-   2. Detection? → code-smells-routing-table.md (smell table) + scan-duplication.md (A-check)
-   3. Template?  → new templates/refactoring/extract-tailwind-class.md
-   4. Layer-specific? → n/a
-   ```
-   Most updates touch 2+ files. If only one target is identified, double-check — a rule without detection won't be enforced, a detection without a template won't guide the fix.
+3. **Classify targets** using `.claude/templates/documentation/prompt-update-classification.md`. Check every category: principle → rules/guidelines; technology-specific detail → tech binding; detection/workflow → agent; example → template; layer-specific context → skill or template. Update every applicable owner; one file is enough when no other layer needs a change. Briefly report the chosen targets and why.
 4. **Check for duplication** — grep key terms across `.claude/rules/`, `.claude/tech/`, `.claude/agents/`, `.claude/skills/`, `.claude/templates/`. If a duplicate exists, report it and ask: skip, merge, or replace?
-5. **Write to all target files** in one pass. Match each file's existing style.
+5. **Make the smallest sufficient edit.** Prefer revising an existing sentence or bullet over adding a section. Add examples, exceptions, or checklists only when needed to resolve ambiguity. Match the file's existing style.
 6. **Tech-agnostic gate** — for every write targeting a universal file (`.claude/rules/`, `.claude/templates/`), scan the content you just wrote for tech leaks. See "Tech-Agnostic Verification" in the classification template. If a leak is found, rephrase in universal terms first — only relocate to tech binding when the content is inherently tech-specific.
 7. **Product-agnostic gate** — after writing, re-read every edit you made (all layers, not just universal) and scrub product-specific information: product/company name, business-domain terms, external vendor/integration names, concrete domain entity names, and story/feature names or numbers. Replace each with the generic concept it represents. See "Product-Agnostic Verification" in the classification template. The prompt library must be reusable across products; product instances belong only in `ProductSpecification/`.
-8. **Report** what was written and where (see Output format in classification template).
+8. **Review and report.** Remove repetition and text that adds no distinct instruction, then briefly report what changed and where.
 9. **Verify with `/skill-creator`** — see Impact Assessment in classification template.
 
 ## Constraints
