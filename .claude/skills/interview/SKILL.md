@@ -44,7 +44,8 @@ Load `.claude/templates/spec/interview-format.md` for round structure and adapti
 
 ### Phase 4: Generate File
 
-Compile all answers into `interview.md` using the format rules from the template.
+Compile the user's answers into `interview.md` using the format rules from the template.
+Before writing, remove any statement not supported by a user answer or explicit agreement.
 
 ### Phase 5: Review & Confirm
 

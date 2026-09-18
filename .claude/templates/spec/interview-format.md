@@ -53,10 +53,13 @@ After each round, if the user's answers reveal topics not covered by the standar
 
 ## Output Format
 
-The interview is a source artifact, not the final story specification. Preserve
-technical answers when they clarify feasibility or implementation limitations; the
-next story-spec step will route them to `NN_StoryName_Notes.md`. Business behavior and
-observable constraints will be rewritten in domain language in the main story file.
+The interview records only what the user stated or explicitly agreed during the
+interview. Preserve technical answers the user actually gave; the next story-spec
+step will route them to `NN_StoryName_Notes.md`. Business behavior and observable
+constraints will be rewritten in domain language in the main story file.
+
+Research and prior-project context inform questions; do not add them, inferred
+requirements, or implementation advice to the result unless explicitly agreed.
 
 **Format rules:**
 - Use `##` headers for major sections
@@ -68,7 +71,7 @@ observable constraints will be rewritten in domain language in the main story fi
 - Mark items as `ALREADY IMPLEMENTED` or `NOT YET IMPLEMENTED` clearly
 - Mark out-of-scope items clearly with explanation
 
-**Section order** (include only sections with content):
+**Section order** (include only sections with user-stated or specifically confirmed content):
 1. Scope
 2. External API/Service Documentation (links)
 3. API Endpoints Used (with implementation status)
