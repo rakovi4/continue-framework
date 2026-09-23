@@ -8,7 +8,13 @@ This project does **not** use pull requests or merge requests — commits land d
 
 Every story follows: **interview → spec → backend scenarios → integration scenarios → frontend scenarios → security scenarios → load scenarios → infrastructure scenarios**.
 
-Those six scenario types are the **categories**, not the delivery order. In a tier-major story, delivery runs **tier-first**: all of Tier 1 in that category order, then the `harvest` boundary, then all of Tier 2 in the same order. The boundary is the story's **shippable milestone** — when every Tier 1 scenario is done the feature works for its primary user, which is what all-left-`✅` phase cells mean; Tier 2 hardens what already works. Why tier outranks category is in `.claude/guidelines/workflow-detail.md` ("Why Delivery Is Ordered by Tier").
+Those six scenario types are coverage categories. After the reviewed specification,
+one `/continue` invocation implements Tier 1 and Tier 2 together in three passes:
+all acceptance RED alongside a design interview and frozen layer contracts; all
+implementation; then all acceptance GREEN and sequential demos. Scenario plans keep
+their existing tier/category layout and metrics; that layout no longer dictates
+execution order. Tier 3 remains deferred. The coordinator and its scoped overrides
+are in `.claude/templates/workflow/story-stages.md`.
 
 **High-level progress** is tracked in `ProductSpecification/stories.md` — three tables: **In Progress**, **Backlog**, and **Done**. Phase columns (Spec, Backend, Integration, Frontend, Security, Load, Infra) per story. The `/continue` skill updates it after each work unit commit. Phase values: ✅ done, 🔧 in progress, — not started, · no story folder yet. When **every checkbox in the story's `progress.md` is `[x]` or `[S]`** — not merely when Tests/% read full, which ignore non-scenario checkboxes like `harvest` — move its row from the **In Progress** table to the **Done** table **and, in the same commit, move its folder** `ProductSpecification/stories/NN-story-name/` → `ProductSpecification/stories/done/NN-story-name/`, so `ls stories/` keeps telling you what is in flight (see `.claude/templates/workflow/stories-md-format.md`). The archived folder is still read — its decisions and interview are where a closed story's rationale lives — so every lookup resolves both locations.
 
@@ -83,11 +89,13 @@ Status markers:
 - `[ ]` — pending
 - `[S]` — skipped
 
-The next work unit is the first `[~]` or `[ ]` entry. After a work unit completes, mark it `[x]`, advance the next to `[~]`, and commit progress.md with the work. Reading and updating mechanics are in `.claude/guidelines/workflow-detail.md`; deriving a `progress.md` from the spec is in `.claude/templates/workflow/bootstrapping.md`.
+For tasks and specification, the next work unit is the first `[~]` or `[ ]` entry. Story implementation uses the stage-pass selection in `story-stages.md`. After a work unit completes, mark it `[x]`, advance the next to `[~]`, and commit progress.md with the work. Reading and updating mechanics are in `.claude/guidelines/workflow-detail.md`; deriving a `progress.md` from the spec is in `.claude/templates/workflow/bootstrapping.md`.
 
-Story sections are **tier-major** — they mirror the tier-first delivery order above; Tier 3 is recorded in `tests/tier3/` and never enters `progress.md`. The ladder is in `.claude/templates/spec/tier-ladder.md`, the section shape in `.claude/templates/workflow/progress-format.md`. Stories specced before tiering keep the flat, untiered shape permanently.
+Story sections remain **tier-major** for tracking; whole-story execution selects work by stage across those sections. Tier 3 is recorded in `tests/tier3/` and never enters `progress.md`. The ladder is in `.claude/templates/spec/tier-ladder.md`, the section shape in `.claude/templates/workflow/progress-format.md`. Stories specced before tiering keep the flat, untiered shape permanently.
 
 ## Atomic Work Units
+
+For story implementation, execute all remaining passes through demos in one invocation; Stage 1 may wait for design answers. Intermediate commits are checkpoints, not stop points. The single-work-unit stop rule below applies to tasks and specification.
 
 A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
 

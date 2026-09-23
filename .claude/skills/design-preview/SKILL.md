@@ -20,6 +20,18 @@ This is also the design gate for a scenario invented mid-cycle (see `.claude/gui
 
 ## Workflow
 
+### Whole-Story Stage 1 Mode
+
+When invoked by `.claude/templates/workflow/story-stages.md`, design for the complete
+story scope while acceptance RED proceeds. The coordinator interviews the user about
+material cross-layer choices, reuses settled answers, and waits for required decisions;
+workers return open questions to the coordinator instead of assuming agreement.
+Freeze the agreed contracts and lane boundaries together. Reuse the concurrent modes'
+interface/skeleton and boundary checks, but their infer-without-questions instruction
+and ordinary preview's per-scenario approval/stop rules do not apply here. The
+coordinator owns existing progress checkboxes and commits; after the joined freeze,
+return for immediate implementation without a new invocation or approval round.
+
 ### Concurrent Contract-Design Mode
 
 When Stage 1 of `parallel-backend-stages.md` dispatches this skill beside acceptance

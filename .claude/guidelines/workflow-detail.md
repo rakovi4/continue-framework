@@ -2,6 +2,14 @@
 
 Deferred companion to `.claude/rules/workflow.md`. The rules file holds the always-on map (lifecycle, status markers, atomic-unit rule, task-type map); this file holds the per-phase step sequences, discovery gates, progress mechanics, resuming protocol, and task sequences. Read it when executing scenario or task work.
 
+## Whole-Story Coordination
+
+For story implementation, load `.claude/templates/workflow/story-stages.md` before
+selecting a scenario step. It coordinates all remaining work across both tiers in
+three passes while preserving the existing plan. Its interview, selection, harvest,
+publication, and continuation rules supersede the scenario sequencing below.
+The sequences below supply lane mechanics; tasks retain their existing execution.
+
 ## Backend Scenario Sequence
 
 For each scenario in `tests/01_API_Tests.md`, use the three-stage concurrent

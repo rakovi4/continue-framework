@@ -9,6 +9,14 @@ You write exactly ONE test target following TDD red phase with failure predictio
 For acceptance only, that target may be one scenario group containing multiple test
 cases; every other layer keeps its cardinality below.
 
+## Whole-Story Acceptance Dispatch
+
+When dispatched by `story-stages.md`, acceptance and browser targets must cover the
+assigned scenario even when production code already exists: reuse or write the target,
+run it, and report per-case RED or already-green evidence instead of applying the
+existence-check skip below. The coordinator owns design, tracking, staging, and
+commits. Return questions and results; never advance the story or skip verification.
+
 ## Input
 
 - **layer**: usecase | acceptance | frontend-logic | frontend-api | selenium | workflow | any adapter name (matches directory under `backend/adapters/`)

@@ -11,10 +11,10 @@ description: Continue story or task work from compact progress state, recording 
 2. **Backlog promotion** -- if the story row is in the **Backlog** table in `ProductSpecification/stories.md`, move it to **In Progress** before proceeding
 3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`). **Missing means both locations came back empty** — resolve `ProductSpecification/stories/NN-story-name/` *and* `ProductSpecification/stories/done/NN-story-name/` before the bootstrap may fire (`.claude/rules/workflow.md`, "Resolving a story folder"); a hit in either is the story, so read its `progress.md` and bootstrap nothing. What an unchecked bootstrap does to an already-shipped story is in the template's "Precondition: the story genuinely has no folder"
    For an existing task, normalize legacy `Type: bug` to `bugfix` and `Type: refactoring` to `refactor` in memory; do not rewrite its type or folder merely to migrate terminology.
-4. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the next step is the first `[~]` or `[ ]` entry. A task with none archives immediately.
-5. **Read relevant context** -- read `carryover.md` (if present), the current scenario's summary, and only `worklog/` records matching the current heading/step or named by its compact pointer. Do not load the directory wholesale. `/continue` never writes journey files (`/handoff` is their sole writer).
-6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
-7. **Execute one work unit** -- dispatch sub-skills per tables below. If no named row matches, execute the checkbox intent directly in the main agent.
+4. **Select execution mode** -- when a story has completed specification and has implementation remaining, load `.claude/templates/workflow/story-stages.md` before selecting work. It coordinates three passes over the existing scenario plan without migration. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md` first; on a failed check report it and STOP without dispatching. Otherwise the first `[~]` or `[ ]` entry remains the physical cursor; story implementation selects eligible work by the coordinator's current pass, which may reach a later scenario before an earlier scenario's implementation. A task with none archives immediately.
+5. **Read relevant context** -- for story implementation, scope summaries, referenced work logs, and ADRs to all included scenarios across both tiers as directed by `story-stages.md`. Otherwise read `carryover.md` (if present), the current scenario's summary, and only `worklog/` records matching the current heading/step or named by its compact pointer. Do not load the directory wholesale. `/continue` never writes journey files (`/handoff` is their sole writer).
+6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step or whole-story scope references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
+7. **Execute** -- story implementation runs the whole-story coordinator through all remaining passes in this invocation. Tasks and specification execute one work unit: dispatch sub-skills per tables below. If no named row matches, execute the checkbox intent directly in the main agent.
 8. **Discovery gates** -- when the next step is `[ ] adapters-discovery`, map usecase ports to adapters (see `.claude/guidelines/workflow-detail.md`), then insert concrete steps. A TDD task's `steps discovery` inserts its scoped TDD plan; a refactor task's `refactor (steps discovery)` reconciles direct `## Work` checkboxes, not merely a companion artifact.
 9. **Update records** -- create one `worklog/` Markdown record for this invocation (maximum 200 lines) and keep routine evidence, notes, coordinator plans, checkpoints, and proposals there. Composite stages update this active record while in flight. Keep `progress.md` to headings, permitted compact tokens, and one-line checkboxes of at most 200 characters: mark completed and advance next. Add a work-log pointer only when a later decision must consume that exact record. **Any new checkbox must pass `.claude/templates/workflow/finding-admission-test.md`**; a failing finding is reported and stored nowhere.
 10. **Update stories.md** -- for stories only, update the phase columns in `ProductSpecification/stories.md` (see below)
@@ -34,6 +34,19 @@ The high-level lifecycle, status markers, and atomic-unit rule are in `.claude/r
 Both work-item rows resolve the active location first and the `done/` archive second, per `.claude/rules/workflow.md`, "Resolving a story folder" — an argument that names a completed item resolves to its archived folder rather than to nothing.
 
 **File lookup:** Use shell `find` (not pattern expansion) when searching for progress files or story folders. For story resolution, derive the folder name from `stories.md` by kebab-casing punctuation as separators, read the known active path, then fall back to `stories/done/`; use `ls` or `find` only when the folder name is ambiguous.
+
+## Whole-Story Implementation
+
+After specification review, run `.claude/templates/workflow/story-stages.md` inline:
+Stage 1 covers all acceptance RED, the design interview, adapter discovery, and agreed
+frozen contracts; Stage 2 completes all implementation; Stage 3 verifies all acceptance
+GREEN before showing demos one by one. Use existing scenario checkboxes and metrics.
+The coordinator overrides the dispatch table's per-scenario approval/stop and
+no-next-stage rules: record agreed choices in existing approval steps and continue
+without another invocation once the whole-story design is settled. Await required
+interview answers; no routine stops after freeze. An existing harvest checkbox is
+marked `[S]` with a work-log reason once its Tier 2 RED/baseline work is covered in
+Stage 1; do not dispatch harvest again. Tasks and specification retain their routes.
 
 ## Work Unit Dispatch
 
@@ -78,7 +91,7 @@ serial progress checkboxes.
 
 ## Stop and Report
 
-A single `/continue` invocation executes exactly ONE work unit. Do not pause between sub-skills except for task-design approval. A `/refactor` work unit ends with behavior then optional refactor commits. STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
+Story implementation follows `story-stages.md` through all remaining passes and reports once at completion or a genuine blocker. The rest of this paragraph applies to tasks and specification: a single invocation executes exactly ONE work unit. Do not pause between sub-skills except for task-design approval. A `/refactor` work unit ends with behavior then optional refactor commits. STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
 
 **Re-orientation block (mandatory, last):** close the report with the re-orientation block specified in `.claude/templates/workflow/continue-report-format.md` -- work item type/number/name, scenario or step, step just done, next step, position, and a two-sentence plain-language summary. It goes below everything else and immediately above the `/plain` hint: a terminal scrolls, and a user running several parallel `/continue` sessions must recover which work item this one is without reading back up. Emit it on both stop points, including a sub-skill failure.
 
@@ -110,7 +123,7 @@ Sub-skills use named agent dispatch for context isolation, following `.claude/gu
 
 Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`, any `red-workflow (...)` → layer `workflow`). Both red-agent and green-agent receive: layer, work-item folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow.
 
-**CHAINING: After each sub-step's awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Only task-design approval may pause.**
+**CHAINING: After each sub-step's awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Required story Stage 1 interview/contract decisions and task-design approval may pause dependent work.**
 
 **AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. After the last commit, include the log contents in the stop-and-report summary.**
 
@@ -122,7 +135,7 @@ Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `stora
 
 ## Rules
 
-- Execute exactly ONE work unit per invocation through its last commit. A `/refactor` unit ends with behavior then optional refactor commits. STOP only after the last owed commit.
+- Story implementation runs all remaining passes under `story-stages.md`; tasks and specification execute exactly ONE work unit per invocation through its last commit. A `/refactor` unit ends with behavior then optional refactor commits. STOP only after the last owed commit.
 - Task commit prefix: `task:` (e.g., `task: red-adapter storage (Task 1, Step 1)`)
 - If a sub-skill fails, stop immediately -- do NOT mark the step complete
 - Mandatory sub-skills per phase: see `.claude/guidelines/workflow-detail.md` sequences
@@ -132,6 +145,8 @@ Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `stora
 After updating `progress.md` for a **story** (not tasks), update the story's row in `ProductSpecification/stories.md` to reflect current phase status. The phase-column values, the tier-major/untiered split for the Tests and % columns, and the story-completion rule are in `.claude/templates/workflow/stories-md-format.md`. Include `ProductSpecification/stories.md` in the same commit.
 
 ## Available Templates
+
+- `.claude/templates/workflow/story-stages.md` -- whole-story three-pass coordination over existing scenario plans
 
 - `.claude/templates/workflow/progress-format.md` -- progress file format for stories and all six task types
 - `.claude/templates/workflow/worklog-format.md` -- per-invocation execution record format
