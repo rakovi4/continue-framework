@@ -18,23 +18,30 @@ description: Run tests with coverage and report uncovered lines/branches per cla
 First word is the module:
 - `usecase` → `:usecase`
 - `storage`, `rest`, `email`, `scheduling`, `security` → `:adapters:{name}`
-- `domain` → `:domain`
+- `domain` → measured through the suites exercising domain code
+- `frontend` → frontend coverage tooling from the active technology profile
 
 Optional second word filters the report to classes matching that name.
 
-Optional `--focus` flag restricts the report to classes changed since the last commit (useful after a green phase to check only new code).
+Optional `--focus` restricts the report to changed production files. In staged
+lanes, pass the recorded baseline and explicit owned paths, including already
+committed changes; use last-commit focus only when no explicit scope was supplied.
+Pass report-only mode for every staged lane so the coordinator owns tracking.
 
 ## Action
 
-Delegate to `.claude/agents/coverage-agent.md` which loads `.claude/tech/{backend}/templates/testing/coverage-commands.md` for commands, report format, gap mapping, and remediation.
+Delegate to `.claude/agents/coverage-agent.md` with module, focus paths/baseline,
+and report-only mode. It resolves backend or frontend tooling from the active
+technology profile and uses `.claude/templates/testing/coverage-commands.md` for
+scope, report format, gap mapping, and remediation.
 
 Steps:
 1. Run tests with coverage (stop if tests fail)
-2. Compute module summary from CSV
+2. Compute each touched module summary from its coverage report
 3. List classes with gaps (apply filter/focus if specified)
-4. Extract uncovered lines from XML, read source to show actual code
+4. Extract uncovered lines/branches, read source to show actual code
 5. Report results
-6. In `--focus` mode: map gaps to scenarios, classify reachability, update progress.md with red/green steps for reachable gaps, flag dead code for refactor
+6. In `--focus` mode: map gaps to scenarios and classify reachability; return staged-lane findings to the coordinator, otherwise update progress.md for reachable gaps. Flag dead code for refactor.
 
 ## Agent
 

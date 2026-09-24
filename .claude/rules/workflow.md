@@ -63,9 +63,11 @@ human-reviewed stages: acceptance RED beside contract design; concurrent complet
 RED-to-GREEN use-case and adapter lanes; then acceptance GREEN verification.
 Frontend scenarios also use three stages: Selenium RED beside interface
 design; concurrent complete frontend-logic, API-client, and design-alignment lanes;
-then Selenium GREEN and demo. `/refactor` lands separately inside
-every lane that requires it. Exact mechanics and legacy in-flight behavior live in
-**`.claude/guidelines/workflow-detail.md`**.
+then Selenium GREEN and demo. Every Stage 2 lane must run `/test-review`,
+coverage checks, and `/refactor` across every touched backend and frontend module,
+production file, and test. Refactor execution is mandatory; only its separate
+commit may be omitted when the completed scan finds no changes. Exact mechanics
+and legacy in-flight behavior live in **`.claude/guidelines/workflow-detail.md`**.
 
 ## Progress Tracking
 
@@ -96,7 +98,7 @@ Story sections remain **tier-major** for tracking; whole-story execution selects
 
 For story implementation, execute all remaining passes through demos in one invocation; Stage 1 may wait for design answers. Intermediate commits are checkpoints, not stop points. The single-work-unit stop rule below applies to tasks and specification.
 
-A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). `/refactor` only runs when a red or green agent ran before it in the same work unit — no red/green agent, no `/refactor`.
+A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). Outside Stage 2, `/refactor` only runs when a red or green agent ran before it in the same work unit. Every Stage 2 lane, including design alignment, follows the mandatory quality gates in `.claude/templates/workflow/stage-2-quality-gates.md`.
 
 STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor` is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
 

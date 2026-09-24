@@ -79,10 +79,12 @@ ownership is complete. Commit the results and finish owed refactoring, then cont
 ## Stage 2 — All implementation
 
 Run the complete use-case, adapter, frontend-logic, API-client, and design-alignment
-lanes for both tiers against the frozen contracts. Preserve each lane's RED-before-
-GREEN discipline, test review, required coverage, separate refactor commits, and
-joined checks. Independent lanes may run concurrently within available capacity;
-shared boundaries stay under one owner. Workers never change frozen contracts.
+lanes for both tiers against the frozen contracts. Load `stage-2-quality-gates.md`
+and dispatch its mandatory test-review, coverage, and refactor phases for each lane.
+Reconcile every changed module, production file, test, and helper against the named
+checkpoint evidence before completion, including legacy serial routes. Independent
+lanes may run concurrently within available capacity; shared boundaries stay under
+one owner. Workers never change frozen contracts.
 
 Update the corresponding scenario implementation checkboxes as lanes finish. Do not
 advance to Stage 3 until every required implementation lane, follow-up check, and

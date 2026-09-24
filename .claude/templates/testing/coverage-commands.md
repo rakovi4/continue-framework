@@ -1,12 +1,17 @@
 # Test Coverage Commands — Universal
 
-Tech-specific commands (run, parse, extract) are in `.claude/tech/{backend}/templates/testing/coverage-commands.md`. This file defines the universal workflow and report structure.
+Resolve tooling and report conventions from `ProductSpecification/technology.md`
+and the active backend or frontend binding. Backend command templates live in
+`.claude/tech/{backend}/templates/testing/coverage-commands.md`. This file defines
+the universal workflow and report structure.
 
 ## Focus Mode (--focus)
 
-When `--focus` is specified, restrict coverage analysis to files changed since the last commit:
+When `--focus` is specified, restrict analysis to the supplied production scope:
 
-1. Get ALL production files touched since last commit — regardless of module (use the tech-specific git diff command)
+1. In staged lanes use explicit owned paths and the recorded lane baseline, including
+   committed changes. Otherwise get all production files touched since the last
+   commit. Never replace a supplied scope with an empty working-tree diff.
 2. This catches domain classes exercised by usecase tests, adapter classes pulled in transitively, etc.
 3. Filter the coverage output to only those class/file names
 4. If the focus filter returns no classes but the green phase wrote new code with branches, the filter is wrong — investigate
@@ -22,8 +27,14 @@ Group touched files by owning module to determine which coverage reports to run.
 | `domain` | `usecase` | Domain has no own tests; usecase tests exercise domain |
 | `usecase` | `usecase` | Direct |
 | `{adapter}` (rest, storage, email, etc.) | `{adapter}` | Direct |
+| Other backend module, including application wiring | Suites exercising that module | Include its production files in instrumentation |
+| Frontend logic, API client, component | Relevant frontend suites | Include all owned executable files |
 
-For each module with touched files, run its mapped test suite's coverage (if not already run as the primary module). Check each touched file against the coverage of its mapped module.
+For each module with touched files, run its mapped test suite's coverage (if not
+already run as the primary module). Check each touched file against that report,
+including files never loaded by the tests. Missing instrumented files are gaps,
+not exclusions. Record non-executable files separately with the reason no metric
+applies. Shared reports may serve several modules if each module's scope is visible.
 
 ## Uncovered Line Analysis
 

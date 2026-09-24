@@ -89,6 +89,7 @@ not `[x]`.
 After approval, the coordinator advances one lane for the use case and one for each
 discovered adapter. Each is a coordinator-owned state machine, not one autonomous
 worker; the coordinator dispatches every phase so no worker must nest a fan-out.
+Load `stage-2-quality-gates.md` for mandatory scope, evidence, and completion gates.
 
 For each lane:
 1. Dispatch its RED writer. Require the predicted raw failure and test-only owned
@@ -98,11 +99,15 @@ For each lane:
    by the RED writer; GREEN owns production paths only.
 3. Join the reviewed test and production candidate. Reject overlapping writes;
    commit the reviewed disabled test from explicit test paths while production edits
-   remain unstaged, then enable and run it against the candidate. A test defect
+   remain unstaged. Dispatch `/refactor` for every test and helper, publish its
+   changes separately, then enable and run against the candidate. A test defect
    returns to test-review; an implementation failure returns to GREEN.
-4. When the complete reviewed target and module suite pass, commit the production
-   paths plus the marker-only enable delta as GREEN. Run the lane's required focused
-   coverage and refactor work, publishing any refactor separately.
+4. When the complete reviewed target and module suite pass, dispatch focused
+   `/test-coverage` for every touched production module. Commit the verified
+   production paths plus the marker-only enable delta as GREEN, then dispatch
+   `/refactor` over all lane production and test paths and publish changes separately.
+5. Complete admitted follow-ups, verify the final result, and reconcile the lane's
+   quality-gate evidence before reporting it complete.
 
 Stage 1 contracts are read-only in every Stage 2 ownership declaration. A lane that
 finds a contract defect fails with evidence; it never edits the frozen interface.
@@ -122,9 +127,10 @@ Only publication is serialized. A shared worktree, build visibility, or the
 version-control index never justifies serial implementation; disjoint manifests bound
 edits, and the publication lock serializes index writes.
 
-Every lane checkpoint records RED, GREEN, and refactor commit identities or its
-current phase, checks, and owned paths. The coordinator stores each published phase
-in the active work log before releasing the lock; workers edit neither tracking file.
+Every lane checkpoint records the named results from `stage-2-quality-gates.md`,
+RED/GREEN and separate refactor commits, or its pending phase. The coordinator
+stores each published phase in the active work log before releasing the lock;
+workers edit neither tracking file.
 
 On resume, require the recorded commit to be an ancestor of `HEAD` and compare each
 owned path at `HEAD` with that lane's committed tree. Preserve the lane only when
@@ -132,7 +138,8 @@ both checks match; dispatch failed, missing, reverted, or invalidated lanes. A f
 lane leaves the stage `[~]`, names itself and its failure, and does not cancel or
 roll back successful independent lanes.
 
-`<!-- lanes: usecase={red:a1,green:b2,refactor:NO_CHANGE} PASS; storage={red:c3,green:PENDING} -->`
+Compact lane summaries link to the complete quality-gate evidence; `NO_CHANGE`
+without a recorded completed refactor scan is incomplete.
 
 ### Commit Publication Lock
 
@@ -145,16 +152,17 @@ Implementation and tests remain concurrent. Only publication is serialized:
 4. Workers never commit, use a shared catch-all stage command, or edit tracking state.
 
 The coordinator grants one publisher at a time. A failed commit releases the lock
-and leaves the phase incomplete. After every required implementation lane succeeds,
+and leaves the phase incomplete. After the implementation candidates join,
 run targeted coverage follow-up lanes concurrently only for concrete gaps reported
 by focused coverage. Coalesce gaps that target the same test file into one lane;
 never create serial follow-up lanes for one path. Concurrent writers never share a
-path. A follow-up owns the named test file, publishes under the same lock, and must
-pass before Stage 2 advances.
+path. A follow-up owns the named test file, passes the same quality gates, and
+publishes under the same lock before Stage 2 advances.
 
 Only the coordinator marks Stage 2 done after all required lanes and admitted
-coverage follow-ups have durable commits. It advances directly to Stage 3 in the
-coordinator commit and stops at that work-unit boundary.
+coverage follow-ups have durable commits and complete quality-gate evidence.
+It advances directly to Stage 3 in the coordinator commit and stops at that
+work-unit boundary.
 
 ## Stage 3 — Acceptance GREEN
 

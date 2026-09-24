@@ -57,10 +57,10 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | `red-acceptance` | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `stage-1 acceptance RED + contract design` | **Inline coordinator.** Load `parallel-backend-stages.md`; dispatch the disjoint RED/design lanes, validate the Stage 2 lane plan gates, record the durable plan in the active work-log record, advance to approval, and commit both records before stopping for review |
 | `approve stage-1 contracts` | **User decision.** Never dispatch Stage 2 from this checkbox. Explicit approval completes it and advances Stage 2 in a coordinator commit; rejection resets Stage 1 to `[~]` and keeps approval and Stage 2 pending |
-| `stage-2 implementation lanes` | **Inline coordinator.** Load `parallel-backend-stages.md`; validate approval and lane ownership; after raw RED, run test review and GREEN implementation concurrently on disjoint paths; join, verify, and publish each phase from explicit paths; advance only after joined checks |
+| `stage-2 implementation lanes` | **Inline coordinator.** Load `parallel-backend-stages.md`; validate approval and lane ownership; after raw RED, run test review and GREEN implementation concurrently on disjoint paths; join, verify, and publish each phase from explicit paths; enforce `stage-2-quality-gates.md` before lane completion and stage advancement |
 | `stage-3 acceptance GREEN` (legacy: `+ review`) | **Inline coordinator.** Load `parallel-backend-stages.md`; require committed Stage 2 lanes and run acceptance GREEN. On GREEN failure reopen the implicated lane. |
 | `stage-1 frontend acceptance RED + interface design` | **Inline coordinator.** Load `parallel-frontend-stages.md`; declare disjoint manifests, dispatch Selenium RED and `/design-preview` frontend concurrent mode, reject worker staging/commits, join once, run combined checks, then stage and commit explicit paths |
-| `stage-2 frontend implementation lanes` | **Inline coordinator.** Load `parallel-frontend-stages.md`; validate separate frozen Stage 1 interface files, dispatch complete `frontend-logic`, `frontend-api`, and design-alignment lanes concurrently, preserve RED-before-GREEN within each lane, gather coverage report-only findings, join each once, run combined checks, then stage and commit explicit paths |
+| `stage-2 frontend implementation lanes` | **Inline coordinator.** Load `parallel-frontend-stages.md`; validate separate frozen Stage 1 interface files, dispatch complete `frontend-logic`, `frontend-api`, and design-alignment lanes concurrently, preserve RED-before-GREEN within each lane, enforce `stage-2-quality-gates.md`, publish behavior and refactoring separately, then join and run combined checks |
 | `stage-3 frontend acceptance GREEN + demo` (legacy: `+ review`) | **Inline coordinator.** Load `parallel-frontend-stages.md`; require the committed Stage 2 join, run remove-marker-only Selenium GREEN, then demo. |
 | Spec items (`interview`, `mockups`, `api-spec`, `test-spec`) | `/{item}` then commit |
 | `story` (spec item) | **Inline** — no subagent. Load `.claude/templates/spec/story-spec-generation.md` (internal template — NOT the `/story` skill) with the story number, name, and folder already resolved, execute its phases, then commit |
@@ -91,7 +91,7 @@ serial progress checkboxes.
 
 ## Stop and Report
 
-Story implementation follows `story-stages.md` through all remaining passes and reports once at completion or a genuine blocker. The rest of this paragraph applies to tasks and specification: a single invocation executes exactly ONE work unit. Do not pause between sub-skills except for task-design approval. A `/refactor` work unit ends with behavior then optional refactor commits. STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
+Story implementation follows `story-stages.md` through all remaining passes and reports once at completion or a genuine blocker. The rest of this paragraph applies to tasks and specification: a single invocation executes exactly ONE work unit. Do not pause between sub-skills except for task-design approval. A `/refactor` work unit ends with behavior then separate refactor commits (omit only an empty refactor commit, never the skill execution). STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
 
 **Re-orientation block (mandatory, last):** close the report with the re-orientation block specified in `.claude/templates/workflow/continue-report-format.md` -- work item type/number/name, scenario or step, step just done, next step, position, and a two-sentence plain-language summary. It goes below everything else and immediately above the `/plain` hint: a terminal scrolls, and a user running several parallel `/continue` sessions must recover which work item this one is without reading back up. Emit it on both stop points, including a sub-skill failure.
 
@@ -103,7 +103,7 @@ End the report with a one-line `/plain` hint (e.g. `Press /plain to have this re
 
 ## Pre-Commit Checklist
 
-Before behavior commit verify: (1) the primary route ran, (2) `/test-review` ran for red, (3) `/test-coverage` ran for green usecase/adapter, (4) fallback tests ran, (5) the active work-log record is staged, and (6) plan-integrity check 8 passes the staged progress additions. Before stopping verify: (7) owed refactor ran and (8) completion was proven from staged progress before archive. Run any omitted action before stopping.
+Before behavior commit verify: (1) the primary route ran, (2) `/test-review` ran for red, (3) `/test-coverage` ran for green usecase/adapter, (4) fallback tests ran, (5) the active work-log record is staged, and (6) plan-integrity check 8 passes the staged progress additions. For Stage 2, require every named result in `stage-2-quality-gates.md` for every lane before advancing. Before stopping verify: (7) owed refactor ran and (8) completion was proven from staged progress before archive. Run any omitted action before stopping.
 
 
 ## Sub-Skill Dispatch
@@ -135,7 +135,7 @@ Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `stora
 
 ## Rules
 
-- Story implementation runs all remaining passes under `story-stages.md`; tasks and specification execute exactly ONE work unit per invocation through its last commit. A `/refactor` unit ends with behavior then optional refactor commits. STOP only after the last owed commit.
+- Story implementation runs all remaining passes under `story-stages.md`; tasks and specification execute exactly ONE work unit per invocation through its last commit. A `/refactor` unit ends with behavior then separate refactor commits (omit only an empty refactor commit, never the skill execution). STOP only after the last owed commit.
 - Task commit prefix: `task:` (e.g., `task: red-adapter storage (Task 1, Step 1)`)
 - If a sub-skill fails, stop immediately -- do NOT mark the step complete
 - Mandatory sub-skills per phase: see `.claude/guidelines/workflow-detail.md` sequences
