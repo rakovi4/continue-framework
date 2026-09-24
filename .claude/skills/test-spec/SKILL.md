@@ -39,6 +39,13 @@ If `interview.md` exists, extract:
 
 Load `.claude/templates/spec/test-spec-format.md` for category formats, ordering principles, and BDD rules.
 
+Trace the primary user's journey from the earliest in-scope entry through first
+value, any required constraint, value capture when in scope, and restored or
+continued value. Draft focused scenarios for its observable checkpoints in the
+relevant categories. Give each scenario its own complete context and assertions;
+never assume another scenario ran first or combine checkpoints just because they
+belong to the same journey.
+
 Create files in the `tests/` directory of the folder the story resolved to — `ProductSpecification/stories/NN-story-name/tests/`, or `stories/done/NN-story-name/tests/` for a story that has closed (`.claude/rules/workflow.md`, "Resolving a story folder"):
 - `01_API_Tests.md`, `02_UI_Tests.md`, `03_Load_Tests.md`
 - `04_Infrastructure_Tests.md`, `05_Security_Tests.md`, `06_Integration_Tests.md`
@@ -141,9 +148,16 @@ require Tier 1 <= 10 and Tier 1 + Tier 2 <= 25. Do not trust the report alone. A
 violation or an infeasible-stack report blocks Phase 5; never hand-demote scenarios.
 Every remaining eligible scenario belongs in Tier 3.
 
+Read the resulting Tier 1 scenarios in journey order and verify that, together
+with explicitly identified shipped behavior, they cover the complete primary
+promise. Report any uncovered checkpoint before proceeding. Apply the ladder's
+infeasible-story rule when necessary; never lengthen scenarios to fit the ceiling.
+
 ### Phase 5: Summary
 
-Report the folder path, files created, and test counts per file. Then Phase 3's
+Report the folder path, files created, test counts per file, and a short primary
+journey outline referencing the scenarios or existing coverage for its checkpoints.
+Then Phase 3's
 consolidation result — the before/after count per file and every merge with what it
 absorbed — and Phase 4's Tier 1 / Tier 2 / Tier 3 split, every Tier 3 scenario
 named with the degradation judgment that put it there, and every Tier 2 admission with

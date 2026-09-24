@@ -24,6 +24,13 @@ are in `.claude/templates/workflow/story-stages.md`.
 
 Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding). The interview may capture technical constraints needed to understand feasibility, but the generated main story spec uses domain language exclusively. Implementation choices, architecture, technology, and integration mechanics belong in the story's Notes file. When a technical limitation changes externally observable behavior, state that behavior in domain terms in the main spec and keep the mechanism in Notes.
 
+**Cover the complete primary-user journey with focused scenarios.** Coverage must
+connect the user's in-scope entry to the story's promised value, including any
+required constraint, value capture, and restored or continued value. Keep each
+scenario readable and self-contained, with one coherent behavior and outcome.
+Consecutive journey checkpoints may have separate headings and their own Given
+state; sharing a journey never requires merging them into one long scenario.
+
 ## Where the Current State Lives
 
 **The acceptance suite is the current-state documentation of what the product does.** It is grouped by functionality rather than by story, each test carries its Gherkin scenario in its scenario description (a display annotation, a subtest name, or a docstring — per the tech binding), it is black-box (HTTP and browser only, so it describes externally observable behavior), and it is self-correcting: when a later increment changes a behavior, the earlier test is rewritten or the build goes red — an outdated behavior makes the build red, never a document quietly stale. So a reader asking *what does this area do today* reads the acceptance tests **of the area it is about to touch** — test class names, scenario descriptions, Statements — and never sweeps story folders to reconstruct the present.
