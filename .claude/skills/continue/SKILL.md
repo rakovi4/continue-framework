@@ -54,7 +54,7 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 
 | Checkbox | Sub-skills |
 |----------|-----------|
-| `red-acceptance` | `red-agent.md` (one scenario target, possibly multiple cases) → `/test-review` → commit → `/refactor` → commit |
+| `red-acceptance` | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `stage-1 acceptance RED + contract design` | **Inline coordinator.** Load `parallel-backend-stages.md`; dispatch the disjoint RED/design lanes, validate the Stage 2 lane plan gates, record the durable plan in the active work-log record, advance to approval, and commit both records before stopping for review |
 | `approve stage-1 contracts` | **User decision.** Never dispatch Stage 2 from this checkbox. Explicit approval completes it and advances Stage 2 in a coordinator commit; rejection resets Stage 1 to `[~]` and keeps approval and Stage 2 pending |
 | `stage-2 implementation lanes` | **Inline coordinator.** Load `parallel-backend-stages.md`; validate approval and lane ownership; after raw RED, run test review and GREEN implementation concurrently on disjoint paths; join, verify, and publish each phase from explicit paths; advance only after joined checks |
@@ -74,7 +74,7 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | `adapters-discovery` | Run all 3 checks in `adapter-discovery-checklist.md`, log evidence, mark `[x]`, insert concrete adapter steps (or `[S]`) → commit records |
 | `steps discovery` (`behavior-change`, `bugfix`) | **Inline** — no subagent. Insert scoped TDD steps from the approved design, then commit |
 | `refactor (steps discovery)` (`refactor`) | Reconcile approved design and discovered evidence against committed `progress.md`; update direct behavior-preserving `## Work` steps and append `(plan: +N/-N/~N)`. Refuse zero-change completion or any RED/GREEN step → run affected checks → commit |
-| `green-acceptance` | **Inline** — no subagent. Read `green-agent.md` workflow, load acceptance implementation template, enable the scenario's complete disabled target (remove its marker or markers — only allowed test change), run acceptance tests, verify every case GREEN → commit |
+| `green-acceptance` | **Inline** — no subagent. Read `green-agent.md` workflow, load acceptance implementation template, enable the disabled test (remove disable marker — only allowed test change), run acceptance tests, verify GREEN → commit |
 | `green-frontend`, `green-frontend-api` | `green-agent.md` → commit → `/refactor` → commit |
 | `green-selenium` | `/run-backend` → `/run-frontend` → `green-agent.md` (remove-marker-only: no production code, no Statements changes, no backend changes — if test fails, STOP and report) → commit |
 | `harvest` (tier-major boundary) | **Inline** — no subagent. It fans out concurrent `red-agent`s, which must not nest inside a wrapper agent. Run every remaining Tier 2 acceptance scenario through `red-agent` (each self-partitions: green → `red-acceptance` `[x]` + other steps `[S]`; red → normal cycle), then baseline the green set against the pre-story build, commit. Full procedure: `.claude/skills/harvest/SKILL.md` |

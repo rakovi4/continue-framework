@@ -102,10 +102,9 @@ cases that slip past a hurried reading of the test above.
 - **Anything needing the Given rebuilt mid-scenario.** Reconstructing state between
   the halves *is* the second pass — moved inside one heading, saving nothing and
   making the failure harder to read.
-- **A sequence of interactions is not consolidation.** After consolidation, stack it
-  only for consecutive steps of one real user journey to value and any value capture
-  in scope. That creates one delivery cycle, not one execution: preserve every
-  assertion and allow separate RED cases. Touching the same code is not eligibility.
+- **A sequence of interactions.** "Create it, assert; update it, assert; remove it,
+  assert" is three passes wearing one heading. It still costs three implementations,
+  and it defeats the section ordering that let each be built on the last.
 - **Anything that makes a failure ambiguous.** A merged scenario whose red does not
   say which fact broke has traded one pass for a diagnosis on every future failure,
   forever.
@@ -122,9 +121,6 @@ cases that slip past a hurried reading of the test above.
   click-and-verify rule — one merged scenario does not discharge it: the mandate is
   about the executions, and each is a different entry point anyway.
 - **To reach a count.** See "Fewer passes, never fewer facts".
-
-Then apply `.claude/templates/spec/journey-stacking-rules.md` to join separate
-executions that are checkpoints in one delivery cycle before tiering.
 
 ## Marker arithmetic
 

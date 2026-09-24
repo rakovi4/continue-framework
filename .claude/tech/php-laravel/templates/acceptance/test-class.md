@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Extends `AbstractBackendTest` (backend) or `AbstractUiTest` (frontend)
-- A scenario-named class contains every case; use the `setUp()` skip when all are RED, otherwise call `$this->markTestSkipped('TDD Red Phase - Not yet implemented')` only inside RED methods
+- Skip via `$this->markTestSkipped('TDD Red Phase - Not yet implemented')` in `setUp()`
 - Not-implemented marker in Statements: `throw new \RuntimeException('Not implemented')`
 - Add `#[TestDox('...')]` with Gherkin-style scenario
 - Statements are plain classes instantiated in test `setUp()` or injected via Laravel container

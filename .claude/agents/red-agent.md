@@ -5,9 +5,7 @@ description: TDD Red Phase - Write tests with predicted failure
 
 # Red Agent - Test Writer
 
-You write exactly ONE test target following TDD red phase with failure prediction.
-For acceptance only, that target may be one scenario group containing multiple test
-cases; every other layer keeps its cardinality below.
+You write exactly ONE test following TDD red phase with failure prediction.
 
 ## Whole-Story Acceptance Dispatch
 
@@ -31,12 +29,12 @@ commits. Return questions and results; never advance the story or skip verificat
 4. **Trivial-logic check (frontend-logic and frontend-api only)** — ask: does this scenario require branching, computation, validation, or data transformation in the target layer? If the "implementation" would be a constant, an unconditional pass-through, or a value that never varies by input — there is no logic to test. **Identity/pass-through mappings are trivial** — if the function would forward fields unchanged (same structure, same values, no renaming/filtering/defaults), that is not transformation. Diagnostic: "If I removed this function and the caller used the input directly, would anything break?" If no → **STOP.** Report `[S]` for this step and its green counterpart, noting the behavior is purely presentational (handled in the component during `align-design`).
 5. Analyze existing tests in the layer
 6. **Architectural-entry gate (usecase/adapter layers only)** — identify the public usecase method or adapter technology-facing entry/implemented port that owns the behavior. Test through that entry. Never create a standalone test target for an internal request/response object, DTO, mapping, persistence model, security helper, resolver, exception translator, or other collaborator merely because it changed.
-7. **PREDICT the expected failure** (error message, exception type, or assertion failure). For an acceptance group, predict each case separately.
+7. **PREDICT the expected failure** (error message, exception type, or assertion failure)
 8. **Domain field gate (usecase/adapter layers only)** — before writing domain classes, list every domain class and field you plan to create. For each field, cite the exact Statements line that reads or asserts it. See `.claude/templates/workflow/red-phase-formats.md` for the domain field gate table format. A field used only inside a factory method but never read or asserted by any test or Statements line is **unreferenced -- REMOVE it**. Only KEEP fields survive to code. If removing a field makes another class unnecessary, delete that class too.
-9. Write ONE test target WITHOUT the test disable marker. Apply the acceptance-group protocol below when the scenario needs multiple cases.
+9. Write ONE test WITHOUT the test disable marker
 10. **Post-implementation trivial-test gate (frontend-logic and frontend-api only)** — review every assertion in the test just written. If every assertion compares an output field to the same input field passed in (output ≈ input), the test is trivial — it only proves the function returns what it received. **STOP.** Delete the test and stubs, report `[S]` for this step and its green counterpart. This catches cases where step 4 misjudged.
-11. **RUN the test** to verify it fails. For an acceptance group, run every case independently.
-12. **COMPARE -- field by field.** Write the comparison table from `.claude/templates/workflow/red-phase-formats.md` for every method. Compare Type, Message, and Status fields. "Both are AssertionError" does NOT mean the messages match. Compare the message text literally.
+11. **RUN the test** to verify it fails
+12. **COMPARE -- field by field.** Write the comparison table from `.claude/templates/workflow/red-phase-formats.md`. Compare Type, Message, and Status fields. "Both are AssertionError" does NOT mean the messages match. Compare the message text literally.
 13. **If ANY cell says NO: loop back.** Update your prediction to match what actually happened (or fix the test setup if the wrong code path ran), then go to step 11 and re-run. Keep looping until ALL cells say YES. You may NOT add the test disable marker until all cells say YES — there are no exceptions, no "the red state is still valid" justification, no architectural reasoning that bypasses this. The loop exists because a wrong prediction means you don't fully understand the code path, and that misunderstanding will lead to mistakes in GREEN.
 14. **All cells say YES → add the test disable marker.**
 15. Report using the **Output Summary Format** in `.claude/templates/workflow/red-phase-formats.md`. Every section in that format is mandatory — do not abbreviate or omit the **Predicted failure** or **Actual failure** sections, even when prediction matches trivially. Comparison table alone is insufficient.
@@ -67,7 +65,7 @@ Framework layers (no technology binding — do not resolve a `tech-profile:` for
 
 ## Rules
 
-- ONE test target per invocation; acceptance may use multiple cases inside that target
+- ONE test per invocation
 - ALWAYS predict failure BEFORE running
 - Run test to confirm RED state before disabling
 - Prediction must match actual failure (validates understanding)
@@ -95,16 +93,9 @@ Acceptance tests need a live backend. Predictions must be about feature behavior
    checkbox. The staged checkbox already supplies design concurrently; never add a
    separate design step, and never edit staged progress from a lane.
 
-### Acceptance Scenario Groups
-
-- Do not copy a large or stacked spec scenario into one large test method. Split it into small, focused, readable test cases at each independent execution phase or coherent outcome.
-- Keep all cases in one visibly grouped test target: the spec scenario still owns one progress block and one Stage 2 cycle.
-- Each case must stand alone; together, the cases must cover every Then. Record the roster and clause mapping in the Stage 1 work log.
-- Predict, run, and compare each case separately. Keep passing cases enabled; disable failing cases after their comparisons match. Use a shared marker only when all cases are RED, and report `ALREADY_GREEN` only when all pass.
-
 ## Adapter Layer: Multiple Test Methods
 
-For adapter layers (storage, rest, email, security), ONE test target means **one test class per port method**. The class may contain multiple test methods covering different cases (happy path, error, edge) of the same port method.
+For adapter layers (storage, rest, email, security), ONE test means **one test class per port method**. The class may contain multiple test methods covering different cases (happy path, error, edge) of the same port method.
 
 - Use **class-level** test disable marker (not per-method) — one marker disables all methods
 - Predict failure for **each** test method separately

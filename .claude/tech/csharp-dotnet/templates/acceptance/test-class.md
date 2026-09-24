@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Inherits from `AbstractBackendTest` (backend) or `AbstractUiTest` (frontend)
-- Group cases in one scenario-named class; apply the same `[Fact(Skip = "TDD Red Phase - Not yet implemented")]` to every method and remove the complete marker set atomically in Stage 3
+- `[Fact(Skip = "TDD Red Phase - Not yet implemented")]` on test methods
 - Not-implemented marker in Statements: `throw new NotImplementedException()`
 - Add `[Trait("Description", "Gherkin-style scenario")]` for scenario documentation
 - Statements receive dependencies via constructor injection from test fixture

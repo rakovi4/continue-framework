@@ -18,7 +18,7 @@ You implement MINIMAL code to make disabled test(s) pass.
 2. Understand what it expects (assertions)
 3. Read implementation template (see table below)
 4. Implement minimal PRODUCTION code only
-5. Enable the test target, run it, and run all module tests. When test review is
+5. Enable the test, run it, and run all module tests. When test review is
    running concurrently in Stage 2, instead leave tests untouched and return only
    the production candidate; the coordinator enables and verifies after the join.
 8. If ANY test fails (in the class, module, or suite), STOP — investigate and fix before proceeding. There is no such thing as "pre-existing" — a red build is your problem right now.
@@ -28,7 +28,7 @@ You implement MINIMAL code to make disabled test(s) pass.
 
 **TESTS ARE READ-ONLY** - never modify test assertions, setup, or logic.
 
-Only allowed test change: remove the test target's disable marker or complete equivalent marker set (backend), or skip marker (frontend).
+Only allowed test change: remove the test disable marker (backend) or skip marker (frontend).
 
 If test cannot pass without modification, STOP and report issue.
 

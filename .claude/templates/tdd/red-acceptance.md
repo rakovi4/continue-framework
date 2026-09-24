@@ -4,7 +4,7 @@
 
 | Tier | Purpose |
 |------|---------|
-| Test Class (DSL Layer) | Disabled scenario target, one or more executable cases, extends base test setup |
+| Test Class (DSL Layer) | Disabled test, scenario in description, extends base test setup |
 | Statements Class (Service Layer) | Assertions, reuses other Statements |
 | Adapter Layer (Client) | Raw HTTP operations, no assertions |
 
@@ -32,10 +32,7 @@ Each type has its own base class, tag/marker, and directory. Tech profiles speci
 
 ## Test Class Rules
 
-- Test bodies read as setup/action/assertion phases
-- Turn a large or stacked spec scenario into small, focused test cases instead of one large test method. Split at each independent execution phase or coherent outcome.
-- Keep the cases in one scenario target and one delivery cycle. Each case must stand alone; together, they must cover every Then. Record the case roster and clause mapping.
-- Predict and run each case separately. Keep passing cases enabled; disable failing cases after their predictions match. The scenario is `ALREADY_GREEN` only when all cases pass.
+- Multi-step test bodies with setup/action/assertion phases
 - **Statements methods must be FULLY FUNCTIONAL in RED** -- real assertions, real setup. NEVER stub Statements with the not-implemented marker (that marker is for real adapter implementations only).
 - Gherkin-style scenario in test description
 - **NEVER call mocks, clients, or adapters directly** -- all infrastructure interactions must be hidden behind Statements. Test class reads like pure business DSL.

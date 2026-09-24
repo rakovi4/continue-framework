@@ -10,7 +10,7 @@ Dispatch these lanes concurrently:
 
 | Lane | Responsibility | May change |
 |------|----------------|------------|
-| Acceptance RED | Write, review, and refactor the scenario's disabled black-box test target; it may contain multiple independently RED cases | Acceptance test and its test DSL only |
+| Acceptance RED | Write, review, and refactor the disabled black-box test | Acceptance test and its test DSL only |
 | Contract design | Plan the design, discover adapters, create the use-case and adapter skeleton, and fix every use-case and port interface | Domain/use-case contracts and adapter skeletons declared before dispatch |
 
 The design lane does not ask the user questions. It makes the best design supported
@@ -67,8 +67,7 @@ adapter-{name}: unit={adapter boundary}; writes=[{path}: {delta}, ...]; frozen-s
 
 Before dispatch, the coordinator records disjoint ownership for both lanes. The
 acceptance lane cannot edit contracts or skeletons; the design lane cannot edit the
-acceptance test. Its result names the scenario target, every case, each case's RED
-comparison, and the scenario Then clauses mapped to that roster. Each lane runs its own required checks and commits its own files.
+acceptance test. Each lane runs its own required checks and commits its own files.
 Only the coordinator advances the stage in `progress.md` after both commits exist.
 It marks Stage 1 done and makes `approve stage-1 contracts` current; Stage 2 stays
 pending.
@@ -78,7 +77,7 @@ commit only genuinely missing contract artifacts; it must not replace working co
 The coordinator records the result and, after Stage 1 approval, marks Stage 2 `[S]`
 with a compact work-log reference before advancing to Stage 3 verification.
 
-Stage 1 closes with a user review of the acceptance target and its complete case roster, frozen interfaces, and lane
+Stage 1 closes with a user review of the acceptance test, frozen interfaces, and lane
 plan. Approval freezes the use-case and port contracts for Stage 2. The coordinator
 records approval by completing its checkbox and advancing Stage 2. Rejection resets
 Stage 1 to current, leaves approval and Stage 2 pending, and records the requested
@@ -159,7 +158,7 @@ coordinator commit and stops at that work-unit boundary.
 
 ## Stage 3 — Acceptance GREEN
 
-Enable only the scenario's complete disabled black-box target and run the acceptance
+Enable only the disabled black-box test and run the acceptance
 suite. This stage writes no production code. On acceptance failure, mark Stage 3
 pending, reset the implicated Stage 2 lane and Stage 2 checkbox to current, and
 invalidate that lane's checkpoint. The acceptance lane

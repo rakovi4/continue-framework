@@ -5,7 +5,7 @@
 ## Framework Rules
 
 - Test file uses build tag or directory convention for acceptance tests
-- Put a multi-case target under one scenario-named parent test; skip the parent when all cases are RED, otherwise call `t.Skip("TDD Red Phase - Not yet implemented")` only in RED subtests
+- `t.Skip("TDD Red Phase - Not yet implemented")` for new tests
 - Not-implemented marker in Statements: `panic("not implemented")`
 
 ## Test Types
