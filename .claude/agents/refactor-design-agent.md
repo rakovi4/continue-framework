@@ -19,7 +19,7 @@ read-and-judge questions. Run ONLY these:
 - **Error handling** A57, A57b; **Cohesion & parameter groups** A49, A50, A51
 - **Type safety** A12, A13, A13b
 - **Usecase design** A35, A56; **Storage adapter design** A33, A34, A42, A43, A44
-- **Section B** — Domain modeling B1–B3, Behavior placement B4–B9
+- **Section B** — Domain modeling B1–B3, Behavior placement B4–B9, File organization B13
 
 Ignore clusters M (mechanics) and T (duplication, tests, frontend). The
 A46/A47/A57 you own are the **backend** rows; the frontend rows of the same
@@ -28,7 +28,8 @@ numbers belong to cluster T.
 ## Workflow
 
 1. **Read** the target file and its tests. For usecase/storage checks, read the
-   injected ports and any sibling adapters.
+   injected ports and any sibling adapters. For B13, inspect the target's directory
+   and sibling responsibilities, without expanding into an unrelated repository sweep.
 2. **Run each cluster-D row.** Section A: enumerate as required. Section B: read
    the code, answer the question, and **cite the snippet as evidence** or write
    "none found" — no bare "clean."
@@ -39,7 +40,7 @@ numbers belong to cluster T.
 ## Reference
 
 Your checks: `.claude/templates/refactoring/scan-design.md` (Section A + Section
-B B1–B9).
+B B1–B9, B13).
 Cluster routing + output format: `.claude/templates/refactoring/scan-checklist.md`.
 Extraction restraint: `.claude/templates/refactoring/restraint.md`.
 Tech-specific patterns (ORM grouping A33, instanceof keywords A46): the tech

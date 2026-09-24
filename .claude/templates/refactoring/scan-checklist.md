@@ -23,7 +23,7 @@ truth, so the per-row checks never drift out of sync with the split.
 | Cluster | Detector agent | Loads | Section A categories | Section B |
 |---------|---------------|-------|----------------------|-----------|
 | **M — Mechanics** | `refactor-mechanics-agent` | `scan-mechanics.md` | Class size (A0); Complexity (A1, A2, A26); Optional (A5, A5b); Variables, lambdas & comments (A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45); Indirection (A20, A21, A55); Imports (A10, A36); Dead code (A11, A11b) | — |
-| **D — Design** | `refactor-design-agent` | `scan-design.md` | Data ownership (A3, A4); Repetition (A6, A7, A7b); Polymorphism (A46, A47, A48); Error handling (A57, A57b); Cohesion & parameter groups (A49, A50, A51); Type safety (A12, A13, A13b); Usecase design (A35, A56); Storage adapter design (A33, A34, A42, A43, A44) | Domain modeling (B1–B3); Behavior placement (B4–B9) |
+| **D — Design** | `refactor-design-agent` | `scan-design.md` | Data ownership (A3, A4); Repetition (A6, A7, A7b); Polymorphism (A46, A47, A48); Error handling (A57, A57b); Cohesion & parameter groups (A49, A50, A51); Type safety (A12, A13, A13b); Usecase design (A35, A56); Storage adapter design (A33, A34, A42, A43, A44) | Domain modeling (B1–B3); Behavior placement (B4–B9); File organization (B13) |
 | **T — Duplication & surface** | `refactor-duplication-agent` | `scan-duplication.md` | Sibling duplication (A14); Cross-class duplication (A22, A52, A54, A23, A24, A37, A41, A31, A38, A39, A40, A53); Frontend (A15, A15b, A16, A17, A18, A19, A46, A47, A57 — `.tsx` only) | Test-specific (B10, B11); Frontend (B12) |
 
 The numbers **A46/A47/A57** are reused for backend (cluster **D**) and frontend

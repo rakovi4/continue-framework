@@ -7,6 +7,12 @@ it. Checklist: `scan-checklist.md` (hub) + the per-cluster files `scan-mechanics
 
 All templates live in `.claude/templates/refactoring/`.
 
+## File Organization (all layers)
+
+| Smell | Fix | Template |
+|-------|-----|----------|
+| Unrelated capabilities mixed in a flat directory (B13) | Move cohesive groups into named subdirectories within the same layer; update imports, discovery configuration, and corresponding test paths, preserving dependency direction and existing public contracts | (inline — move files, update references, run affected tests/build) |
+
 ## Backend Code Smells
 
 | Smell | Fix | Template |

@@ -51,7 +51,9 @@ existing coverage and report already-green cases with evidence. A harness failur
 or unavailable service does not count as an expected behavior failure.
 
 In parallel, discover all required adapters and prepare the cross-layer contracts
-and skeletons using the existing design templates. Reconcile backend/frontend seams
+and skeletons using the existing design templates. Before creating skeletons, choose
+their paths under the File Organization rules in `.claude/rules/coding-rules.md`
+and include those paths in the lane ownership plan. Reconcile backend/frontend seams
 and group the Stage 2 lane plan by architectural boundary across scenarios. Require
 complete disjoint ownership and independently testable frozen seams. Stage 1 may
 create contracts and skeletons, but must not implement story behavior.

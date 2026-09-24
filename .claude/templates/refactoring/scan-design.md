@@ -95,3 +95,9 @@ frontend rows of the same numbers belong to cluster T.
 | B7 | Are there consecutive find + validate sequences guarding the same concern? | Quote the guard block |
 | B8 | Does a parent entity remove/add children in a collection directly instead of delegating to the child? | Quote the remove/add calls |
 | B9 | Does a controller return a raw usecase/domain object without REST DTO wrapping? | Quote the return statement |
+
+**File organization:**
+
+| # | Question | Evidence required |
+|---|----------|------------------|
+| B13 | Does the target's directory mix unrelated capabilities, contrary to File Organization in `.claude/rules/coding-rules.md`? | Inspect sibling paths and responsibilities; cite the unrelated groups and proposed destinations within the same layer. A small cohesive directory is not a finding. |

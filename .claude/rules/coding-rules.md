@@ -20,6 +20,12 @@ in any backend layer.
 - Adapter interaction rules: first-layer adapters (controllers, listeners) must not call other first-layer adapters — they delegate to usecases. Third-layer adapters (repositories, clients) must not call other third-layer adapters or usecases — they are called by usecases only.
 - Usecase interaction rule: usecases must not call other usecases. Each usecase is a top-level entry point that orchestrates one user-visible operation; usecases do not compose. If two usecases share logic, extract it into the domain layer (a domain method, value-object behavior, or a stateless domain service) or into a shared helper that is itself not a usecase. Chaining usecases hides the call graph from the controller layer, leaks transactional/authorization boundaries across operations, and entangles top-level scenarios that should evolve independently.
 
+## File Organization
+
+- Within each architectural layer or adapter module, group code by cohesive feature or domain capability in named subdirectories. Do not accumulate unrelated capabilities in one flat directory or divide them only by technical type.
+- Keep collaborators local to their owning capability; put genuinely shared code in a narrowly named responsibility directory within its owning layer. Preserve inward dependencies when organizing files.
+- Let directories reflect real boundaries: a small, cohesive area may stay flat. Avoid empty scaffolding and one directory per class. Place tests and test helpers by the same capability within the technology's test layout.
+
 ## File Size
 
 - **Hard limit: 200 lines per file.** After any creation or refactoring, verify with `wc -l`. If a file exceeds 200 lines, split it further. This applies to **every source file regardless of type** — production code, test classes, Statements classes, API clients, stylesheets, and config files. The limit is not class-specific: a file with no classes (a stylesheet, a config file) is still capped at 200 lines. Third-party generated files (shadcn/ui) are exempt.
