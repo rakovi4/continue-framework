@@ -10,10 +10,10 @@ Tech binding for `frontend-rules.md`. Shared section structure: `.claude/templat
 
 ## Feature Structure
 
-- Features live in `frontend/src/features/{feature}/` with subdirectories:
-  - `components/` -- React components: `{Feature}Page.tsx` and extracted sub-components.
-  - `logic/` -- pure logic `{feature}.logic.ts`, API client `{feature}.api.ts`, `types.ts`.
-  - `__tests__/` -- Vitest tests: `{feature}.logic.test.ts`, `{feature}.api.test.ts`.
+- Features live in `frontend/src/features/{feature}/`. Choose capability directories within each feature using File Organization in `.claude/rules/coding-rules.md`.
+- Keep component, logic, API, type, and style files with their owning capability.
+- Co-locate Vitest tests (`{feature}.logic.test.ts`, `{feature}.api.test.ts`) or use a capability-local `__tests__/` directory. Shared code needs a named responsibility and explicit owner.
+- Template-relative `components/`, `logic/`, and test paths are illustrative within one capability, not required feature-wide buckets. Resolve them against the agreed capability map and adjust imports.
 
 ## Shared UI Components
 

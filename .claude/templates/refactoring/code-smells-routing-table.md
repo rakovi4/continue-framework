@@ -11,7 +11,7 @@ All templates live in `.claude/templates/refactoring/`.
 
 | Smell | Fix | Template |
 |-------|-----|----------|
-| Unrelated capabilities mixed in a flat directory (B13) | Move cohesive groups into named subdirectories within the same layer; update imports, discovery configuration, and corresponding test paths, preserving dependency direction and existing public contracts | (inline — move files, update references, run affected tests/build) |
+| Distinct capabilities mixed inside a broad feature, or collaborators scattered across technical directories (B13) | Move cohesive groups into named subdirectories within the same layer; update imports, discovery configuration, and corresponding test paths, preserving dependency direction and existing public contracts | (inline — reconcile ownership, move files, update references, run affected tests/build) |
 
 ## Backend Code Smells
 
@@ -69,9 +69,10 @@ All templates live in `.claude/templates/refactoring/`.
 | Unused code | Delete it | (inline -- just delete) |
 | Unreachable branch reported by coverage | Remove the dead code branch and simplify the condition | (inline -- delete branch, simplify) |
 | Long method (>10 lines) | Extract private methods per concern | `extract-method.md` |
-| Commented block sections (`// comment` + code + blank) | Extract each block, use its intent as the method name, then delete the comment | `extract-method.md` |
+| Comment-labeled block with a distinct responsibility (A29) | Apply extraction restraint; extract only when its behavior warrants a named method, and preserve essential comment information before deletion | `extract-method.md` |
 | Any source comment | Preserve essential information through clearer code, tests, executable configuration, or owning documentation; then delete the comment | `replace-comment-with-code.md` |
 | Blank line wrapped sections (blank line + code + blank) | Extract each block, derive method name from purpose | `extract-method.md` |
+| Multiple statements on one line, collapsed blocks, or missing spacing between methods (A60) | Put statements on separate lines, expand blocks, and restore spacing before checking size limits | (inline — format source, remeasure sizes, run affected checks) |
 | Sequential independent blocks (3+ small operations, no shared state, each a distinct concern) | Extract each block into named method -- parent becomes table of contents | `extract-method.md` |
 | Single-use local: simple pass-through (accessor result used once, NOT a call to an injected dependency) | Inline variable | `simplify-expressions.md` |
 | Inlined dependency call (usecase/port/repo call nested inside return or method arg) | Extract variable to isolate side effect | `simplify-expressions.md` |
