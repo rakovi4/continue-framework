@@ -24,7 +24,10 @@ re-scan after each change.
 ## Workflow
 
 1. **Read** the merged, deduped candidate list you were handed. If it arrived
-   undeduped, keep one entry per `file:line`.
+   undeduped, keep one entry per `file:line`. Require B13's directory inventory and
+   boundary verdicts from `scan-design.md` alongside the candidates. If absent,
+   perform that check inline before accepting an empty list; this also applies
+   to a small-file pass without detectors.
 2. **Order** the list: resolve formatting (A60) and remeasure A0/A1 first,
    then highest-impact first: class/file splits (A0) before method
    extractions (A1) before local/expression cleanups — so cascades resolve

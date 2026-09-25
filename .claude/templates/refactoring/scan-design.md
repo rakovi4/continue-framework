@@ -100,4 +100,30 @@ frontend rows of the same numbers belong to cluster T.
 
 | # | Question | Evidence required |
 |---|----------|------------------|
-| B13 | Do directories expose cohesive capabilities inside each broad feature, following File Organization in `.claude/rules/coding-rules.md`? | Enumerate sibling groups by responsibility, collaborators, and reasons to change, including tests/helpers. Cite paths and proposed destinations for distinct groups or collaborators scattered across technical buckets. A clean verdict must explain why no independently cohesive subgroup exists; a shared feature name or small file count is insufficient. |
+| B13 | Do directories expose cohesive capabilities inside each broad feature, following File Organization in `.claude/rules/coding-rules.md`? | Produce the directory inventory and boundary verdict below, including tests/helpers. A clean verdict requires the inventory; a shared feature name or small file count is insufficient. |
+
+### B13 — Directory boundary check
+
+Run once per affected capability area, including when the target is one small
+file. Read sibling files and their consumers; names alone do not establish roles.
+Record one row per file: current path, responsibility, collaborators/consumers
+(with source references), and owning capability/destination. Include related tests
+and helpers; files outside the edit scope remain read-only context.
+
+Identify entry operations, then group their dedicated collaborators with them.
+A worker plus its provider port, validator, and failure type forms an independently
+cohesive subgroup when those collaborators serve that worker. Other operations
+sharing its entity or storage port do not erase that boundary. Check the same
+relationship for interface components, state logic, clients, tests, and helpers.
+
+For each subgroup, report MOVE or KEEP with its member paths and reason to change.
+MOVE when a dedicated group is mixed with other responsibilities or scattered
+across technical buckets. KEEP requires showing that the current directory already
+contains that group or that no separate subgroup exists. Put genuinely shared
+collaborators in a directory named for their responsibility; trace their consumers
+before calling them shared. Do not duplicate shared ports or introduce wrappers
+to make the directory tree symmetrical. One cohesive group may remain flat.
+
+For example, eight files serving one operation can be cohesive; fewer files mixing
+an operation and its dedicated collaborators with unrelated operations require a
+split. A common entity, journey, or persistence dependency is not a KEEP reason.

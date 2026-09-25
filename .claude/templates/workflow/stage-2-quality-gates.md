@@ -64,9 +64,12 @@ Before marking a lane or Stage 2 complete, reconcile the changed-path inventory
 against these results. Bare `PASS`, passing tests, coverage percentages alone, or
 an unsupported `NO_CHANGE` do not establish completion. Run missing phases before
 advancing to Stage 3; do not ask whether to run them.
-Missing B13 grouping evidence or unformatted source blocks completion even when
-raw line counts meet the limit. Reconcile file moves with lane ownership and update
-imports, discovery, and test paths before rerunning affected checks.
+Validate B13 against the directory boundary check in `scan-design.md`: require
+the file inventory and MOVE/KEEP verdicts, with every MOVE resolved in the final
+paths. A summary such as "no further split" cannot replace that evidence. Missing
+evidence or unformatted source blocks completion even when raw line counts meet
+the limit. Reconcile file moves with lane ownership and update imports, discovery,
+and test paths before rerunning affected checks.
 
 Apply the same gates to coverage follow-ups and reopened lanes. Later edits
 invalidate results for affected paths: repeat test review for changed tests,

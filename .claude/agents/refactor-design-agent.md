@@ -28,10 +28,10 @@ numbers belong to cluster T.
 ## Workflow
 
 1. **Read** the target file and its tests. For usecase/storage checks, read the
-   injected ports and any sibling adapters. For B13, inspect the target's directory
-   and sibling responsibilities inside the broad feature, including collaborators
-   scattered across technical directories. Provide B13's grouping evidence even
-   for a clean verdict; do not expand into an unrelated repository sweep.
+   injected ports and any sibling adapters. Run the B13 directory boundary check
+   in `scan-design.md` once per affected capability area, including for small-file
+   targets. Return its file inventory and MOVE/KEEP verdicts even when clean;
+   do not expand into an unrelated repository sweep.
 2. **Run each cluster-D row.** Section A: enumerate as required. Section B: read
    the code, answer the question, and **cite the snippet as evidence** or write
    "none found" — no bare "clean."
