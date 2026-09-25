@@ -80,13 +80,26 @@ ownership is complete. Commit the results and finish owed refactoring, then cont
 
 ## Stage 2 — All implementation
 
-Run the complete use-case, adapter, frontend-logic, API-client, and design-alignment
-lanes for both tiers against the frozen contracts. Load `stage-2-quality-gates.md`
-and dispatch its mandatory test-review, coverage, and refactor phases for each lane.
-Reconcile every changed module, production file, test, and helper against the named
-checkpoint evidence before completion, including legacy serial routes. Independent
-lanes may run concurrently within available capacity; shared boundaries stay under
-one owner. Workers never change frozen contracts.
+Schedule the complete use-case, adapter, frontend-logic, API-client, and
+design-alignment lanes for both tiers in one shared queue against the frozen
+contracts. Dispatch ready backend and frontend lane phases concurrently. When both
+have pending ready work and capacity permits, start work from both before filling
+remaining slots; do not drain all backend lanes before starting frontend or vice
+versa. Refill available slots as phases finish, preserving each lane's phase order.
+The category order in the plan is not an implementation dependency.
+
+Frontend focused tests use test doubles against the frozen API and interface
+contracts; they do not wait for the live backend implementation. If a lane requires
+another lane's new output, apply the existing lane-plan gate: freeze the missing
+seam in Stage 1 or coalesce work within one architectural boundary. Workers never
+change frozen contracts. Shared writable paths stay under one owner, and the
+coordinator serializes publication under one lock across backend and frontend.
+Record dispatched phases and any capacity or prerequisite wait in the work log.
+
+Load `stage-2-quality-gates.md` and dispatch its mandatory test-review, coverage,
+and refactor phases for each lane. Reconcile every changed module, production file,
+test, and helper against the named checkpoint evidence before completion, including
+legacy serial routes.
 
 Update the corresponding scenario implementation checkboxes as lanes finish. Do not
 advance to Stage 3 until every required implementation lane, follow-up check, and

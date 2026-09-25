@@ -22,6 +22,9 @@ Stage 2. Every Stage 1 interface becomes read-only for Stage 2.
 
 ## Stage 2 — Implementation Lanes
 
+For whole-story execution, use `story-stages.md`'s shared backend/frontend queue;
+the sequences below advance each frontend lane within that queue.
+
 Build three manifests from the frozen design. Load `stage-2-quality-gates.md`;
 the coordinator dispatches each phase of every active lane, including review and
 refactor detectors, so workers never nest fan-outs. Use these sequences:

@@ -86,6 +86,9 @@ not `[x]`.
 
 ## Stage 2 — Implementation Lanes
 
+For whole-story execution, use `story-stages.md`'s shared backend/frontend queue;
+the sequence below advances each backend lane within that queue.
+
 After approval, the coordinator advances one lane for the use case and one for each
 discovered adapter. Each is a coordinator-owned state machine, not one autonomous
 worker; the coordinator dispatches every phase so no worker must nest a fan-out.
