@@ -81,8 +81,10 @@ is still in flight, even though its Spec phase is `✅` — and only then become
 ## Story completion
 
 A story is complete only when **every checkbox in `progress.md` is `[x]` or `[S]`** — not
-when the scenario counts alone read full. The scenario counts ignore non-scenario
-work-unit checkboxes such as `harvest`, which carries no `### ` heading, so a story with
+when the scenario counts alone read full. For active implementation, also enforce
+plan-integrity check 9: every required quality entry must exist, be `[x]`, and have
+valid evidence; `[S]` never satisfies a quality gate. The scenario counts ignore
+non-scenario work-unit checkboxes such as `harvest`, which carries no `### ` heading, so a story with
 an empty Tier 2 can reach `Tests = T1total/T1total · 0/0` and `% = 100%` while
 `- [ ] harvest` is still open: full by count, not yet done. Gate the move on the
 checkboxes, never on the count or the percentage. When complete, move the row from **In

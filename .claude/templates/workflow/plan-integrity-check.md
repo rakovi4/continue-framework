@@ -15,8 +15,9 @@ nobody anticipated.
 
 Checks 1, 2, 4 and 6 need a **tier-major** plan (any `## Tier N — ` heading). Checks 3
 and 5 apply to every plan, tiered or not; check 7 applies to refactor tasks. The
-write-time check 8 applies to every staged progress edit. Checks 1–7 are greps over `progress.md` and
-`tests/*.md` — no agent, no build.
+write-time check 8 applies to every staged progress edit. Check 9 applies to active
+story implementation at selection, stage transitions, and completion. Checks 1–7
+are greps over `progress.md` and `tests/*.md` — no agent, no build.
 
 1. **Heading shape.** Every scenario section heading matches
    `## Tier {N} — {Category} Scenarios ({file})`
@@ -90,6 +91,18 @@ write-time check 8 applies to every staged progress edit. Checks 1–7 are greps
    Checking additions rather than the whole file grandfathers legacy narrative
    while preventing any new bloat.
 
+9. **Quality phases are planned and proven.** After the coordinator's reconciliation
+   in `story-quality-checklist.md`, compare the expected acceptance scopes and frozen
+   implementation lanes with the `## Quality gates` entries. Every required phase
+   must appear exactly once per scope. Reject missing rows, unknown scopes, `[S]`,
+   and `[x]` without the named skill result, full checked scope/revisions, findings
+   disposition, and verification in its referenced work-log record. Stage 1 completion
+   requires all its quality entries `[x]`; Stage 2 completion requires its own and
+   Stage 1's entries `[x]`. Stage 3 dispatch and archive require both stages complete.
+   Review changed paths against the manifests so omitting a lane or helper cannot
+   shrink the checklist. A self-review, passing suite, or a bare `NO_CHANGE` fails.
+   Ordinary pending quality entries are valid while their parent stage is incomplete.
+
 ## On a failed check
 
 Report the check, the file, and the offending lines, then **stop**. Do not repair the
@@ -97,6 +110,11 @@ plan: a plan out of step with its markers means either the marker or the plan is
 and guessing wrong silently reorders or deletes committed work. The resolution is a
 human call — or, for a story still at 0%, a re-bootstrap, which derives the whole plan
 from the markers again.
+
+The quality-checklist reconciliation is a defined coordinator operation before
+check 9: it adds missing obligations and reopens unsupported completions. It never
+guesses scenario membership or tiering. Dispatch recovery phases in the reopened
+stage; do not stop merely to ask whether mandatory review/refactor should run.
 
 An untiered plan is not a failure. It has no tier sections and no markers, so checks 1,
 2, 4 and 6 have nothing to read and are skipped — the permanent untiered branch, never a

@@ -8,6 +8,11 @@ lane undispatchable: never mix a worker edit with pre-existing work in one file.
 
 ## Stage 1 — Acceptance RED and Interface Design
 
+Load `story-quality-checklist.md`; materialize browser acceptance quality entries
+before dispatch. After RED returns, the coordinator runs `/test-review`, publishes
+the reviewed tests, then runs `/refactor` over tests and helpers and publishes changes
+separately. Record each completed phase before joining Stage 1.
+
 Dispatch Selenium RED and frontend design concurrently. Selenium RED owns its test
 and Statements files. Design owns only the declared shared component, logic,
 API-client, type, and test-interface files. Design is non-interactive: it infers the
@@ -17,8 +22,9 @@ contract is co-located with production behavior a Stage 2 lane must implement.
 
 Join both results once. Reject a worker that staged, committed, edited
 `progress.md`, or touched an undeclared path. After both succeed, the coordinator
-runs their checks together, stages explicit owned paths, commits once, and advances
-Stage 2. Every Stage 1 interface becomes read-only for Stage 2.
+runs their checks together and requires valid Stage 1 quality evidence before
+publishing the join and advancing Stage 2. Every Stage 1 interface becomes read-only
+for Stage 2.
 
 ## Stage 2 — Implementation Lanes
 

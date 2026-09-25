@@ -50,6 +50,10 @@ genuinely absent from the path it was given.
 6. For new frontend scenarios emit the three staged frontend checkboxes from
    `progress-format.md`. Preserve the legacy `red-selenium` through `demo` shape
    only when repository evidence shows that scenario already started under it.
+7. Append `## Quality gates` per `story-quality-checklist.md`. Acceptance entries
+   must exist before writers start; implementation entries are added when Stage 1
+   defines the lanes. Existing code or passing tests never prove a quality phase
+   completed; only matching skill execution evidence can mark its entry `[x]`.
 
 ## Tier order
 

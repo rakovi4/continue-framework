@@ -6,6 +6,12 @@ owns `progress.md`; every lane owns only its declared files.
 
 ## Stage 1 — Acceptance RED and Contract Design
 
+Load `story-quality-checklist.md`; materialize acceptance quality entries before
+dispatch. The coordinator runs RED → `/test-review` → test commit → `/refactor` →
+separate refactor publication for each acceptance scope, recording each completed
+phase. Join only after those entries have valid evidence; design approval cannot
+substitute for test review or refactor execution.
+
 Dispatch these lanes concurrently:
 
 | Lane | Responsibility | May change |
@@ -67,8 +73,9 @@ adapter-{name}: unit={adapter boundary}; writes=[{path}: {delta}, ...]; frozen-s
 
 Before dispatch, the coordinator records disjoint ownership for both lanes. The
 acceptance lane cannot edit contracts or skeletons; the design lane cannot edit the
-acceptance test. Each lane runs its own required checks and commits its own files.
-Only the coordinator advances the stage in `progress.md` after both commits exist.
+acceptance test. Workers return their checks and edits without staging or committing.
+Only the coordinator publishes and advances the stage after both lanes and acceptance
+quality entries complete, keeping reviewed tests and refactoring in separate commits.
 It marks Stage 1 done and makes `approve stage-1 contracts` current; Stage 2 stays
 pending.
 

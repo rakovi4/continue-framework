@@ -6,8 +6,10 @@ deferred. Tasks and specification items retain their single-work-unit routes.
 
 ## Existing plans and dispatch
 
-Keep scenario headings, checkboxes, tier classifications, progress format, and
-`stories.md` calculations. Do not migrate plans or add global stage checkboxes.
+Keep scenario headings, checkboxes, tier classifications, and `stories.md`
+calculations. Load `story-quality-checklist.md` and reconcile its required quality
+entries before selecting a pass, including on resume. Do not replace scenario plans
+or add global stage-completion checkboxes; quality phases are tracked separately.
 An untiered story keeps its full existing implementation scope.
 
 Validate the plan normally, then map every eligible `(category file, scenario
@@ -45,7 +47,13 @@ and consequences, reuse settled decisions, and await answers without blocking
 independent RED work. Design workers return questions to the coordinator. Never
 infer user agreement from silence or implement a choice awaiting an answer.
 
-Run and review every acceptance case; record predicted and observed failures.
+Run every acceptance case; record predicted and observed failures. After each
+acceptance writer returns, the coordinator dispatches `/test-review` over its full
+test/helper scope, commits the reviewed tests, then dispatches `/refactor` over
+that scope and publishes changes separately. Recheck expected RED or already-green
+outcomes after fixes. Await completed skill results and update the Stage 1 quality
+entries; a writer's self-review is not either skill. Design may continue on disjoint
+paths while these phases run. Shared helpers have one owner throughout.
 Existing production code does not justify omitting a black-box test. Reuse valid
 existing coverage and report already-green cases with evidence. A harness failure
 or unavailable service does not count as an expected behavior failure.
@@ -75,8 +83,11 @@ covered here, explaining the replacement in the log. Empty Tier 2 has no cases t
 baseline. Never use an already-green result to skip final acceptance verification.
 
 Stage 2 cannot begin until every scenario has reviewed RED or verified already-green
-evidence, all material design questions are answered, contracts are frozen, and lane
-ownership is complete. Commit the results and finish owed refactoring, then continue.
+evidence, every Stage 1 quality entry passes `story-quality-checklist.md`, all material
+design questions are answered, contracts are frozen, and lane ownership is complete.
+Missing harnesses require runnable scaffolding before RED; they never authorize
+starting story implementation beside acceptance writers. Commit the completed Stage 1
+results, including refactoring, then continue.
 
 ## Stage 2 — All implementation
 
@@ -96,14 +107,16 @@ change frozen contracts. Shared writable paths stay under one owner, and the
 coordinator serializes publication under one lock across backend and frontend.
 Record dispatched phases and any capacity or prerequisite wait in the work log.
 
-Load `stage-2-quality-gates.md` and dispatch its mandatory test-review, coverage,
-and refactor phases for each lane. Reconcile every changed module, production file,
+Load `stage-2-quality-gates.md` and dispatch each lane's recorded quality entries as
+separate coordinator-owned phases; never delegate an entire stage to a generic
+implementation worker. Reconcile every changed module, production file,
 test, and helper against the named checkpoint evidence before completion, including
 legacy serial routes.
 
 Update the corresponding scenario implementation checkboxes as lanes finish. Do not
 advance to Stage 3 until every required implementation lane, follow-up check, and
-refactor is complete and committed. Then continue immediately in the same invocation.
+refactor is complete and committed, and every Stage 2 quality entry has valid
+completion evidence. Then continue immediately in the same invocation.
 
 ## Stage 3 — All acceptance GREEN, then sequential demos
 

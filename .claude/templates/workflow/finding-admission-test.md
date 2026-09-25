@@ -4,6 +4,10 @@ When may a finding become a **plan step**? Read by `.claude/agents/refactor-agen
 and `.claude/agents/test-review-agent.md` before reporting anything they did not fix,
 and by `/continue` before writing any new checkbox into `progress.md`.
 
+Prescribed workflow phases, including `story-quality-checklist.md` entries, are
+existing obligations being materialized, not findings proposing scope expansion.
+This test applies to additional work discovered while executing those phases.
+
 **A checkbox is the most expensive disposal a finding has.** It costs two boxes (a red
 and its green), four commits, and two further sub-agent dispatches that are themselves
 licensed to find more. Filing is not the neutral option — fixing is. In an unfiltered

@@ -93,6 +93,15 @@ A story with no Tier 2 scenarios still gets the boundary. Harvest's baseline che
 is what confirms Tier 1 actually delivered the feature, and a story that skipped it
 because nothing followed would be the one story where nobody checked.
 
+### Quality gates
+
+Append `## Quality gates` without scenario subheadings, using
+[`story-quality-checklist.md`](story-quality-checklist.md). The coordinator adds
+acceptance review/refactor entries before Stage 1 dispatch and each implementation
+lane's quality phases before Stage 2. Entries stay outside scenario counts but block
+their parent stage and archive until completed with evidence. Existing active plans
+receive the same section on resume without replacing their scenario sequences.
+
 ### Untiered stories
 
 A `progress.md` whose sections carry no `Tier N —` prefix is **untiered**: flat

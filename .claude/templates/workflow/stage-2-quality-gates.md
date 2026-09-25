@@ -1,6 +1,9 @@
 # Stage 2 Quality Gates
 
 Both backend and frontend stage coordinators load this contract before dispatch.
+Materialize each lane's phases using `story-quality-checklist.md` before its writers
+start. Update those checkboxes after each completed skill result; the evidence
+below is mandatory for the matching entry, including after resume or recovery.
 The coordinator dispatches `/test-review`, `/test-coverage`, and `/refactor` as
 separate required phases using `/continue`'s sub-skill routing. A GREEN worker
 return is an implementation candidate, not a completed lane. Workers must not
@@ -61,8 +64,9 @@ alongside the coverage assessment.
 Neither fact excuses skipping the remaining phases.
 
 Before marking a lane or Stage 2 complete, reconcile the changed-path inventory
-against these results. Bare `PASS`, passing tests, coverage percentages alone, or
-an unsupported `NO_CHANGE` do not establish completion. Run missing phases before
+against these results and the required quality entries. Missing, pending, skipped,
+or unsupported entries block completion. Bare `PASS`, passing tests, coverage
+percentages alone, or an unsupported `NO_CHANGE` do not establish completion. Run missing phases before
 advancing to Stage 3; do not ask whether to run them.
 Validate B13 against the directory boundary check in `scan-design.md`: require
 the file inventory and MOVE/KEEP verdicts, with every MOVE resolved in the final
@@ -71,7 +75,8 @@ evidence or unformatted source blocks completion even when raw line counts meet
 the limit. Reconcile file moves with lane ownership and update imports, discovery,
 and test paths before rerunning affected checks.
 
-Apply the same gates to coverage follow-ups and reopened lanes. Later edits
-invalidate results for affected paths: repeat test review for changed tests,
+Apply the same gates to coverage follow-ups and reopened lanes. Validate recorded
+phase revisions using `story-quality-checklist.md`; later unverified edits
+invalidate results for affected paths: repeat test review for changed test behavior,
 refresh affected coverage measurements, and refactor changed code and tests before
 final verification. On resume, reuse evidence only for matching checked revisions.

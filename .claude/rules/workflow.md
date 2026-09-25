@@ -68,6 +68,10 @@ coverage checks, and `/refactor` across every touched backend and frontend modul
 production file, and test. Refactor execution is mandatory; only its separate
 commit may be omitted when the completed scan finds no changes. Exact mechanics
 and legacy in-flight behavior live in **`.claude/guidelines/workflow-detail.md`**.
+Stage 1 acceptance tests also require `/test-review` and `/refactor`. Track each
+required quality phase in `progress.md` using
+`.claude/templates/workflow/story-quality-checklist.md`; missing or unsupported
+completion evidence blocks the owning stage and story archive.
 
 ## Progress Tracking
 
@@ -98,7 +102,7 @@ Story sections remain **tier-major** for tracking; whole-story execution selects
 
 For story implementation, execute all remaining passes through demos in one invocation; Stage 1 may wait for design answers. Intermediate commits are checkpoints, not stop points. The single-work-unit stop rule below applies to tasks and specification.
 
-A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). Outside Stage 2, `/refactor` only runs when a red or green agent ran before it in the same work unit. Every Stage 2 lane, including design alignment, follows the mandatory quality gates in `.claude/templates/workflow/stage-2-quality-gates.md`.
+A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). Outside Stage 2, `/refactor` requires a preceding red/green agent in the work unit, except when recovering an owed story quality phase under `story-quality-checklist.md`. Every Stage 2 lane, including design alignment, follows the mandatory quality gates in `.claude/templates/workflow/stage-2-quality-gates.md`.
 
 STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor` is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
 
