@@ -5,6 +5,11 @@ refactoring. Both detectors (when deciding whether a candidate is a real smell)
 and the fixer (before applying an extraction) apply these guardrails — a
 "partial overlap / NO ACTION" verdict is often the correct one:
 
+These guardrails govern abstraction changes, not readable formatting. Restoring
+line breaks and spacing may add lines without adding indirection; never use
+restraint to waive A30 or retain compressed code. Judge method size only after
+formatting, and keep blank lines between coherent phases of a linear recipe.
+
 - **Don't over-fragment into single-use helpers.** Extracting several tiny 1–3
   line helpers each used once usually makes the file *longer* without adding
   clarity. Inline single-use helpers; extract only when the helper names a

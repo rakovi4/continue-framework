@@ -22,13 +22,20 @@ in any backend layer.
 
 ## File Organization
 
-- Within each architectural layer or adapter module, group code by cohesive feature or domain capability in named subdirectories. Do not accumulate unrelated capabilities in one flat directory or divide them only by technical type.
+- Within each architectural layer or adapter module, group code by cohesive domain capability in named subdirectories. Inspect boundaries inside each broad feature: a feature or product folder alone does not establish cohesion. Separate groups with distinct responsibilities, collaborators, and reasons to change, even when they serve the same user journey.
 - Keep collaborators local to their owning capability; put genuinely shared code in a narrowly named responsibility directory within its owning layer. Preserve inward dependencies when organizing files.
-- Let directories reflect real boundaries: a small, cohesive area may stay flat. Avoid empty scaffolding and one directory per class. Place tests and test helpers by the same capability within the technology's test layout.
+- Keep each capability's production code, tests, and helpers together within the technology's source/test layout. Technical subdirectories may organize a capability internally; feature-wide buckets for components, hooks, logic, or clients must not scatter collaborators from several capabilities.
+- Let directories reflect real boundaries: a small area may stay flat when its files serve one responsibility and no independently cohesive subgroup exists. Neither file count nor a shared feature name proves cohesion. Avoid empty scaffolding and one directory per class.
+
+## Source Formatting
+
+- Keep hand-written production code, tests, styles, markup, and configuration readable: one statement per line, expanded block bodies, consistent indentation, and blank lines between methods and logical sections. Put stylesheet declarations on separate lines; wrap long expressions and markup using the project's formatting conventions.
+- Run the configured formatter on touched files. If none exists, apply the language's conventional multiline formatting manually. Generated output is not a model for hand-written source.
+- Blank lines are readability aids, not evidence of separate responsibilities. Never remove spacing, join statements, or collapse blocks to satisfy a file or method size limit. Format first; split oversized files by cohesive responsibility afterward.
 
 ## File Size
 
-- **Hard limit: 200 lines per file.** After any creation or refactoring, verify with `wc -l`. If a file exceeds 200 lines, split it further. This applies to **every source file regardless of type** — production code, test classes, Statements classes, API clients, stylesheets, and config files. The limit is not class-specific: a file with no classes (a stylesheet, a config file) is still capped at 200 lines. Third-party generated files (shadcn/ui) are exempt.
+- **Hard limit: 200 lines per file after readable formatting.** Count every physical line, including blank lines, imports, and declarations. After any creation or refactoring, verify with `wc -l`. If a file exceeds 200 lines, split it further. This applies to **every source file regardless of type** — production code, test classes, Statements classes, API clients, stylesheets, and config files. Third-party generated files (shadcn/ui) are exempt.
 
 ## Source Comments
 

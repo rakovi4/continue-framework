@@ -25,7 +25,8 @@ re-scan after each change.
 
 1. **Read** the merged, deduped candidate list you were handed. If it arrived
    undeduped, keep one entry per `file:line`.
-2. **Order** the list highest-impact first: class/file splits (A0) before method
+2. **Order** the list: resolve formatting (A30) and remeasure A0/A1 first,
+   then highest-impact first: class/file splits (A0) before method
    extractions (A1) before local/expression cleanups — so cascades resolve
    downward and you don't refactor code you are about to delete.
 3. **Apply ONE refactoring.** Pick the top candidate, load its template from the
@@ -33,8 +34,10 @@ re-scan after each change.
    and follow the template steps. Apply the restraint guardrails in
    `.claude/templates/refactoring/restraint.md` first — skip the candidate if a
    "NO ACTION" verdict is correct.
-4. **Verify size** — `wc -l` on every changed file (code, stylesheet, config). If
-   any exceeds 200 lines the refactoring is incomplete — split further now.
+4. **Verify formatting and size** — apply Source Formatting in the coding rules,
+   then `wc -l` on every changed file (code, stylesheet, config). If any exceeds
+   200 formatted lines, split further now. Recheck A30 after every extraction;
+   formatting fixes cannot be waived under extraction restraint.
 5. **Run tests** for the module.
 6. **Re-scan cascades** — re-run only the checks that cascade from this change
    (param removal A55 → re-check locals A8 + repeated expressions A7; method

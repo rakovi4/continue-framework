@@ -10,13 +10,13 @@ Skip checks marked with a file-type tag that doesn't match the target file.
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A0 | File / class size & concerns | Total source lines (excluding imports/package), implemented interfaces/ports, distinct method groups (methods that don't call each other and serve different concerns). **Applies to every file type — for files with no classes (stylesheets, config, plain modules) count all lines.** | >200 lines OR 2+ unrelated interfaces |
+| A0 | File / class size & concerns | Every physical line after Source Formatting in the coding rules, including blank lines and imports; implemented interfaces/ports and distinct responsibility groups. Applies to every file type. If A30 fails, report current counts as provisional and require remeasurement after formatting. | >200 formatted lines OR 2+ unrelated interfaces; compressed source cannot pass by its raw count |
 
 **Complexity:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A1 | Method sizes | Every method with source line count (count from opening `{` line to closing `}` line inclusive — use the file's line numbers, e.g. L48–L71 = 23 lines) | > 10 lines |
+| A1 | Method sizes | Every method's physical line count after readable formatting, including opening and closing block lines. Apply extraction restraint to cohesive recipes. | >10 formatted lines is an extraction candidate; packed statements cannot establish a pass |
 | A2 | Nesting depth | Methods with control flow nesting (`if`, `for`, `while`, `try`, `switch`, lambda) | > 1 level |
 | A26 | If/return vs switch | Methods with 3+ `if (x === 'constant') return` lines branching on the same variable | Any — replace with `switch` |
 
@@ -38,9 +38,9 @@ Skip checks marked with a file-type tag that doesn't match the target file.
 | A25 | Replace Loop with Pipeline | For-loops over collections that can be replaced with stream pipelines (`forEach`, `map`, `filter`, `collect`, `reduce`, `anyMatch`, etc.). Includes loops that accumulate into a list, filter by condition, or transform elements. | Any for-loop replaceable by a collection pipeline |
 | A27 | Inline multi-step pipeline | Stream/async pipelines (`IntStream.range().mapToObj().toArray()`, `.stream().map().filter().collect()`) written inline in a method that also does other work | Any inline pipeline with 2+ chained transformations in a method with other logic |
 | A28 | Functional factory method | Methods returning `Runnable`, `Supplier`, `Callable`, or other functional interfaces where the body is a lambda wrapping imperative code | Any `return () -> { ... }` or `return () -> expr` |
-| A29 | Commented sections | Comments followed by a code block followed by a blank line — each is a named concern that should be extracted | Any `// comment` + code block + blank line pattern |
+| A29 | Comment-labeled responsibilities | For each section comment, inspect whether its block has a distinct responsibility; cite the behavior and shared state. Route comment removal through A59. | Extract only a distinct responsibility when restraint permits; a comment or whitespace alone does not justify extraction |
 | A59 | Source comments | Count comment-only lines and enumerate every contiguous source comment block (`start–end`, line count). Identify what information or directive must be preserved elsewhere before removal. | Any source comment. Preserve essential information through names, types, tests, executable configuration, or owning documentation, then delete the comment. No `KEEP` classification exists. |
-| A30 | Blank line wrapped sections | Code blocks surrounded by blank lines without comments — each is an unnamed concern that should be extracted | Any blank line + code block + blank line pattern |
+| A30 | Source formatting | Check every target against Source Formatting in `.claude/rules/coding-rules.md`. Cite packed statements/declarations, collapsed block bodies, missing method/section separation, and unwrapped expressions or markup; record formatter check or manual inspection. | Any formatting violation requires expansion and spacing, then A0/A1 remeasurement; blank lines themselves never require extraction |
 | A45 | Sequential independent blocks | Methods with 2+ sequential operations that don't share intermediate state and each handle a distinct concern (e.g., validate page, validate size, validate date range). Count independent blocks even without comments or blank lines separating them. | 2+ independent blocks in one method — extract each into a named method |
 
 **Indirection:**

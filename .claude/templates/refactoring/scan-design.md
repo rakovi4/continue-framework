@@ -100,4 +100,4 @@ frontend rows of the same numbers belong to cluster T.
 
 | # | Question | Evidence required |
 |---|----------|------------------|
-| B13 | Does the target's directory mix unrelated capabilities, contrary to File Organization in `.claude/rules/coding-rules.md`? | Inspect sibling paths and responsibilities; cite the unrelated groups and proposed destinations within the same layer. A small cohesive directory is not a finding. |
+| B13 | Do directories expose cohesive capabilities inside each broad feature, following File Organization in `.claude/rules/coding-rules.md`? | Enumerate sibling groups by responsibility, collaborators, and reasons to change, including tests/helpers. Cite paths and proposed destinations for distinct groups or collaborators scattered across technical buckets. A clean verdict must explain why no independently cohesive subgroup exists; a shared feature name or small file count is insufficient. |

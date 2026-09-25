@@ -1,53 +1,19 @@
 # Extract Method
 
-When to use: a method is too long, mixes abstraction levels, repeats an expression, buries preconditions inline, or has commented sections separated by blank lines.
+When to use: a method mixes responsibilities or abstraction levels, repeats a
+computation, or buries a meaningful precondition. Format before measuring size;
+apply `restraint.md` before extracting.
 
-## Extract Commented Sections
-When code is organized with comments or followed by blank lines, each commented block is a named concern. Extract each block to a method named after its comment. The comment text becomes the method name.
+## Identify Responsibilities
 
-```java
-// Before — commented sections signal separate concerns
-// Normal save-load-save cycle — forces version round-trip through domain
-Task loaded = storage.findByTaskId(task.getTaskId()).orElseThrow();
-loaded.archive();
-em.clear();
-storage.save(loaded);
-em.flush();
-em.clear();
+Inspect behavior, collaborators, and shared intermediate state. Extract a block
+when naming a distinct responsibility clarifies the caller. Comments may suggest
+intent, but neither comments nor blank lines prove that extraction is useful.
+Preserve essential comment information under the source-comment rule.
 
-// First handler saves successfully — bumps version
-firstRead.markComplete();
-storage.save(firstRead);
-em.flush();
-em.clear();
-
-// After — each comment became a method name
-archive(task);
-updateAndSave(firstRead);
-```
-
-**Heuristic:** When you see `// comment` followed by a code block followed by a blank line, extract the block as a method named after the comment. The comment is already doing the naming work for you.
-
-## Extract Blank Line Wrapped Sections
-When code blocks are separated by blank lines without comments, each block is an unnamed concern. You must derive the method name from what the code does.
-
-```java
-// Before — blank lines signal separate concerns but no names provided
-User user = storage.findById(userId).orElseThrow();
-
-if (user.getRole() != UserRole.ADMIN) {
-    throw new AccessDeniedException("Admin only");
-}
-
-task.archive();
-storage.save(task);
-
-// After — each blank-separated block extracted with derived names
-User admin = requireAdmin(userId);
-archiveTask(task);
-```
-
-**Heuristic:** When you see a blank line, ask "what concern ends here?" The answer becomes the method name. Unlike commented sections, you must infer the purpose from the code itself.
+Blank lines between methods and logical phases are normal readable formatting.
+Keep them in linear test recipes and cohesive methods; do not extract each
+blank-separated block or delete whitespace to avoid a finding.
 
 ## Extract Named Computation
 ```java

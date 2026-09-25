@@ -36,11 +36,16 @@ templates; detectors only name the prescribed fix.
 
 **Print this filled checklist before starting refactoring.**
 
-**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the enumerated data — even when clean. Write `→ clean` after the data shows no violation. Bare `[clean]` is only allowed for: (1) file-type skips (`[storage — skipped]`, `[frontend — skipped]`), (2) judgment checks (Section B) where the answer is "none found."
+**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the enumerated data — even when clean. Write `→ clean` after the data shows no violation. Bare `[clean]` is only allowed for: (1) file-type skips (`[storage — skipped]`, `[frontend — skipped]`), (2) judgment checks (Section B) where the answer is "none found," except B13, which always requires grouping evidence.
+
+Run A30 before treating A0/A1 counts as final. Read-only detectors report formatting
+defects without rewriting files; the serial fixer formats and remeasures before
+choosing extractions. Include formatting verification and B13 grouping evidence in
+the scan result even when the candidate table is empty.
 
 ```
 ### A. Structural
-A0.  Class size: 85 lines, 1 interface, 1 concern → clean
+A0.  File size after formatting: 85 physical lines, 1 interface, 1 concern → clean
 A1.  Method sizes: methodA=7, methodB=9 → clean
 A2.  Nesting depth: methodA=0, methodB=1 → clean
 A3.  Feature envy: methodA reads self only; methodB reads order.{amount, currency} → VIOLATION

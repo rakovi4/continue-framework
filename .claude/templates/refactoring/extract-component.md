@@ -34,7 +34,9 @@ Rules:
 
 ## Step 3: Create Component File
 
-Location: `frontend/src/features/{feature}/components/{ComponentName}.tsx`
+Location: the owning capability directory from the agreed feature map. Follow
+File Organization in the coding rules and the active frontend binding; update
+imports and corresponding test paths when moving files.
 
 ```tsx
 import { FieldError } from '@/app/components/ui/field-error'
@@ -124,7 +126,7 @@ export function BoardView({ columns, selectedColumnId, onColumnSelect }: Props) 
 
 1. [ ] JSX block identified
 2. [ ] Props interface defined (minimal, primitive values)
-3. [ ] Component created in `components/`
+3. [ ] Component created beside its owning capability collaborators
 4. [ ] `data-testid` attributes preserved
 5. [ ] Page component updated to use new component
 6. [ ] Computed values extracted as private functions (no local variables in render)
