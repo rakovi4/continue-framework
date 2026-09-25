@@ -10,10 +10,10 @@ Tech binding for `frontend-rules.md`. Shared section structure: `.claude/templat
 
 ## Feature Structure
 
-- Features live in `frontend/src/app/features/{feature}/`. Choose capability directories within each feature using File Organization in `.claude/rules/coding-rules.md`.
-- Keep Angular component source, template, and styles together.
-- Co-locate Jest tests (`{feature}.logic.spec.ts`, `{feature}.api.spec.ts`) or use a capability-local `__tests__/` directory. Shared code needs a named responsibility and explicit owner.
-- Template-relative `components/`, `logic/`, and test paths are illustrative within one capability, not required feature-wide buckets. Resolve them against the agreed capability map and adjust imports.
+- Features live in `frontend/src/app/features/{feature}/` with subdirectories:
+  - `components/` -- Angular components: `{feature}-page/` and extracted sub-components, each in its own directory with `.component.ts`, `.component.html`.
+  - `logic/` -- pure logic `{feature}.logic.ts`, API client `{feature}.api.ts`, `types.ts`.
+  - `__tests__/` -- Jest tests: `{feature}.logic.spec.ts`, `{feature}.api.spec.ts`.
 
 ## Shared UI Components
 

@@ -22,7 +22,7 @@ truth, so the per-row checks never drift out of sync with the split.
 
 | Cluster | Detector agent | Loads | Section A categories | Section B |
 |---------|---------------|-------|----------------------|-----------|
-| **M — Mechanics** | `refactor-mechanics-agent` | `scan-mechanics.md` | Formatting (A60); Class size (A0); Complexity (A1, A2, A26); Optional (A5, A5b); Variables, lambdas & comments (A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45); Indirection (A20, A21, A55); Imports (A10, A36); Dead code (A11, A11b) | — |
+| **M — Mechanics** | `refactor-mechanics-agent` | `scan-mechanics.md` | Class size (A0); Complexity (A1, A2, A26); Optional (A5, A5b); Variables, lambdas & comments (A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45); Indirection (A20, A21, A55); Imports (A10, A36); Dead code (A11, A11b) | — |
 | **D — Design** | `refactor-design-agent` | `scan-design.md` | Data ownership (A3, A4); Repetition (A6, A7, A7b); Polymorphism (A46, A47, A48); Error handling (A57, A57b); Cohesion & parameter groups (A49, A50, A51); Type safety (A12, A13, A13b); Usecase design (A35, A56); Storage adapter design (A33, A34, A42, A43, A44) | Domain modeling (B1–B3); Behavior placement (B4–B9); File organization (B13) |
 | **T — Duplication & surface** | `refactor-duplication-agent` | `scan-duplication.md` | Sibling duplication (A14); Cross-class duplication (A22, A52, A54, A23, A24, A37, A41, A31, A38, A39, A40, A53); Frontend (A15, A15b, A16, A17, A18, A19, A46, A47, A57 — `.tsx` only) | Test-specific (B10, B11); Frontend (B12) |
 
@@ -36,16 +36,11 @@ templates; detectors only name the prescribed fix.
 
 **Print this filled checklist before starting refactoring.**
 
-**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the enumerated data — even when clean. Write `→ clean` after the data shows no violation. Bare `[clean]` is only allowed for: (1) file-type skips (`[storage — skipped]`, `[frontend — skipped]`), (2) judgment checks (Section B) where the answer is "none found," except B13, which always requires grouping evidence.
-
-Run A60 before treating A0/A1 counts as final. Read-only detectors report formatting
-defects without rewriting files; the serial fixer formats and remeasures before
-choosing extractions. Include formatting verification and B13 grouping evidence in
-the scan result even when the candidate table is empty.
+**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the enumerated data — even when clean. Write `→ clean` after the data shows no violation. Bare `[clean]` is only allowed for: (1) file-type skips (`[storage — skipped]`, `[frontend — skipped]`), (2) judgment checks (Section B) where the answer is "none found."
 
 ```
 ### A. Structural
-A0.  File size after formatting: 85 physical lines, 1 interface, 1 concern → clean
+A0.  Class size: 85 lines, 1 interface, 1 concern → clean
 A1.  Method sizes: methodA=7, methodB=9 → clean
 A2.  Nesting depth: methodA=0, methodB=1 → clean
 A3.  Feature envy: methodA reads self only; methodB reads order.{amount, currency} → VIOLATION

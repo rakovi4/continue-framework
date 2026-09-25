@@ -13,14 +13,14 @@ Mockups contain placeholder values (`user@example.com`, fake dates, sample price
 
 ## Component Size
 
-- When a component file exceeds ~70-100 formatted lines, extract sub-components (views, sections, cards) into their owning capability's directory.
+- When a component file exceeds ~70-100 lines, extract sub-components (views, sections, cards) into their own files in the same `components/` directory.
 - Page components should be thin routers/orchestrators -- fetch data, route between views, render child components.
 - Helper components used by only one view live in that view's file. When a helper is shared across views, give it its own file.
 
 ## Feature Structure
 
-- Apply File Organization in `.claude/rules/coding-rules.md` within each feature. Identify its cohesive capabilities before choosing component, logic, client, style, and test paths.
-- Keep collaborators with their owning capability; separate responsibilities into files without requiring feature-wide technical directories. Shared contracts and page composition have explicit owners.
+- Features are organized in self-contained directories with subdirectories for components, logic, API clients, and tests.
+- Feature-specific components stay in the feature's components directory.
 - Reusable components shared across features live in a dedicated shared UI directory.
 
 ## Naming

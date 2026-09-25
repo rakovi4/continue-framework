@@ -45,7 +45,7 @@ export async function registerUser(request: RegistrationRequest): Promise<Regist
 
 ## Humble Object Component
 
-Resolve component and collaborator paths inside the owning capability, following the profile coding rules. The relative directories below illustrate one capability; adapt paths and imports to its agreed layout.
+Components live in `components/` subdirectory.
 
 Page component (`components/{feature}-page/{feature}-page.component.ts`) -- orchestrates state and composes field components:
 

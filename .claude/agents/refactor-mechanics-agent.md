@@ -13,7 +13,7 @@ serial fixer agent applies refactorings after all detectors finish.
 You own **cluster M** of `.claude/templates/refactoring/scan-checklist.md` — the
 objective "shape of the code within a file" categories. Run ONLY these:
 
-- **Formatting** A60; **Class size** A0; **Complexity** A1, A2, A26
+- **Class size** A0; **Complexity** A1, A2, A26
 - **Optional** A5, A5b
 - **Variables, lambdas & comments** A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45
 - **Indirection** A20, A21, A55

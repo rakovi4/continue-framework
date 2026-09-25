@@ -43,7 +43,7 @@ export async function registerUser(request: RegistrationRequest): Promise<Regist
 
 ## Humble Object Component (.tsx)
 
-Build AFTER logic and API are tested. Resolve component and collaborator paths inside the owning capability, following the profile coding rules. The relative directories below illustrate one capability; adapt paths and imports to its agreed layout.
+Build AFTER logic and API are tested. Components live in `components/` subdirectory.
 
 Page component (`components/{Feature}Page.tsx`) — orchestrates state and composes field components:
 

@@ -1,20 +1,53 @@
 # Extract Method
 
-When to use: a method mixes responsibilities or abstraction levels, repeats a
-computation, or buries a meaningful precondition. Format before measuring size;
-apply `restraint.md` before extracting.
+When to use: a method is too long, mixes abstraction levels, repeats an expression, buries preconditions inline, or has commented sections separated by blank lines.
+
+## Extract Commented Sections
+When code is organized with comments or followed by blank lines, each commented block is a named concern. Extract each block to a method named after its comment. The comment text becomes the method name.
+
+```java
+// Before — commented sections signal separate concerns
+// Normal save-load-save cycle — forces version round-trip through domain
+Task loaded = storage.findByTaskId(task.getTaskId()).orElseThrow();
+loaded.archive();
+em.clear();
+storage.save(loaded);
+em.flush();
+em.clear();
+
+// First handler saves successfully — bumps version
+firstRead.markComplete();
+storage.save(firstRead);
+em.flush();
+em.clear();
+
+// After — each comment became a method name
+archive(task);
+updateAndSave(firstRead);
+```
+
+**Heuristic:** When you see `// comment` followed by a code block followed by a blank line, extract the block as a method named after the comment. The comment is already doing the naming work for you.
 
 ## Extract Blank Line Wrapped Sections
+When code blocks are separated by blank lines without comments, each block is an unnamed concern. You must derive the method name from what the code does.
 
-Blank lines inside a method often group operations by purpose. For each group,
-ask what it does; extract the block into a method whose name expresses that intent.
-A section comment can supply the name. Preserve essential comment information
-under the source-comment rule.
+```java
+// Before — blank lines signal separate concerns but no names provided
+User user = storage.findById(userId).orElseThrow();
 
-Apply `restraint.md` to cohesive test recipes and blocks sharing intermediate
-state. Spacing between imports, declarations, or methods is outside this heuristic.
-The fix is a named extraction, never deleting whitespace or joining statements.
-Keep readable spacing in both the caller and extracted methods.
+if (user.getRole() != UserRole.ADMIN) {
+    throw new AccessDeniedException("Admin only");
+}
+
+task.archive();
+storage.save(task);
+
+// After — each blank-separated block extracted with derived names
+User admin = requireAdmin(userId);
+archiveTask(task);
+```
+
+**Heuristic:** When you see a blank line, ask "what concern ends here?" The answer becomes the method name. Unlike commented sections, you must infer the purpose from the code itself.
 
 ## Extract Named Computation
 ```java
