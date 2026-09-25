@@ -51,7 +51,7 @@ Keep one checkpoint per lane in the invocation work log, with these named result
 | RED refactor | Scanned test paths, completed skill result, commit or evidenced `NO_CHANGE` |
 | Coverage | Measured production paths per module, report location and counts, gap dispositions |
 | GREEN refactor | Scanned production and test paths, completed skill result, commit or evidenced `NO_CHANGE` |
-| Structure and formatting | B13 capability grouping evidence; A30 formatter/manual check; A0 final physical line counts after formatting, for both RED and GREEN scopes |
+| Structure and formatting | B13 capability grouping evidence; A60 formatter/manual check; A0 final physical line counts after formatting, for both RED and GREEN scopes |
 | Final verification | Affected suite results and final checked revisions; verify-only alignment for design lanes |
 
 Design lanes without a RED phase record that fact; their post-behavior refactor

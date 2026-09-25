@@ -31,7 +31,7 @@ in any backend layer.
 
 - Keep hand-written production code, tests, styles, markup, and configuration readable: one statement per line, expanded block bodies, consistent indentation, and blank lines between methods and logical sections. Put stylesheet declarations on separate lines; wrap long expressions and markup using the project's formatting conventions.
 - Run the configured formatter on touched files. If none exists, apply the language's conventional multiline formatting manually. Generated output is not a model for hand-written source.
-- Blank lines are readability aids, not evidence of separate responsibilities. Never remove spacing, join statements, or collapse blocks to satisfy a file or method size limit. Format first; split oversized files by cohesive responsibility afterward.
+- Blank lines aid readability and can reveal blocks within a method that deserve a named extraction. Extract those blocks by purpose; retain normal spacing between declarations, methods, and logical sections. Never remove spacing, join statements, or collapse blocks to satisfy a file or method size limit. Format first; split oversized files by cohesive responsibility afterward.
 
 ## File Size
 

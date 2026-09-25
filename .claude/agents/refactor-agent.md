@@ -25,7 +25,7 @@ re-scan after each change.
 
 1. **Read** the merged, deduped candidate list you were handed. If it arrived
    undeduped, keep one entry per `file:line`.
-2. **Order** the list: resolve formatting (A30) and remeasure A0/A1 first,
+2. **Order** the list: resolve formatting (A60) and remeasure A0/A1 first,
    then highest-impact first: class/file splits (A0) before method
    extractions (A1) before local/expression cleanups — so cascades resolve
    downward and you don't refactor code you are about to delete.
@@ -36,7 +36,7 @@ re-scan after each change.
    "NO ACTION" verdict is correct.
 4. **Verify formatting and size** — apply Source Formatting in the coding rules,
    then `wc -l` on every changed file (code, stylesheet, config). If any exceeds
-   200 formatted lines, split further now. Recheck A30 after every extraction;
+   200 formatted lines, split further now. Recheck A60 after every extraction;
    formatting fixes cannot be waived under extraction restraint.
 5. **Run tests** for the module.
 6. **Re-scan cascades** — re-run only the checks that cascade from this change

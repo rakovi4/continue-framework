@@ -7,7 +7,7 @@ and the fixer (before applying an extraction) apply these guardrails — a
 
 These guardrails govern abstraction changes, not readable formatting. Restoring
 line breaks and spacing may add lines without adding indirection; never use
-restraint to waive A30 or retain compressed code. Judge method size only after
+restraint to waive A60 or retain compressed code. Judge method size only after
 formatting, and keep blank lines between coherent phases of a linear recipe.
 
 - **Don't over-fragment into single-use helpers.** Extracting several tiny 1–3

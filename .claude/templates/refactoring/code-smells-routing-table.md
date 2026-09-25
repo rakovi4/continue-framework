@@ -71,7 +71,8 @@ All templates live in `.claude/templates/refactoring/`.
 | Long method (>10 lines) | Extract private methods per concern | `extract-method.md` |
 | Comment-labeled block with a distinct responsibility (A29) | Apply extraction restraint; extract only when its behavior warrants a named method, and preserve essential comment information before deletion | `extract-method.md` |
 | Any source comment | Preserve essential information through clearer code, tests, executable configuration, or owning documentation; then delete the comment | `replace-comment-with-code.md` |
-| Compressed or unseparated source (A30) | Apply Source Formatting from the coding rules, then remeasure file/method sizes; preserve readable spacing | (inline — format, remeasure A0/A1, run affected checks) |
+| Blank line wrapped sections (blank line + code + blank) | Extract each block, derive method name from purpose | `extract-method.md` |
+| Multiple statements on one line, collapsed blocks, or missing spacing between methods (A60) | Put statements on separate lines, expand blocks, and restore spacing before checking size limits | (inline — format source, remeasure sizes, run affected checks) |
 | Sequential independent blocks (3+ small operations, no shared state, each a distinct concern) | Extract each block into named method -- parent becomes table of contents | `extract-method.md` |
 | Single-use local: simple pass-through (accessor result used once, NOT a call to an injected dependency) | Inline variable | `simplify-expressions.md` |
 | Inlined dependency call (usecase/port/repo call nested inside return or method arg) | Extract variable to isolate side effect | `simplify-expressions.md` |

@@ -6,11 +6,17 @@ routing + output format: `scan-checklist.md`. Fix templates: `code-smells-routin
 Produce structural data. Violation is numeric/objective.
 Skip checks marked with a file-type tag that doesn't match the target file.
 
+**Formatting:**
+
+| # | Check | Enumerate | Violation |
+|---|-------|-----------|-----------|
+| A60 | Packed statements and missing spacing | Cite lines containing multiple statements, collapsed block bodies, multiple stylesheet declarations, or missing separation between methods. Check the remaining Source Formatting rules; record formatter verification or manual inspection. | Put statements and declarations on separate lines, expand blocks, and restore readable spacing; then remeasure A0/A1 |
+
 **Class size & responsibility:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A0 | File / class size & concerns | Every physical line after Source Formatting in the coding rules, including blank lines and imports; implemented interfaces/ports and distinct responsibility groups. Applies to every file type. If A30 fails, report current counts as provisional and require remeasurement after formatting. | >200 formatted lines OR 2+ unrelated interfaces; compressed source cannot pass by its raw count |
+| A0 | File / class size & concerns | Every physical line after Source Formatting in the coding rules, including blank lines and imports; implemented interfaces/ports and distinct responsibility groups. Applies to every file type. If A60 fails, report current counts as provisional and require remeasurement after formatting. | >200 formatted lines OR 2+ unrelated interfaces; compressed source cannot pass by its raw count |
 
 **Complexity:**
 
@@ -40,7 +46,7 @@ Skip checks marked with a file-type tag that doesn't match the target file.
 | A28 | Functional factory method | Methods returning `Runnable`, `Supplier`, `Callable`, or other functional interfaces where the body is a lambda wrapping imperative code | Any `return () -> { ... }` or `return () -> expr` |
 | A29 | Comment-labeled responsibilities | For each section comment, inspect whether its block has a distinct responsibility; cite the behavior and shared state. Route comment removal through A59. | Extract only a distinct responsibility when restraint permits; a comment or whitespace alone does not justify extraction |
 | A59 | Source comments | Count comment-only lines and enumerate every contiguous source comment block (`start–end`, line count). Identify what information or directive must be preserved elsewhere before removal. | Any source comment. Preserve essential information through names, types, tests, executable configuration, or owning documentation, then delete the comment. No `KEEP` classification exists. |
-| A30 | Source formatting | Check every target against Source Formatting in `.claude/rules/coding-rules.md`. Cite packed statements/declarations, collapsed block bodies, missing method/section separation, and unwrapped expressions or markup; record formatter check or manual inspection. | Any formatting violation requires expansion and spacing, then A0/A1 remeasurement; blank lines themselves never require extraction |
+| A30 | Blank line wrapped sections | List blocks separated by blank lines inside methods; describe each block’s purpose and shared state. Exclude spacing between declarations, methods, and imports. | Extract each block into a method named for its purpose, subject to extraction restraint; never delete the blank lines as the fix |
 | A45 | Sequential independent blocks | Methods with 2+ sequential operations that don't share intermediate state and each handle a distinct concern (e.g., validate page, validate size, validate date range). Count independent blocks even without comments or blank lines separating them. | 2+ independent blocks in one method — extract each into a named method |
 
 **Indirection:**

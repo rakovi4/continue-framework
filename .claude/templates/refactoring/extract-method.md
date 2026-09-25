@@ -4,16 +4,17 @@ When to use: a method mixes responsibilities or abstraction levels, repeats a
 computation, or buries a meaningful precondition. Format before measuring size;
 apply `restraint.md` before extracting.
 
-## Identify Responsibilities
+## Extract Blank Line Wrapped Sections
 
-Inspect behavior, collaborators, and shared intermediate state. Extract a block
-when naming a distinct responsibility clarifies the caller. Comments may suggest
-intent, but neither comments nor blank lines prove that extraction is useful.
-Preserve essential comment information under the source-comment rule.
+Blank lines inside a method often group operations by purpose. For each group,
+ask what it does; extract the block into a method whose name expresses that intent.
+A section comment can supply the name. Preserve essential comment information
+under the source-comment rule.
 
-Blank lines between methods and logical phases are normal readable formatting.
-Keep them in linear test recipes and cohesive methods; do not extract each
-blank-separated block or delete whitespace to avoid a finding.
+Apply `restraint.md` to cohesive test recipes and blocks sharing intermediate
+state. Spacing between imports, declarations, or methods is outside this heuristic.
+The fix is a named extraction, never deleting whitespace or joining statements.
+Keep readable spacing in both the caller and extracted methods.
 
 ## Extract Named Computation
 ```java
