@@ -21,12 +21,14 @@ Scatter–gather: **three parallel read-only detectors** scan for smells, then a
 ## Workflow
 
 1. **Identify the target** file (and its tests / siblings). This determines which
-   file-type checks apply (backend vs `.tsx`).
+   responsibilities to scan using `scan-checklist.md`'s applicability protocol.
+   Load shared coding detail for every target, frontend role rules where relevant,
+   and the active technology bindings. Syntax and runtime do not narrow shared checks.
 2. **Dispatch the detectors concurrently and await all of them** — start every
    named agent before awaiting results, then gather every result. No dispatch is
    detached or fire-and-forget: step 3 requires the complete result set.
    Each runs only its cluster of `.claude/templates/refactoring/scan-checklist.md`
-   and returns a candidate table:
+   and returns candidates, evidenced KEEP decisions, and role applicability:
    - `refactor-mechanics-agent` — cluster M (size, complexity, variables, dead code)
    - `refactor-design-agent` — cluster D (domain modeling, behavior placement, type safety)
    - `refactor-duplication-agent` — cluster T (sibling/cross-class duplication, tests, frontend)
@@ -46,7 +48,7 @@ file was touched.
 
 ## Available Templates
 
-### Backend (`.claude/templates/refactoring/`)
+### Shared principles and responsibility-specific patterns (`.claude/templates/refactoring/`)
 
 - `scan-checklist.md` - Scan hub: detector clusters + output format (links the three below)
 - `scan-mechanics.md` - Cluster M checks (structural mechanics)
@@ -72,7 +74,7 @@ file was touched.
 - `adapter-query.md` - Extract typed AdapterQuery for Specification/CriteriaQuery logic
 - `subselect-read-model.md` - Consolidate multiple repositories into single query with ORM relationships
 
-### Frontend (`.claude/templates/refactoring/`)
+### Additional presentation and fixture patterns (`.claude/templates/refactoring/`)
 
 - `extract-component.md` - Extract JSX block into field/section component
 - `extract-shared-ui.md` - Move reusable component to `app/components/ui/`

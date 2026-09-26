@@ -3,8 +3,9 @@
 Part of the refactor scan, run by `refactor-mechanics-agent`. Hub + cluster
 routing + output format: `scan-checklist.md`. Fix templates: `code-smells-routing-table.md`.
 
-Produce structural data. Violation is numeric/objective.
-Skip checks marked with a file-type tag that doesn't match the target file.
+Produce structural data for all executable forms, including functions, callbacks,
+closures, and methods. Use the role applicability protocol in `scan-checklist.md`;
+translate syntax through the active binding instead of skipping a principle.
 
 **Formatting:**
 
@@ -22,32 +23,32 @@ Skip checks marked with a file-type tag that doesn't match the target file.
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A1 | Method sizes | Every method's physical line count after readable formatting, including opening and closing block lines. Apply extraction restraint to cohesive recipes. | >10 formatted lines is an extraction candidate; packed statements cannot establish a pass |
-| A2 | Nesting depth | Methods with control flow nesting (`if`, `for`, `while`, `try`, `switch`, lambda) | > 1 level |
-| A26 | If/return vs switch | Methods with 3+ `if (x === 'constant') return` lines branching on the same variable | Any — replace with `switch` |
+| A1 | Function sizes | Every function, method, callback, and effect body: formatted physical lines, responsibilities, abstraction levels, and possible extraction boundaries | Over 10 lines requires decomposition or the per-function KEEP evidence in `restraint.md`; shared state, asynchronous ordering, or a lifecycle name alone cannot justify KEEP |
+| A2 | Nesting depth | Control-flow depth in every executable body, including callbacks | More than one level requires flattening or named extraction; preserve required error/lifetime boundaries and justify retained nesting under `restraint.md` |
+| A26 | Repeated variant branching | Three or more branches comparing the same value against constants | Use exhaustive dispatch at the owning responsibility; preserve clear guard returns and do not manufacture an accumulator merely to force one return |
 
 **Optional:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A5 | Optional handling | Every Optional variable with its handling pattern | Any `isPresent()`/`get()` pair |
-| A5b | Nullable request fields | Fields in usecase request DTOs that are nullable instead of `Optional` with `@Builder.Default Optional.empty()` | Any nullable filter/parameter field in a request DTO (adapters wrap nulls at the boundary) |
+| A5 | Optional handling | Every representation of absence and its access/unwrap pattern | Replace redundant check-then-unwrap with the active binding's safe optional handling; preserve required narrowing and legitimate guards |
+| A5b | Optional request fields | Optional fields in internal operation requests and their boundary conversions | Ambiguous missing/default values or unchecked absence reaching model logic; normalize at the boundary using explicit optional states |
 
 **Variables & lambdas:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A8 | Local variables | ALL local variables (single-use and multi-use). Classify each as *pass-through* (simple delegation used once: `Foo x = obj.field()`, `Foo x = privateMethod()`, `Foo x = staticMethod()` — the key is no injected dependency involved) or *computation* (conditional, ternary, multi-step expression, stream pipeline — any use count) or *side-effect isolation* (any call to an injected dependency — usecase, port, repository, API client — regardless of verb, whose result feeds a pure return/mapping). Only injected fields count as dependencies — private/static methods on the same class are NOT side-effecting. | Any local that is not side-effect isolation. Single-use pass-through → inline variable. Computation (any use count) → extract private method. **Side-effect isolation → KEEP** (never inline). |
-| A9 | Lambda → method ref | Lambdas that delegate to a single constructor or method call | `x -> new Foo(x)`, `x -> bar(x)` |
+| A8 | Local variables | All locals: classify aliases, named computations, stable snapshots/identities, and effect results; inspect the called behavior | Inline disposable aliases; extract distinct or repeated computations; keep meaningful names, required snapshots, and effect isolation. Injection alone does not establish an effect |
+| A9 | Forwarding callbacks | Callbacks that only forward arguments to another operation | Use a direct reference when binding, argument shape, and lifetime remain identical; otherwise retain the adapter with evidence |
 | A58 | Type-inference local declarations | Local variables declared with the language's type-inference shorthand instead of an explicit type (see tech binding for the keyword and policy). | Per tech binding — any occurrence where the binding forbids type inference. An inferred type forces the reviewer to derive it from the right-hand side; an explicit type is self-documenting in diffs. |
-| A32 | Inlined dependency calls | Calls to injected dependencies (usecase, port, repository, API client) nested inside expressions (return statements, method arguments, DTO factory calls) instead of isolated in their own local variable. Any call to an injected field is side-effecting regardless of verb — `getTasksByColumn()` hits the DB just like `save()` does. | Any dependency call nested inside another expression → extract to local variable |
-| A25 | Replace Loop with Pipeline | For-loops over collections that can be replaced with stream pipelines (`forEach`, `map`, `filter`, `collect`, `reduce`, `anyMatch`, etc.). Includes loops that accumulate into a list, filter by condition, or transform elements. | Any for-loop replaceable by a collection pipeline |
-| A27 | Inline multi-step pipeline | Stream/async pipelines (`IntStream.range().mapToObj().toArray()`, `.stream().map().filter().collect()`) written inline in a method that also does other work | Any inline pipeline with 2+ chained transformations in a method with other logic |
-| A28 | Functional factory method | Methods returning `Runnable`, `Supplier`, `Callable`, or other functional interfaces where the body is a lambda wrapping imperative code | Any `return () -> { ... }` or `return () -> expr` |
+| A32 | Effects hidden in expressions | Nested network, persistence, scheduling, mutation, clock, or other time-dependent calls; identify actual behavior and evaluation order | Isolate effects before pure mapping. Do not expand pure accessor calls merely because the object was injected; preserve snapshot timing and short-circuit behavior where observable |
+| A25 | Collection transformations | Loops implementing mapping, filtering, aggregation, or search | Use the active binding's collection operations when they clarify the transformation without changing ordering, short-circuiting, or effects |
+| A27 | Inline multi-step pipeline | Two or more transformations embedded in a function that also owns another concern | Extract the transformation into a named operation; preserve evaluation and asynchronous order |
+| A28 | Functional wrappers | Returned callbacks and factories wrapping imperative work; list captured values and lifetime | Remove redundant indirection; retain callbacks that own meaningful identity, subscription cleanup, or lifetime, with that responsibility stated |
 | A29 | Comment-labeled responsibilities | For each section comment, inspect whether its block has a distinct responsibility; cite the behavior and shared state. Route comment removal through A59. | Extract only a distinct responsibility when restraint permits; a comment or whitespace alone does not justify extraction |
 | A59 | Source comments | Count comment-only lines and enumerate every contiguous source comment block (`start–end`, line count). Identify what information or directive must be preserved elsewhere before removal. | Any source comment. Preserve essential information through names, types, tests, executable configuration, or owning documentation, then delete the comment. No `KEEP` classification exists. |
 | A30 | Blank line wrapped sections | List blocks separated by blank lines inside methods; describe each block’s purpose and shared state. Exclude spacing between declarations, methods, and imports. | Extract each block into a method named for its purpose, subject to extraction restraint; never delete the blank lines as the fix |
-| A45 | Sequential independent blocks | Methods with 2+ sequential operations that don't share intermediate state and each handle a distinct concern (e.g., validate page, validate size, validate date range). Count independent blocks even without comments or blank lines separating them. | 2+ independent blocks in one method — extract each into a named method |
+| A45 | Mixed sequential responsibilities | Consecutive validation, state transitions, transport, mapping, or assertions; enumerate purposes and values exchanged | Extract distinct responsibilities even when they share intermediate state; pass values or use the owning model. Shared data is not evidence of a single concern |
 
 **Indirection:**
 
@@ -55,18 +56,18 @@ Skip checks marked with a file-type tag that doesn't match the target file.
 |---|-------|-----------|-----------|
 | A20 | Thin wrappers | Methods whose entire body is a single delegation to another method in the same class, passing only constants/hardcoded values. List each wrapper → target method + hardcoded args. | Any delegate-only method |
 | A21 | Single-value parameters | Parameters that receive the same argument at every call site. For each method parameter, grep all callers. | Parameter always receives one value |
-| A55 | Parameter derivable from sibling parameter | For each method with 2+ parameters of related types, check if any parameter's value is accessible from another parameter (e.g., `method(Task original, Title title)` where `title == original.getTitle()`). List the derivable parameter and the accessor path. | Any parameter obtainable from a sibling → remove it, use the accessor inside the method |
+| A55 | Derivable parameters | Parameters whose values can be obtained from another parameter; list all callers | Remove redundant parameters unless they intentionally capture a different snapshot or independently expected test value |
 
 **Imports:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A10 | Enum qualification | Enum constants used with class prefix in logic (not import lines) | Any `EnumClass.VALUE` |
-| A36 | Repeated FQN | Fully-qualified class names (`com.foo.Bar`) appearing 2+ times in logic (not import lines). When the short name collides with an inner class, rename the inner class and import the external one. | Any FQN used 2+ times |
+| A10 | Qualified fixed values | Repeated qualifications in expressions; inspect binding conventions and naming collisions | Apply the active binding's import conventions while keeping ownership unambiguous |
+| A36 | Repeated fully qualified names | Repeated module/type qualification in executable expressions | Use imports or meaningful aliases under the active binding; resolve name collisions explicitly |
 
 **Dead code:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A11 | Unused code | Private methods/fields with no call site in the file | Any unreferenced private member |
-| A11b | `// Unreachable` markers | Grep `// Unreachable` in the file. These are dead code branches flagged by the coverage agent. | Any match → remove the dead branch and simplify the surrounding condition |
+| A11 | Unused code | Unreferenced functions, members, exports, fixtures, and styles; inspect consumers, discovery, and dynamic registrations | Remove code with no consumer after verifying framework discovery and external contracts |
+| A11b | Unreachable branches | Coverage findings and source markers that claim unreachability; verify each path against contracts | Delete proven unreachable code; lack of coverage alone is not proof. Remove source comments through A59 |

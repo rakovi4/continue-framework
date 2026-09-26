@@ -54,6 +54,7 @@ Keep one checkpoint per lane in the invocation work log, with these named result
 | RED refactor | Scanned test paths, completed skill result, commit or evidenced `NO_CHANGE` |
 | Coverage | Measured production paths per module, report location and counts, gap dispositions |
 | GREEN refactor | Scanned production and test paths, completed skill result, commit or evidenced `NO_CHANGE` |
+| Refactor applicability and exemptions | Role inventory, every applicable M/D/T check, and per-candidate KEEP evidence under `restraint.md`; no language/extension-based waiver of shared principles |
 | Structure and formatting | B13 capability grouping evidence; A60 formatter/manual check; A0 final physical line counts after formatting, for both RED and GREEN scopes |
 | Final verification | Affected suite results and final checked revisions; verify-only alignment for design lanes |
 
@@ -71,7 +72,7 @@ advancing to Stage 3; do not ask whether to run them.
 Validate B13 against the directory boundary check in `scan-design.md`: require
 the file inventory and MOVE/KEEP verdicts, with every MOVE resolved in the final
 paths. A summary such as "no further split" cannot replace that evidence. Missing
-evidence or unformatted source blocks completion even when raw line counts meet
+evidence, unsupported exemptions, syntax-only skips, or unformatted source block completion even when raw line counts meet
 the limit. Reconcile file moves with lane ownership and update imports, discovery,
 and test paths before rerunning affected checks.
 

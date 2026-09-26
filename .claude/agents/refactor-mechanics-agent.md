@@ -25,7 +25,8 @@ duplication, frontend, all of Section B).
 
 ## Workflow
 
-1. **Read** the target file (and, for A21/A55 single-value / derivable
+1. **Read** shared coding detail, active bindings, and the role protocol in
+   `scan-checklist.md`. Read the target file (and, for A21/A55 single-value / derivable
    parameters, grep all call sites of the methods involved).
 2. **Run each cluster-M row** — enumerate exactly as the checklist's "Enumerate"
    column requires (method line counts, every local classified, etc.). Show the
@@ -35,7 +36,9 @@ duplication, frontend, all of Section B).
    Never infer a clean result from A29 alone.
 3. **Report candidates** — no edits. Apply the restraint guardrails in
    `.claude/templates/refactoring/restraint.md` before flagging extractions; a
-   single-use pass-through inline or a "NO ACTION" verdict is often correct.
+   retained candidate requires the concrete evidence defined there. Return every
+   over-threshold function and mixed-responsibility block with FIX or evidenced
+   KEEP; do not hide declined candidates from the fixer.
 
 ## Reference
 
@@ -47,7 +50,8 @@ tech binding referenced by the checklist.
 
 ## Findings Output
 
-Return one row per candidate (no prose, no fixes applied):
+Return one row per candidate plus retained-candidate evidence and applicability
+verdicts. Apply no fixes:
 
 ```
 ## Cluster M candidates

@@ -37,7 +37,7 @@ refactor detectors, so workers never nest fan-outs. Use these sequences:
 
 | Lane | Complete sequence | Owns |
 |------|-------------------|------|
-| Frontend logic | RED → test review → test refactor → GREEN → coverage → refactor | Logic production and test files |
+| Frontend logic | RED → test review → test refactor → GREEN → coverage → refactor | Pure capability models, operation/lifecycle controllers, and their tests; separate owners/files under the frontend role map |
 | API client (`layer=frontend-api`) | RED → test review → test refactor → GREEN → coverage → refactor | API-client production and test files |
 | Design alignment | Component build → align → design review → test review → coverage → refactor → verify-only align | Component, style, and explicitly owned test files |
 

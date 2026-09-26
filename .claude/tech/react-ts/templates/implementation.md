@@ -1,98 +1,94 @@
 # Frontend Implementation Template
 
-## Logic Implementation (.logic.ts)
+Load shared `coding-detail.md`, `frontend-rules.md`, and the React/TypeScript
+coding and test bindings before implementing. Their responsibility map applies
+to the entire capability, including functions, hooks, clients, and test helpers.
+
+## Pure model (.logic.ts)
+
+Own validation, derived values, and named transitions in pure model functions.
+Use typed outcomes so callers do not repeat the rule or inspect unrelated fields.
 
 ```typescript
-export function validateEmail(email: string): ValidationResult {
-  if (!email) return { valid: false, error: 'Email is required' }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { valid: false, error: 'Invalid email format' }
-  return { valid: true }
-}
+type InputDecision =
+  { kind: "invalid"; message: string } | { kind: "valid"; value: string };
 
-export function isFormValid(state: RegistrationFormState): boolean {
-  return validateEmail(state.email).valid
-    && validatePassword(state.password).valid
-    && state.password === state.confirmPassword
-}
-
-export function buildRegistrationRequest(state: RegistrationFormState): RegistrationRequest {
-  return { email: state.email, password: state.password, passwordConfirmation: state.confirmPassword }
-}
-```
-
-## API Client Implementation (.api.ts)
-
-```typescript
-const BASE_URL = import.meta.env.VITE_API_URL ?? ''
-
-export async function registerUser(request: RegistrationRequest): Promise<RegistrationResponse> {
-  const response = await fetch(`${BASE_URL}/api/v1/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message)
+export function validateInput(value: string): InputDecision {
+  if (!value.trim()) {
+    return { kind: "invalid", message: "A value is required" };
   }
-
-  return response.json()
+  return { kind: "valid", value };
 }
 ```
 
-## Humble Object Component (.tsx)
+Keep capability state and its transitions with this owner. A transition returns
+new state; observable publication belongs to the controller/store boundary.
+Represent mutually exclusive states with discriminated unions where appropriate.
 
-Build AFTER logic and API are tested. Resolve component and collaborator paths inside the owning capability, following the profile coding rules. The relative directories below illustrate one capability; adapt paths and imports to its agreed layout.
+## Orchestration (.controller.ts)
 
-Page component (`components/{Feature}Page.tsx`) — orchestrates state and composes field components:
+Own operation sequencing and lifecycle here. Inject narrow API, navigation,
+clock, and state-publication ports as needed. Delegate validation and transitions
+to the model; never place external effects in a pure logic file.
+
+Use `.claude/tech/react-ts/templates/refactoring.md` for decomposition of an
+asynchronous operation. Preserve cancellation and freshness checks at each await
+boundary. Handle expected errors through the owning error policy; never add an
+empty catch or silently ignore an unexpected failure.
+
+## API client (.api.ts)
+
+The adapter owns transport, typed decoding, and protocol error translation.
+Models and components do not know response status codes or external SDK details.
+Use the backend URL configuration from the active binding. Validate unknown
+external data at the boundary; a type assertion is not decoding.
+
+## Component (.tsx)
+
+Render view state and bind events to controller operations. The controller owns
+submission, validation, and failure handling. Keep capability paths local.
 
 ```tsx
-import { useState } from 'react'
-import { validateEmail, buildRegistrationRequest } from '../logic/registration.logic'
-import { registerUser } from '../logic/registration.api'
-import { EmailField } from './EmailField'
-import type { RegistrationFormState } from '../logic/types'
+type InputViewProps = {
+  value: string;
+  error: string | null;
+  busy: boolean;
+  onChange(value: string): void;
+  onSubmit(): void;
+};
 
-export function RegistrationPage() {
-  const [form, setForm] = useState<RegistrationFormState>(getInitialFormState)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const updateField = (field: keyof RegistrationFormState, value: string | boolean) => {
-    setForm(prev => ({ ...prev, [field]: value }))
-  }
-
-  const submitForm = async () => {
-    if (isLoading) return
-    setIsLoading(true)
-    await registerUser(buildRegistrationRequest(form)).catch(() => {})
-  }
-
+export function InputView(props: InputViewProps) {
   return (
-    <form onSubmit={handleSubmit}>
-      <EmailField value={form.email} onChange={v => updateField('email', v)} />
-      {/* ... other field components ... */}
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        props.onSubmit();
+      }}
+    >
+      <label htmlFor="input-value">Value</label>
+      <input
+        id="input-value"
+        data-testid="input-value"
+        value={props.value}
+        onChange={(event) => props.onChange(event.target.value)}
+      />
+      {props.error && <p role="alert">{props.error}</p>}
+      <button disabled={props.busy} type="submit">
+        Submit
+      </button>
     </form>
-  )
+  );
 }
 ```
 
-Field components (`components/{FieldName}.tsx`) — encapsulate label + input + error for one field:
+The markup is one form responsibility. Its event callback only adapts the browser
+event. Adding a multi-step workflow requires a controller operation; adding an
+independent visual responsibility requires component extraction. A render block's
+length never exempts its executable callbacks from the common checks.
 
-```tsx
-export function EmailField({ value, error, onChange, onBlur }: EmailFieldProps) {
-  return (
-    <div>
-      <label htmlFor="email">Email</label>
-      <input data-testid="email-input" value={value} onChange={e => onChange(e.target.value)} onBlur={onBlur} />
-      {error && <FieldError message={error} />}
-    </div>
-  )
-}
-```
+## Verification
 
-## Test Verification
-
-```
-Skill tool: skill="test-frontend", args="{feature}"
-```
+Use the frontend test skill for the owning capability. Check pure models,
+orchestration with controlled effects, and transport at their respective seams.
+Check component binding and rendered behavior where required. All production and
+test paths receive shared refactor checks plus applicable presentation checks.

@@ -10,6 +10,28 @@ line breaks and spacing may add lines without adding indirection; never use
 restraint to waive A60 or retain compressed code. Judge method size only after
 formatting, and keep blank lines between coherent phases of a linear recipe.
 
+## Evidence for retaining a candidate
+
+Use the same standard for production, presentation, test, and helper code. For
+each retained candidate, record its check ID, source range, responsibility, and
+the concrete extraction considered. Explain why that extraction would obscure
+one responsibility or change observable behavior, and why a smaller safe
+extraction does not resolve the smell. A detector must return these decisions
+alongside its fix list; the fixer must reassess them after changes.
+
+For a function over 10 formatted lines, enumerate its phases and abstraction
+levels. Distinct validation, transition, transport, mapping, and assertion phases
+must be decomposed. Shared values can become parameters; an asynchronous boundary
+requires preserving order, not retaining all surrounding behavior in one method.
+The labels "cohesive", "lifecycle stage", "recipe", "frontend", and "test" alone
+are not evidence. Neither literal formatting nor passing tests waives mixed
+responsibilities. A single declarative literal or flat scenario of named steps
+may remain intact only with the same per-candidate evidence.
+
+Do not satisfy one check by making another worse: adding mutable accumulators,
+nested branches, redundant snapshots, or forwarding helpers requires reassessing
+complexity and ownership. Unsupported KEEP decisions block a clean result.
+
 - **Don't over-fragment into single-use helpers.** Extracting several tiny 1–3
   line helpers each used once usually makes the file *longer* without adding
   clarity. Inline single-use helpers; extract only when the helper names a

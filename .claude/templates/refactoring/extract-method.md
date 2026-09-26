@@ -1,195 +1,57 @@
-# Extract Method
+# Extract Method or Function
 
-When to use: a method mixes responsibilities or abstraction levels, repeats a
-computation, or buries a meaningful precondition. Format before measuring size;
-apply `restraint.md` before extracting.
+Apply to methods, functions, callbacks, event handlers, lifecycle effects, and
+test helpers on both client and server. Read `restraint.md` before extraction;
+its evidence requirements apply to every candidate, including long methods.
 
-## Extract Blank Line Wrapped Sections
+## Identify responsibilities
 
-Blank lines inside a method often group operations by purpose. For each group,
-ask what it does; extract the block into a method whose name expresses that intent.
-A section comment can supply the name. Preserve essential comment information
-under the source-comment rule.
+1. Enumerate each block's purpose, inputs, output, effects, and failure behavior.
+2. Identify changes in abstraction level: model validation, transition details,
+   boundary calls, response mapping, presentation decisions, and assertions.
+3. Give each distinct responsibility a named owner. Shared values become explicit
+   parameters or owned model state; they do not prevent extraction.
+4. Prefer moving behavior to its existing owner over adding a generic utility.
 
-Apply `restraint.md` to cohesive test recipes and blocks sharing intermediate
-state. Spacing between imports, declarations, or methods is outside this heuristic.
-The fix is a named extraction, never deleting whitespace or joining statements.
-Keep readable spacing in both the caller and extracted methods.
+## Preserve behavior
 
-## Extract Named Computation
-```java
-// Before — repeated expression, unnamed concept
-long seconds = ChronoUnit.SECONDS.between(now, expiresAt.plus(GRACE_PERIOD));
-// ...
-if (now.isBefore(expiresAt.plus(GRACE_PERIOD))) {
-// After — named private method, single source of truth
-private Instant endOfGracePeriod() {
-    return expiresAt.plus(GRACE_PERIOD);
-}
-```
+- Preserve guard precedence, short-circuiting, call order, and error translation.
+- Keep freshness checks at their asynchronous boundaries. Never hoist a snapshot
+  or validity decision across a response when it must be re-evaluated afterward.
+- Preserve captured identity, callback binding, subscriptions, and cleanup.
+- A guard that returns from a helper does not return from its caller. Return an
+  explicit decision or use the existing failure contract; do not silently turn
+  rejection into continued execution.
+- Keep test expectations independent of production computations. Extract setup
+  and observation by intent without changing assertion strength or scenario order.
 
-## Replace Local Variable with Private Method
-When a local variable names a non-trivial computation (conditional, ternary, multi-step),
-replace it with a private method. The calling method becomes a clean one-liner;
-the computation gets a named home. Don't inline — that buries complexity in an argument.
-```java
-// Before — local variable names a computation
-public Task toDomain() {
-    Optional<TaskAssignment> assignment = assigneeId != null && columnId != null
-            ? Optional.of(TaskAssignment.of(assigneeId, columnId))
-            : Optional.empty();
-    return new Task(boardId, title, assignment);
-}
-// After — private method, calling method reads clean
-public Task toDomain() {
-    return new Task(boardId, title, taskAssignment());
-}
-private Optional<TaskAssignment> taskAssignment() {
-    return assigneeId != null && columnId != null
-            ? Optional.of(TaskAssignment.of(assigneeId, columnId))
-            : Optional.empty();
-}
-```
+## Common extractions
 
-## Extract Sequential Independent Blocks
-When a method is a flat sequence of independent operations — each small and cohesive, not sharing intermediate state — extract each into a named private method. The parent becomes a readable table of contents. The trigger is structural independence, not method length: even a short method benefits when its blocks represent distinct concerns.
+| Mixed behavior | Extracted owner |
+|----------------|-----------------|
+| Eligibility and input validation inside an operation | Named model decision with an explicit result |
+| Repeated field updates for a lifecycle phase | Named state transition in the capability model |
+| Request construction inside rendering or orchestration | Typed request mapping at its owning model/boundary |
+| Response validation and state publication inside a transport sequence | Named response decision/transition; orchestration retains effect order |
+| Repeated calculations or multi-step transformations | A named computation next to the data it interprets |
+| Multi-step setup or repeated contract assertions | Focused fixture or assertion helper using independent expected values |
 
-```java
-// Before — 5 independent validations inline, each a distinct concern
-public void validate() {
-    if (page < 1) {
-        throw new ValidationException("Page number must be at least 1");
-    }
-    if (size < 1 || size > 100) {
-        throw new ValidationException("Page size must be between 1 and 100");
-    }
-    from.flatMap(f -> to.filter(f::isAfter)).ifPresent(t -> {
-        throw new ValidationException("From date must not be after to date");
-    });
-    priority.ifPresent(p -> parseOrThrow(p, TaskPriority::from, "Invalid priority: " + p));
-    boardId.ifPresent(id -> parseOrThrow(id, UUID::fromString, "Invalid boardId: " + id));
-}
+An operation should read as a sequence of named responsibilities. Do not make a
+forwarding helper for every statement; each extraction must name meaningful
+behavior. Do not replace early returns with nested branches merely to reduce
+return counts or compress formatting to reduce line counts.
 
-// After — parent reads as a checklist, each step self-documenting
-public void validate() {
-    validatePage();
-    validateSize();
-    validateDateRange();
-    validatePriority();
-    validateBoardId();
-}
-```
+## Verification
 
-**Heuristic:** Count independent operations in sequence. If 3+ blocks each handle a distinct concern and share no intermediate state, extract them — regardless of total line count or whether blank lines/comments separate them.
+Run affected checks after each extraction. Remeasure formatted sizes and revisit
+nesting, locals, duplication, parameter groups, and ownership. Retained candidates
+need current source ranges and the concrete alternatives rejected under
+`restraint.md`; a lifecycle label alone cannot establish a clean result.
 
-## Extract Guard Method
-When consecutive guards (find + validate) protect the same concern, extract a void method.
-The main method reads as a clean sequence; the guard encapsulates all precondition checks.
-```java
-// Before — inline guards clutter the happy path
-Task task = taskStorage.findById(taskId)
-        .orElseThrow(() -> new TaskNotFoundException("..."));
-if (task.isArchived()) {
-    throw new TaskArchivedException("...");
-}
-// ... happy path ...
+## Binding examples
 
-// After — single named guard, main method reads clean
-checkTask(taskId);
-// ... happy path ...
+- Java: `.claude/tech/java-spring/templates/refactoring/extract-method.md`
+- TypeScript: `.claude/tech/react-ts/templates/refactoring.md`
 
-private void checkTask(UUID taskId) {
-    Task task = taskStorage.findById(taskId)
-            .orElseThrow(() -> new TaskNotFoundException("..."));
-    if (task.isArchived()) {
-        throw new TaskArchivedException("...");
-    }
-}
-```
-
-## Decompose Long Method (>10 lines)
-Methods over 10 lines almost always mix abstraction levels or handle multiple concerns.
-Extract one private method per concern so the parent reads as a clean sequence of named steps.
-```java
-// Before — 13 lines, mixes raw storage access with named assertions
-public void assertBoardUpdatedForUser(UserResponse user) {
-    List<Task> tasks = taskStorage.findAll();
-    assertThat(tasks).as("saved tasks count").hasSize(2);
-    assertTask(tasks, "task-1", ...);
-    assertTask(tasks, "task-2", ...);
-    List<Column> columns = columnStorage.findAll();
-    assertThat(columns).as("saved columns count").hasSize(3);
-    assertColumn(columns, "TODO", ...);
-    assertColumn(columns, "IN_PROGRESS", ...);
-    assertNotificationsProcessed(user.userId(), ...);
-    assertAuditLogUpdated(user.userId(), ...);
-}
-// After — 4 lines, every line at the same abstraction level
-public void assertBoardUpdatedForUser(UserResponse user) {
-    assertTasksSaved();
-    assertColumnsCreated();
-    assertNotificationsProcessed(user.userId(), ...);
-    assertAuditLogUpdated(user.userId(), ...);
-}
-```
-
-## Parameterize Near-Duplicate Blocks
-When 2+ code blocks share the same structure but differ in literal values,
-extract the structure into a method and make the differing values parameters.
-```java
-// Before — two blocks, identical structure, different data
-private void stubCompletedTask(String taskId) {
-    stubEndpoint("""{"id": "%s", "status": "done", "archived": true}"""
-            .formatted(taskId));
-}
-private void stubPendingTask(String taskId) {
-    stubEndpoint("""{"id": "%s", "status": "todo", "archived": false}"""
-            .formatted(taskId));
-}
-// After — parameterize the varying literals
-private String taskBody(String id, String status, boolean archived) {
-    return """{"id": "%s", "status": "%s", "archived": %s}"""
-            .formatted(id, status, archived);
-}
-```
-
-## Decompose Pipeline
-When a method contains an inline multi-step pipeline (stream, async, IntStream), extract each
-transformation step as a named method so the parent reads as a clean sequence of delegation calls.
-```java
-// Before — inline pipeline mixes orchestration with transformation
-public void sendConcurrentNotifications(String event) {
-    CountDownLatch latch = new CountDownLatch(1);
-    CompletableFuture[] futures = IntStream.range(0, CONCURRENT_COUNT)
-            .mapToObj(i -> CompletableFuture.runAsync(latchedNotification(event, latch)))
-            .toArray(CompletableFuture[]::new);
-    latch.countDown();
-    CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
-}
-// After — each pipeline step is a named method
-public void sendConcurrentNotifications(String event) {
-    CountDownLatch latch = new CountDownLatch(1);
-    CompletableFuture[] futures = runNotificationsAsync(event, latch);
-    latch.countDown();
-    CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
-}
-private CompletableFuture[] runNotificationsAsync(String event, CountDownLatch latch) {
-    return IntStream.range(0, CONCURRENT_COUNT)
-            .mapToObj(i -> sendNotificationAsync(event, latch))
-            .toArray(CompletableFuture[]::new);
-}
-private CompletableFuture<Void> sendNotificationAsync(String event, CountDownLatch latch) {
-    return CompletableFuture.runAsync(() -> latchedNotification(event, latch));
-}
-```
-
-## Extract Method
-```java
-// Before
-String h = Base64.getUrlEncoder().withoutPadding().encodeToString(header.getBytes());
-String p = Base64.getUrlEncoder().withoutPadding().encodeToString(payload.getBytes());
-// After
-private static String base64(String value) {
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes());
-}
-```
+Use only the active binding's examples; other bindings apply the same principles
+through their native representations.

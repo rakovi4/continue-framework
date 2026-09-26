@@ -1,9 +1,15 @@
 # Coding Rules
 
 Always-on architectural core. The DDD smell catalogue, code-style catalogue, and
-per-layer rules (usecases, controllers, storage adapters, error handling) live in
-`.claude/guidelines/coding-detail.md` — read it before writing or refactoring code
-in any backend layer.
+per-role rules (models, orchestration, boundaries, error handling) live in
+`.claude/guidelines/coding-detail.md` — read it before writing or refactoring any
+code, including frontend production code, tests, and helpers.
+
+## Common Engineering Standard
+
+- Apply the same principles of cohesion, abstraction level, encapsulation, type safety, dependency direction, duplication, error handling, readability, and test quality to every codebase area. Technology bindings supply idioms, not weaker standards.
+- Determine applicability by responsibility and behavior, never by language, extension, framework, or whether code runs in a browser. Specialized mechanisms apply where present: a persistence rule requires persistence, but model and orchestration rules apply on both client and server.
+- A different syntax does not exempt a smell. Functions, closures, modules, and classes must meet the same standard. Shared state, asynchronous execution, rendering, and test setup do not exempt mixed responsibilities.
 
 ## Deployment
 

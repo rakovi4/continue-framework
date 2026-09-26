@@ -6,9 +6,10 @@ routing + output format: `scan-checklist.md`. Fix templates: `code-smells-routin
 Two modes below. **Section A (structural):** produce numeric/objective data.
 **Section B (judgment):** read the code, answer the question, and **cite the
 snippet as evidence** or write "none found" — no bare "clean."
-Skip checks marked with a file-type tag that doesn't match the target file.
-The A46/A47/A57 here are the **backend** rows (domain/usecase source only) — the
-frontend rows of the same numbers belong to cluster T.
+Use the role applicability protocol in `scan-checklist.md` for every target.
+Models and orchestration exist on client and server. Error handling applies
+wherever errors are handled, including tests. Qualify reused IDs as D-A46,
+D-A47, and D-A57; the presentation checks with those numbers belong to T.
 
 ## Section A — Structural
 
@@ -16,56 +17,56 @@ frontend rows of the same numbers belong to cluster T.
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A3 | Feature envy | Per method: external objects with field accesses, grouped by object | 2+ accesses from same external object |
+| A3 | Feature envy | Per operation: external fields read, computations performed, and actual data owner | Repeated field reads used to implement another owner's rule or transition; move behavior to that owner. Boundary mapping must have an explicit owner |
 | A4 | Getter chains | Chained method calls through different objects | 3+ levels deep |
 
 **Repetition:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A6 | Repeated construction | `.builder()` or `new Type(...)` calls, grouped by type | Same type constructed 2+ times |
+| A6 | Repeated construction | Object, record, and state construction grouped by type and purpose | Repeated construction policy belongs in a named factory or transition; do not merge intentionally independent identities |
 | A7 | Repeated expressions | Same sub-expression appearing in multiple places | 2+ occurrences |
-| A7b | Near-duplicate blocks | Code blocks with identical structure but different literal values (same JSON template with different `status`/`amount`, same WireMock registration with different body). Group by structure, list the differing literals. | 2+ blocks sharing structure |
+| A7b | Near-duplicate blocks | Structurally similar blocks and their differing values, across functions and classes | Repeated behavior with the same reason to change; parameterize the variation under `restraint.md` |
 
 **Polymorphism & type dispatch:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A46 | `instanceof` in domain/usecase | Grep `instanceof` in domain and usecase source files. List each occurrence with file and line. | Any `instanceof` in domain or usecase → push behavior onto interface method, dispatch polymorphically |
-| A47 | Re-partitioned base lists | `List<SealedBase>` or `List<InterfaceType>` that gets filtered/partitioned with `instanceof` downstream. List the field type and the instanceof filter location. | Any → replace with typed lists at creation time |
-| A48 | Interleaved computation + side effects | Methods that alternate between computing results and calling external services (API, storage). List the interleaved calls. | Any → compute all results first, then try side effect, return original or error-mapped results |
+| A46 | Scattered variant dispatch | Runtime type tests, casts, or repeated tag/status branches in models and orchestration | Centralize variant behavior in its model with polymorphism or exhaustive typed dispatch. Safe narrowing and boundary decoding are not themselves smells |
+| A47 | Erased collection types | Collections that discard known variant types and require later filtering or casts to recover them | Preserve known types at construction; use explicit variant handling when mixed data is intentional |
+| A48 | Computation mixed with effects | Validation, decisions, transitions, and effect calls within each operation; record response dependencies | Extract pure decisions and transitions from effect orchestration. Preserve response-before-decision, freshness, and error ordering; asynchronous execution does not exempt mixed concerns |
 
 **Error handling:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A57 | Catch-and-rethrow | Grep `catch (` in the file. For each catch block list: (a) the exception type caught, (b) the body in line-numbered form, (c) whether the body re-raises the same exception (or wraps its message unchanged), (d) the side effect(s) in the body — classify as: log statement, metric/counter increment, span/trace annotation, audit write, print/stderr, no-op (empty), or transformation. A catch is "transforming" only when it does at least one of: throws a different exception type, returns a fallback value, performs cleanup/compensating action (resource close, transaction rollback). | Any catch whose body re-raises the same exception without transformation, fallback, or cleanup — regardless of the side effect (log, metric, trace, audit, print, none) → delete the try/catch. Cross-cutting concerns belong elsewhere: exception logging in the centralized exception handler, metrics/tracing in an interceptor or aspect, request context (userId, request ID) in the logger's diagnostic context (MDC). |
-| A57b | Catch-and-swallow on broad type | Grep `catch (RuntimeException\|catch (Exception\|catch (Throwable` in the file. For each match list: (a) the broad exception type caught, (b) the body in line-numbered form, (c) whether the body rethrows (if yes, A57 covers it). For non-rethrowing bodies, classify the outcome as **silent drop** (no return value, `continue` in iteration, `return` from void, returns `Optional.empty()` that downstream just skips) vs **meaningful fallback** (returns a sentinel/default value that a caller branches on, returns a domain Null Object that downstream uses normally). A log statement does NOT count as making the drop meaningful. | Any broad catch without rethrow and without a meaningful fallback (silent drop, log-and-continue, best-effort iteration) → delete the try/catch and let the exception propagate to the centralized handler / scheduled-job wrapper / message listener (which already ERROR-logs uncaught exceptions); OR catch a SPECIFIC expected exception type with a real fallback consumed downstream; OR make the call non-throwing at the source (return Optional/Result from the domain method). |
+| A57 | Catch-and-rethrow | Every error handler: caught category, body, rethrow, translation, fallback, state transition, or cleanup | Remove handlers that merely log or rethrow unchanged. Keep meaningful recovery/translation/cleanup at its boundary; do not duplicate error policy across operations |
+| A57b | Catch-and-swallow | Broad or untyped handlers, rejected asynchronous operations, empty handlers, and ignored errors; trace what the caller or user observes | Silent loss or log-and-continue without an explicit recovery contract is a violation. Narrow expected failures; surface unexpected ones. Stale-result suppression requires a demonstrated lifetime contract, not a blanket catch exemption |
 
 **Cohesion & parameter groups:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A49 | Bloated entity / value object | Count fields. For each method, list which fields it accesses. Group fields by co-access patterns. | 10+ fields AND methods that use only a subset → extract cohesive value object for the field cluster |
-| A50 | Repeating parameter group | Factory methods / constructors with 3+ parameters that appear together across 2+ call sites. List the repeated group. | Any → extract parameter object (record) and overload to accept it |
-| A51 | External record rebuild | Code that constructs a new record/VO from an existing one, changing only 1-2 fields (copy all fields, override some). List the reconstruction site and the changed fields. | Any → add `toX()` transform method on the record itself |
+| A49 | Bloated model or state | Fields and per-operation access groups in objects, records, stores, and closures | Ten or more fields with distinct co-access groups require splitting by capability; smaller models with unrelated responsibilities still fail cohesion |
+| A50 | Repeating parameter group | Three or more parameters traveling together across constructors, factories, functions, or callbacks | Give a cohesive group a named type; do not hide unrelated dependencies in a broad context object |
+| A51 | External state reconstruction | Callers copying another owner's fields and changing a subset; list transition rules and duplicate updates | Move the transition into the state owner, through a model method or cohesive pure function. Typed transport mapping stays at the boundary |
 
 **Type safety:**
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
-| A12 | Raw map usage | `Map.of(`, `Map<String, Object>`, `Map<String, String>` in production code | Any map standing in for typed data |
-| A13 | Null/default args | Constructor, `of()`, `from()` calls listing arguments | Any null/default argument |
-| A13b | Nullable domain value object | Domain value object constructor that accepts null (e.g., `if (value != null` guard instead of rejecting null). Also: domain entity fields typed as a value object but allowed to be null at construction time. | Any null-accepting constructor or nullable VO field in domain — use empty string, Optional, or Null Object pattern per `.claude/guidelines/coding-detail.md` "No nulls in domain" |
+| A12 | Untyped structured data | Maps, dictionaries, generic objects, dynamic field access, and unchecked conversions replacing known shapes | Use typed boundary records and validated decoding; genuine key/value collections remain collections |
+| A13 | Placeholder arguments | Construction and operation calls with missing/default values used as mode flags; inspect their contracts | Replace ambiguous placeholders with explicit operations or typed alternatives; legitimate optional boundary data follows A13b |
+| A13b | Invalid or ambiguous model states | Model construction, optional fields, unchecked casts, and flag combinations | Make invalid states unrepresentable or reject them; represent legitimate absence explicitly. Boundary nullability is not permission for unchecked model state |
 
-**Usecase design** (skip if not a usecase class):
+**Orchestration design** (client and server operations):
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
 | A35 | Sequential storage port queries | Count injected storage/repository port fields. For each, check if data from one port feeds queries to another (N+1 pattern: fetch list → per item: fetch related data from another port). | 2+ storage ports queried sequentially — enrich aggregate, single port fetches everything upfront |
-| A56 | Usecase-to-usecase dependency | List every injected field on the usecase. For each, classify its type: domain type, port interface, request DTO, clock/time source, other usecase. A type is "other usecase" if it lives under the usecase layer directory, is a concrete implementation (not a port interface), and itself orchestrates a user-visible operation. | Any other-usecase dependency → extract shared logic into the domain (entity method, value-object behavior, stateless domain service) or a non-usecase helper at the usecase layer; delete the usecase dependency |
+| A56 | Operation-to-operation dependency | Each orchestration dependency: model, effect port, internal helper, or another top-level user operation; classify by behavior | Top-level operations must not call one another to share logic; extract a focused model operation or helper. Names and file locations alone cannot classify a collaborator |
 
-**Storage adapter design** (skip if not a storage adapter class):
+**Storage adapter design** (only where persistence/query mechanisms exist):
 
 | # | Check | Enumerate | Violation |
 |---|-------|-----------|-----------|
@@ -81,20 +82,20 @@ frontend rows of the same numbers belong to cluster T.
 
 | # | Question | Evidence required |
 |---|----------|------------------|
-| B1 | Are there `String`/`int`/`long`/`UUID` parameters or fields that represent domain concepts (email, token, userId, amount)? | Quote the declaration |
-| B2 | Are there String constants or parameters representing a fixed domain set (status, plan, type, period)? | Quote the usage |
-| B3 | Are there persisted fields that could be computed from other fields in the same entity? | Quote the field + the fields it derives from |
+| B1 | Do primitive parameters or fields carry validation, units, identity, or other domain meaning without an owner? | Quote declarations and rules; use the active binding's validated value representation |
+| B2 | Are fixed states represented by unrestricted strings, duplicated predicates, or inconsistent branches? | Quote definitions and consumers; require a closed type and owned behavior |
+| B3 | Is stored or observable state derivable from other owned state? | Quote the fields and derivation; justify any independently observable snapshot |
 
 **Behavior placement:**
 
 | # | Question | Evidence required |
 |---|----------|------------------|
-| B4 | Is there validation logic in the wrong layer (usecase validating domain rules, controller with business logic)? | Quote the validation code |
-| B5 | Does a caller check an object's fields then throw an exception? | Quote the `if` + `throw` block |
-| B6 | Is there serialization, hashing, or formatting done outside the data object that owns the fields? | Quote the caller code |
-| B7 | Are there consecutive find + validate sequences guarding the same concern? | Quote the guard block |
-| B8 | Does a parent entity remove/add children in a collection directly instead of delegating to the child? | Quote the remove/add calls |
-| B9 | Does a controller return a raw usecase/domain object without REST DTO wrapping? | Quote the return statement |
+| B4 | Are validation, policy, or state transitions in presentation, transport, or orchestration instead of the model? | Quote behavior and identify its proper owner on either client or server |
+| B5 | Does a caller inspect another owner's fields to reject an operation or construct an error? | Quote guards and failure mapping; separate model validation from boundary presentation |
+| B6 | Are serialization, normalization, formatting, or derived computations scattered outside their owning model or boundary? | Quote callers and the intended owner; keep framework/transport concerns at boundaries |
+| B7 | Do consecutive eligibility/validation guards implement one unnamed decision? | Quote guards, inputs, and outcome; extract a named decision without changing failure behavior |
+| B8 | Does external code mutate another model's children or fields instead of requesting a transition? | Quote mutation and state owner |
+| B9 | Does a boundary leak domain or transport structures into consumers with different contracts? | Quote exposed type and consumers; introduce a boundary projection only where the contract differs |
 
 **File organization:**
 

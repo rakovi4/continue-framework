@@ -2,7 +2,29 @@
 
 **Run EVERY check on the target file. Show results. Fix violations before declaring clean.**
 
-Skip checks marked with a file-type tag that doesn't match the target file.
+## Applicability by responsibility
+
+Read `coding-detail.md` for every scope and `frontend-rules.md` for frontend work.
+Map targets to actual responsibilities; a file may have several roles. Technology
+bindings supply syntax and representations, never a weaker engineering standard.
+
+| Responsibility | Apply |
+|----------------|-------|
+| All source, tests, and helpers | Mechanics, ownership, duplication, cohesion, type safety, error handling where present, and file organization |
+| Model and state | Invariants, valid states, derived values, owned transitions, and variant behavior; includes client state and test doubles |
+| Orchestration | Named steps, narrow dependencies, computation/effect separation, and operation boundaries; includes callbacks and lifecycle hooks |
+| Boundary | Typed decoding, mapping, error translation, and resource lifetime; includes transport and browser adapters |
+| Persistence/query mechanism | Storage-specific checks where present; absence of persistence does not skip other design checks |
+| Presentation | Rendering, component composition, and styles in addition to shared checks |
+| Tests | Scenario abstraction, fixtures, assertion quality, independent oracles, and duplication regardless of test syntax |
+
+For every row report findings, enumerated clean evidence, or NOT_APPLICABLE with
+the absent responsibility/mechanism and inspected paths. A missing syntax match
+is not evidence of absence: inspect its equivalent in the active language.
+Never skip shared checks because a target lacks classes, a particular extension,
+inheritance, or a named test-helper convention. Qualify reused IDs by cluster.
+Frozen contracts and lane locks require coordinator ownership resolution; they
+cannot turn a real violation into CLEAN.
 
 The checklist is split **per cluster** — each detector loads only its own file,
 nothing more:
@@ -24,11 +46,12 @@ truth, so the per-row checks never drift out of sync with the split.
 |---------|---------------|-------|----------------------|-----------|
 | **M — Mechanics** | `refactor-mechanics-agent` | `scan-mechanics.md` | Formatting (A60); Class size (A0); Complexity (A1, A2, A26); Optional (A5, A5b); Variables, lambdas & comments (A8, A9, A58, A32, A25, A27, A28, A29, A59, A30, A45); Indirection (A20, A21, A55); Imports (A10, A36); Dead code (A11, A11b) | — |
 | **D — Design** | `refactor-design-agent` | `scan-design.md` | Data ownership (A3, A4); Repetition (A6, A7, A7b); Polymorphism (A46, A47, A48); Error handling (A57, A57b); Cohesion & parameter groups (A49, A50, A51); Type safety (A12, A13, A13b); Usecase design (A35, A56); Storage adapter design (A33, A34, A42, A43, A44) | Domain modeling (B1–B3); Behavior placement (B4–B9); File organization (B13) |
-| **T — Duplication & surface** | `refactor-duplication-agent` | `scan-duplication.md` | Sibling duplication (A14); Cross-class duplication (A22, A52, A54, A23, A24, A37, A41, A31, A38, A39, A40, A53); Frontend (A15, A15b, A16, A17, A18, A19, A46, A47, A57 — `.tsx` only) | Test-specific (B10, B11); Frontend (B12) |
+| **T — Duplication & surface** | `refactor-duplication-agent` | `scan-duplication.md` | Sibling duplication (A14); Cross-module duplication and tests (A22, A52, A54, A23, A24, A37, A41, A31, A38, A39, A40, A53); Presentation (A15, A15b, A16, A17, A18, A19, A46, A47, A57) | Test-specific (B10, B11); Presentation (B12) |
 
-The numbers **A46/A47/A57** are reused for backend (cluster **D**) and frontend
-(cluster **T**) checks — the file-type tag disambiguates: cluster D runs them
-only on domain/usecase source, cluster T only on `.tsx`. The serial fixer owns
+The numbers **A46/A47/A57** are reused for design (cluster **D**) and presentation
+(cluster **T**) checks. Qualify them by cluster, not runtime or extension.
+Cluster D checks client and server models/orchestration and all error handlers;
+cluster T adds presentation checks wherever rendering/styles exist. The fixer owns
 the **Code Smells Routing Table** (`code-smells-routing-table.md`) and applies
 templates; detectors only name the prescribed fix.
 
@@ -36,46 +59,24 @@ templates; detectors only name the prescribed fix.
 
 **Print this filled checklist before starting refactoring.**
 
-**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the enumerated data — even when clean. Write `→ clean` after the data shows no violation. Bare `[clean]` is only allowed for: (1) file-type skips (`[storage — skipped]`, `[frontend — skipped]`), (2) judgment checks (Section B) where the answer is "none found," except B13, which always requires grouping evidence.
+**Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the data, even when clean. Judgment checks cite inspected behavior or explain that none was found. NOT_APPLICABLE follows the role protocol above; bare language/file-type skips are invalid. B13 always requires grouping evidence. Preserve every candidate's FIX or evidenced KEEP disposition, including those declined by a detector.
 
 Run A60 before treating A0/A1 counts as final. Read-only detectors report formatting
 defects without rewriting files; the serial fixer formats and remeasures before
 choosing extractions. Include formatting verification and B13 grouping evidence in
 the scan result even when the candidate table is empty.
 
-```
-### A. Structural
-A0.  File size after formatting: 85 physical lines, 1 interface, 1 concern → clean
-A1.  Method sizes: methodA=7, methodB=9 → clean
-A2.  Nesting depth: methodA=0, methodB=1 → clean
-A3.  Feature envy: methodA reads self only; methodB reads order.{amount, currency} → VIOLATION
-A4.  Getter chains: methodB: order.getItems().get(0).getPrice() → VIOLATION
-A5.  Optional handling: none → clean
-A6.  Repeated construction: TaskRequest.builder() ×2 → VIOLATION
-A7.  Repeated expressions: toDo.getTasks() ×2 (L47, L48) → VIOLATION
-A7b. Near-duplicate blocks: stubSucceeded ≈ stubCanceled → VIOLATION
-A8.  Locals: orderId (pass-through, 1 use) → inline; result (side-effect) → KEEP
-A9.  Lambda→ref: L55 x -> new Foo(x) → VIOLATION
-A59. Source comments: L32 section label → VIOLATION; L80 rationale → VIOLATION
-A10. Enum qualification: TaskStatus.DONE L30 → VIOLATION
-A11–A14. Null args L18 → VIOLATION; sibling duplication → VIOLATION; rest: none found
-A20. Thin wrappers: none → clean
-A21. Single-value params: process(type) — all callers pass "EMAIL" → VIOLATION
-A55. Derivable params: assertRoundTrip(actual, original, title, desc) — title=original.getTitle(), desc=original.getDescription() → VIOLATION
-A25–A32. Inlined dep call L30 → VIOLATION; rest: none found
-A33–A34. [storage — skipped]
-A42–A44. [storage — skipped]
-A45–A48. [polymorphism — skipped if not domain/usecase]
-A49–A51. Bloated entity: 5 fields → clean; repeating params: none → clean; external rebuild: none → clean
-A52–A53. [test-specific checks if applicable]
-A15–A19. [frontend — skipped]
+Example result entries (expand every check in its owning cluster):
 
-### B. Judgment
-B1.  Primitive obsession: `String email` in RegisterRequest L12 → VIOLATION
-B2–B4. [clean]
-B5.  Caller checks+throws: task null check L25-28 → VIOLATION
-B6–B9. [clean]
-B10. Hardcoded helpers: givenUser() uses "test@example.com" L44 → VIOLATION
-B11–B12. [clean]
-```
+| Check | Evidence | Disposition |
+|-------|----------|-------------|
+| A1 | Operation is 34 lines: eligibility, validation, pending transition, request, result publication | FIX: extract named model decisions and transitions; retain ordered orchestration |
+| A8/A32 | Getter only returns owned state; request performs network I/O | Keep required snapshot; isolate request result; injection does not determine effects |
+| D-A48 | Controller mixes a validation rule, transport call, and field updates | FIX: delegate validation and transition details to the model |
+| A23 | Two assertion helpers duplicate the same contract checks | FIX: one assertion owner with independent expected values |
+| A33 | Inspected client model and its consumers contain no persistence or row mapping | NOT_APPLICABLE: no storage mechanism; other design checks still ran |
+| B13 | Per-file inventory and capability boundary verdicts attached | Every MOVE resolved or reported as blocked by ownership |
+
+The final result must account for every applicable check; this example is not
+permission to sample a subset.
 **If any item has a violation, fix it BEFORE reporting "no issues."**

@@ -1,75 +1,63 @@
-# Frontend Logic Test Template
+# Frontend Model and Controller Test Template
 
-## Test File
+Apply shared test-quality and refactor checks to every callback and helper.
+Resolve paths inside the owning capability under the agreed responsibility map.
 
-Location: `frontend/src/features/{feature}/__tests__/{feature}.logic.test.ts`
+## Model tests
 
-```typescript
-import { describe, it, expect } from 'vitest'
-import { validateEmail, validatePassword, isFormValid, buildRegistrationRequest } from '../logic/registration.logic'
-
-describe('Registration Logic', () => {
-  describe('validateEmail', () => {
-    it('should return valid for correct email format', () => {
-      const result = validateEmail('user@example.com')
-
-      expect(result.valid).toBe(true)
-      expect(result.error).toBeUndefined()
-    })
-
-    it('should return error for empty email', () => {
-      const result = validateEmail('')
-
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe('Email is required')
-    })
-  })
-})
-```
-
-## Stub
-
-Create minimal stub in `logic/{feature}.logic.ts`:
+Pure model tests live beside their `.logic.ts` owner. Expected values are literal
+and independent of the model implementation.
 
 ```typescript
-import type { ValidationResult } from './types'
+import { describe, expect, it } from "vitest";
+import { validateInput } from "./input.logic";
 
-export function validateEmail(email: string): ValidationResult {
-  throw new Error('Not implemented')
-}
+describe("input validation", () => {
+  it("accepts a nonblank value unchanged", () => {
+    expect(validateInput("example")).toEqual({
+      kind: "valid",
+      value: "example",
+    });
+  });
+
+  it("rejects an empty value", () => {
+    expect(validateInput("")).toEqual({
+      kind: "invalid",
+      message: "A value is required",
+    });
+  });
+});
 ```
 
-## Types
+Use the exact reviewed behavior and error text for the actual capability. Direct
+assertions here express one complete outcome; multi-step setup and observations
+still require named helpers under the common checks.
 
-Create `logic/types.ts` if not present:
+## Controller tests
+
+Effectful orchestration belongs in `.controller.ts`, with matching controller
+tests in the same capability. Use real model decisions and transitions with
+controlled effect ports, timers, and deferred promises. Assert observable state
+and calls, including freshness, errors, and disposal where the scenario needs them.
+Do not move effects into `.logic.ts` merely to fit the frontend-logic lane name;
+that lane owns both model and orchestration work with separate responsibilities.
+
+## RED stub and failure
+
+Create only the importable signature from the approved contract. Its body throws
+the configured not-implemented error until GREEN. An import/type error is not the
+behavioral RED prediction. Preserve reviewed assertions during implementation.
+
+After verifying the raw failure, encode the actual reason in the disabled case:
 
 ```typescript
-export interface ValidationResult {
-  valid: boolean
-  error?: string
-}
+it.skip("TDD Red: validator not implemented — rejects an empty value", () => {
+  expect(validateInput("")).toEqual({
+    kind: "invalid",
+    message: "A value is required",
+  });
+});
 ```
 
-## Expected Failure Patterns
-
-| Stub | Expected Failure |
-|------|-----------------|
-| `throw new Error('Not implemented')` | Error: Not implemented |
-| `return undefined` | expect(undefined).toBe(true) fails |
-| No function exported | Import error |
-
-## .skip Convention
-
-After verified failure, add `.skip` and encode the failure reason in the test name:
-
-```typescript
-it.skip('TDD Red: validateEmail not implemented — returns valid for correct email format', () => {
-  expect(validateEmail('valid@example.com')).toBe(true)
-})
-```
-
-## Test Verification
-
-```
-Skill tool: skill="test-frontend", args="{feature}.logic"
-```
+Run the frontend test skill for the explicit model/controller paths. Use the
+capability filter when both roles change so neither suite is silently omitted.

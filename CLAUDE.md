@@ -32,7 +32,7 @@ The always-on rules (`.claude/rules/*.md`) hold only the high-level map, invaria
 
 | When you are about to… | Read first |
 |------------------------|-----------|
-| Write or refactor backend code (any layer) | `.claude/guidelines/coding-detail.md` |
+| Write or refactor any code (backend, frontend, tests, or helpers) | `.claude/guidelines/coding-detail.md` |
 | Write or refactor frontend code or browser (Selenium/Cypress/Playwright) tests | `.claude/guidelines/frontend-rules.md` |
 | Write or run TDD tests (red/green cycles, assertions, stop-on-failure) | `.claude/guidelines/tdd-rules.md` |
 | Execute a scenario/task work unit (sequences, adapter-discovery, progress, resuming) | `.claude/guidelines/workflow-detail.md` |

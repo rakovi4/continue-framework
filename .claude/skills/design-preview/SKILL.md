@@ -70,6 +70,11 @@ scenario, mockup, existing frontend, and acceptance criterion. Declare the share
 component, logic, API-client, type, and test interfaces needed by Stage 2, then
 create only those interface surfaces within the coordinator's file manifest.
 
+Apply shared coding detail and the frontend responsibility map before freezing
+interfaces. Name model, orchestration, transport, and presentation owners; keep
+pure model contracts separate from effectful controller contracts. Use the active
+binding for file conventions, and include each owner's tests in the lane plan.
+
 Do not implement lane behavior, stage, commit, or edit `progress.md`. The Selenium
 test is optional input: inspect it when available, but neither lane depends on the
 other. Return the declared interfaces, changed paths, and checks to the coordinator,

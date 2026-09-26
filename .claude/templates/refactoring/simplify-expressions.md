@@ -116,7 +116,7 @@ CompletableFuture.runAsync(() -> latchedNotification(event, latch));
 
 ## Inline Variable
 
-**NEVER inline a local variable that isolates a side-effecting call from a pure return mapping.** Any call to an injected dependency (usecase, port, repository, API client) is side-effecting regardless of verb — `getTasks()` hits the DB just like `save()` does. The variable exists to separate the side effect from the value transformation — removing it buries side effects inside expressions where they are invisible and reordering-sensitive. See `.claude/guidelines/coding-detail.md` "Don't extract local variables" exception.
+**Keep locals that isolate actual effects or time-dependent observations from pure mapping.** Determine effects from the called behavior, not injection: network, persistence, mutation, scheduling, and clock reads require ordering; a pure accessor does not. Keep meaningful snapshots and identities, inline disposable aliases, and preserve observable evaluation order. Apply the common local-variable rule in `.claude/guidelines/coding-detail.md`.
 
 ```java
 // Before — single-accessor local

@@ -77,6 +77,11 @@ For frontend layers, remove the skip marker and restore the original test or sui
 ## Context Files
 
 Before implementing, read:
+
+Apply `.claude/guidelines/coding-detail.md` for every layer and
+`.claude/guidelines/frontend-rules.md` for frontend roles. The active binding
+supplies idioms; it does not waive shared modeling or refactoring principles.
+
 1. The disabled/skipped test file (understand expectations)
 2. Layer template (see "Template by Layer" table above)
 3. Existing implementations in the module

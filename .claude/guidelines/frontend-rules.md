@@ -2,10 +2,23 @@
 
 ## Humble Object Pattern
 
-- Pure logic in logic files: validation, state computation, request building, data mapping. No side effects.
-- HTTP client in API client files: fetch calls, response mapping, error handling.
-- Component files are thin wrappers: call logic + API, translate UI state from logic files, render markup.
-- FORBIDDEN in component files: business logic, validation regex, direct fetch calls, request building.
+Read `.claude/guidelines/coding-detail.md` first. Its modeling, code-style,
+orchestration, boundary, and error-handling principles apply here. Use this role
+map to place behavior; the tech binding defines file conventions.
+
+| Responsibility | Owner | Boundary |
+|----------------|-------|----------|
+| Validation, invariants, derived values, request decisions, state transitions | Pure capability model/logic | No network, navigation, timers, subscriptions, or mutation of external state |
+| User operation and asynchronous lifecycle | Controller/orchestrator | Coordinate model operations and injected effect ports; keep validation, mapping, and transition details in their owners |
+| Transport, browser services, external SDKs | Client/adapter | Own protocol mapping, external error translation, and resource cleanup; never own capability policy or rendering |
+| Rendering and event binding | Component/view | Render model state and invoke operations; no domain validation, request construction, transport calls, or multi-step workflows |
+| Scenario, setup, observation | Tests and focused test helpers | Preserve independent expected values and clear action/assertion boundaries using the active test binding |
+
+- State has one capability owner. Other code requests named transitions; it must not scatter field-by-field updates, duplicate status predicates, or rebuild another owner's state. Represent valid states explicitly and derive redundant flags where possible.
+- A top-level user operation must not call another top-level operation to share behavior. Extract shared model behavior or a focused helper. Internal lifecycle helpers may compose; name and scope them by responsibility.
+- Keep contracts narrow: consumers receive the values and operations they need. A shared page state or controller is not a reason to give every leaf access to all capabilities.
+- Cancellation, freshness, subscription lifetime, and resource cleanup have explicit owners. Preserve their ordering, but do not use asynchronous execution or shared state as an exemption from decomposition.
+- Client-side validation serves the interaction; authoritative authorization and domain enforcement remain on the server. Do not duplicate server policy in components or trust browser state as authorization.
 
 ## Mockup Placeholder Data
 
@@ -14,7 +27,7 @@ Mockups contain placeholder values (`user@example.com`, fake dates, sample price
 ## Component Size
 
 - When a component file exceeds ~70-100 formatted lines, extract sub-components (views, sections, cards) into their owning capability's directory.
-- Page components should be thin routers/orchestrators -- fetch data, route between views, render child components.
+- Page components compose views and bind controller state/operations; controllers own data loading and multi-step workflows.
 - Helper components used by only one view live in that view's file. When a helper is shared across views, give it its own file.
 
 ## Feature Structure
@@ -32,7 +45,7 @@ Mockups contain placeholder values (`user@example.com`, fake dates, sample price
 
 ## Testing
 
-- Logic tests: pure functions, no DOM, no framework rendering. Use the frontend test runner (see technology.md Conventions).
+- Model/logic tests exercise pure behavior. Orchestration tests exercise real orchestration with controlled effect ports, time, and asynchronous completion. Neither requires rendering; component tests cover rendering/binding where needed. Apply shared test-quality and refactoring rules to every test and helper, with syntax from the active binding.
 - API client tests: frontend test runner + HTTP mock library.
 - The test skip marker (see technology.md Conventions) is the frontend equivalent of the backend test disable marker. Encode the actual failure reason in the skipped test or suite name; never add a comment.
 - Use the native `fetch` API (not axios). Base URL from the backend URL environment variable.

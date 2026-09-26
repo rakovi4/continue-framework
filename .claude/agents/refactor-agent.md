@@ -24,7 +24,10 @@ re-scan after each change.
 ## Workflow
 
 1. **Read** the merged, deduped candidate list you were handed. If it arrived
-   undeduped, keep one entry per `file:line`. Require B13's directory inventory and
+   undeduped, deduplicate by cluster/check ID plus source range, preserving distinct
+   findings at the same location. Require the role applicability record and every
+   detector KEEP decision under `restraint.md`; reject syntax-only skips and
+   unsupported exemptions. Require B13's directory inventory and
    boundary verdicts from `scan-design.md` alongside the candidates. If absent,
    perform that check inline before accepting an empty list; this also applies
    to a small-file pass without detectors.
@@ -42,12 +45,17 @@ re-scan after each change.
    200 formatted lines, split further now. Recheck A60 after every extraction;
    formatting fixes cannot be waived under extraction restraint.
 5. **Run tests** for the module.
-6. **Re-scan cascades** — re-run only the checks that cascade from this change
+6. **Re-scan cascades** — re-run the checks affected by this change
    (param removal A55 → re-check locals A8 + repeated expressions A7; method
    extraction → re-check A1; class split → re-check A0). Add any new candidate to
-   the list. This targeted re-scan is inline — do NOT re-dispatch the detectors.
+   the list. Reassess retained candidates in changed functions and interactions
+   between checks: control-flow edits affect size/nesting/locals; extraction
+   affects ownership, duplication, and dependencies. This targeted re-scan is
+   inline — do NOT re-dispatch the detectors.
 7. **Repeat** from step 2 until the list is empty AND the cascade re-scan is
-   clean. Then run the full build to catch missed files.
+   clean, with every finding resolved or supported by current KEEP evidence.
+   Then run the full build to catch missed files. Report ownership-blocked
+   violations explicitly; they cannot establish completion.
 
 ## Rules
 

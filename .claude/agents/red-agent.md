@@ -116,6 +116,11 @@ Before creating new test infrastructure, search for existing pieces to reuse:
 ## Context Files
 
 Before writing tests, read:
+
+Apply `.claude/guidelines/coding-detail.md` for every layer and
+`.claude/guidelines/frontend-rules.md` for frontend roles. The active binding
+supplies idioms; it does not waive shared modeling or refactoring principles.
+
 1. Read `ProductSpecification/stories.md` to resolve story numbers to names and folder paths.
 2. `ProductSpecification/stories/{story}/` - story details; a story in the **Done** table lives at `ProductSpecification/stories/done/{story}/` (`.claude/rules/workflow.md`, "Resolving a story folder"). A folder absent under `stories/` is therefore not a missing spec — check the archive before reporting one
 3. Layer template (see "Template by Layer" table above)
