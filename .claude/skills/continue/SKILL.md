@@ -47,6 +47,9 @@ without another invocation once the whole-story design is settled. Await require
 interview answers; no routine stops after freeze. An existing harvest checkbox is
 marked `[S]` with a work-log reason once its Tier 2 RED/baseline work is covered in
 Stage 1; do not dispatch harvest again. Tasks and specification retain their routes.
+Load `.claude/templates/workflow/quality-execution.md` for independent scope workers,
+retained quality context, concurrent inspection/coverage, and phase result joining.
+Quality checkbox order records obligations; it does not serialize eligible work.
 
 ## Work Unit Dispatch
 
@@ -54,14 +57,14 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 
 | Checkbox | Sub-skills |
 |----------|-----------|
-| `quality stage-N {scope} {phase}` | **Inline coordinator.** Load `story-quality-checklist.md`; resolve scope and phase prerequisites, dispatch the named skill, record its completed result, then update only that entry. This route takes precedence over the free-form fallback and executes inside the parent stage. |
+| `quality stage-N {scope} {phase}` | **Inline coordinator.** Load `story-quality-checklist.md` and `quality-execution.md`; resolve scope and phase prerequisites, dispatch the named skill through an independent scope worker, record its completed result, then update only that entry. This route takes precedence over the free-form fallback and executes inside the parent stage. |
 | `red-acceptance` | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `stage-1 acceptance RED + contract design` | **Inline coordinator.** Load `parallel-backend-stages.md`; dispatch the disjoint RED/design lanes, validate the Stage 2 lane plan gates, record the durable plan in the active work-log record, advance to approval, and commit both records before stopping for review |
 | `approve stage-1 contracts` | **User decision.** Never dispatch Stage 2 from this checkbox. Explicit approval completes it and advances Stage 2 in a coordinator commit; rejection resets Stage 1 to `[~]` and keeps approval and Stage 2 pending |
-| `stage-2 implementation lanes` | **Inline coordinator.** Load `parallel-backend-stages.md`; validate approval and lane ownership; after raw RED, run test review and GREEN implementation concurrently on disjoint paths; join, verify, and publish each phase from explicit paths; enforce `stage-2-quality-gates.md` before lane completion and stage advancement |
+| `stage-2 implementation lanes` | **Inline coordinator.** Load `parallel-backend-stages.md`; validate approval and lane ownership; after raw RED, run test review → reviewed-test publication → explicit RED refactor concurrently with GREEN production on disjoint paths; join and verify; overlap coverage with read-only GREEN refactor inspection, then publish behavior before granting fixes; enforce `stage-2-quality-gates.md` and `quality-execution.md` before lane completion and stage advancement |
 | `stage-3 acceptance GREEN` (legacy: `+ review`) | **Inline coordinator.** Load `parallel-backend-stages.md`; require committed Stage 2 lanes and run acceptance GREEN. On GREEN failure reopen the implicated lane. |
 | `stage-1 frontend acceptance RED + interface design` | **Inline coordinator.** Load `parallel-frontend-stages.md`; declare disjoint manifests, dispatch Selenium RED and `/design-preview` frontend concurrent mode, reject worker staging/commits, join once, run combined checks, then stage and commit explicit paths |
-| `stage-2 frontend implementation lanes` | **Inline coordinator.** Load `parallel-frontend-stages.md`; validate separate frozen Stage 1 interface files, dispatch complete `frontend-logic`, `frontend-api`, and design-alignment lanes concurrently, preserve RED-before-GREEN within each lane, enforce `stage-2-quality-gates.md`, publish behavior and refactoring separately, then join and run combined checks |
+| `stage-2 frontend implementation lanes` | **Inline coordinator.** Load `parallel-frontend-stages.md`; validate separate frozen Stage 1 interface files, dispatch complete `frontend-logic`, `frontend-api`, and design-alignment lanes concurrently, preserve each lane's RED prerequisites, use `quality-execution.md` to overlap test quality with production and coverage with read-only inspection, enforce `stage-2-quality-gates.md`, publish behavior and refactoring separately, then join and run combined checks |
 | `stage-3 frontend acceptance GREEN + demo` (legacy: `+ review`) | **Inline coordinator.** Load `parallel-frontend-stages.md`; require the committed Stage 2 join, run remove-marker-only Selenium GREEN, then demo. |
 | Spec items (`interview`, `mockups`, `api-spec`, `test-spec`) | `/{item}` then commit |
 | `story` (spec item) | **Inline** — no subagent. Load `.claude/templates/spec/story-spec-generation.md` (internal template — NOT the `/story` skill) with the story number, name, and folder already resolved, execute its phases, then commit |
@@ -110,7 +113,7 @@ Before behavior commit verify: (1) the primary route ran, (2) `/test-review` ran
 
 ## Sub-Skill Dispatch
 
-Sub-skills use named agent dispatch for context isolation, following `.claude/guidelines/platform-capabilities.md`, EXCEPT the rows marked **Inline** — those run in the main agent, which fans out their detectors itself so that no dispatched agent nests a fan-out of its own:
+Sub-skills use named agent dispatch for context isolation, following `.claude/guidelines/platform-capabilities.md`. Rows marked **Inline** run in the main agent, which owns scheduling and publication. Quality dispatch follows `quality-execution.md`: retain an independent worker across explicit named phases when available, and never let workers nest fan-outs.
 
 | Sub-skill | Dispatch method |
 |-----------|----------------|
@@ -119,13 +122,13 @@ Sub-skills use named agent dispatch for context isolation, following `.claude/gu
 | `green-acceptance` | **Inline** — no subagent. Main agent reads `green-agent.md`, loads acceptance template, enables the test, runs it. Full visibility for user. |
 | `harvest` | **Inline** — no subagent. Main agent reads `.claude/skills/harvest/SKILL.md` and fans out its own writer sub-agents (`red-agent`, layer `acceptance`); it must not nest inside a wrapper agent. |
 | backend or frontend `stage-*` | **Inline coordinator** — fan out lane phases directly, including sibling test-review/GREEN work where the stage template permits it; gather results and remain sole writer of tracking state, staging, and commits; workers never nest detector fan-outs |
-| `/refactor` | **Inline** — no wrapper subagent. Main agent concurrently fans out `refactor-mechanics-agent`, `refactor-design-agent` and `refactor-duplication-agent`, awaits every result, merges duplicate locations while preserving check ids and impact order, then dispatches `refactor-agent` as the serial fixer with the detector roster. |
-| `/test-review` | **Inline** — no wrapper subagent. Main agent fans out the detector roster, merges findings, then dispatches `test-review-agent`. The fixer runs the suite unless Stage 2 production work is concurrent; then the coordinator owns joined verification. |
+| `/refactor` | **Inline dispatcher.** Load the skill and `quality-execution.md`; dispatch one independent `refactor-agent` per coherent scope with all applicable checks. Default scan-and-fix; Stage 2 may explicitly inspect alongside coverage, then grant fixes after behavior publication. Await all scope results. |
+| `/test-review` | **Inline dispatcher.** Load the skill and `quality-execution.md`; dispatch one independent `test-review-agent` per coherent scope with all applicable checks. Retain it for a separately dispatched RED refactor after reviewed-test publication. Await all results; the coordinator owns joined verification during concurrent production work. |
 | `/test-coverage` | Dispatch named agent `coverage-agent` and await its result. |
 
 Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`, any `red-workflow (...)` → layer `workflow`). Both red-agent and green-agent receive: layer, work-item folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow.
 
-**CHAINING: After each sub-step's awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts) to the user, then immediately dispatch the next sub-step. Required story Stage 1 interview/contract decisions and task-design approval may pause dependent work.**
+**CHAINING:** After an awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts). In story implementation, immediately refill free slots with ready phases under `quality-execution.md`; each next phase requires an explicit dispatch and its own prerequisites. Tasks and specification immediately dispatch their next sub-step. Required story Stage 1 interview/contract decisions and task-design approval may pause dependent work.
 
 **AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. After the last commit, include the log contents in the stop-and-report summary.**
 
@@ -155,4 +158,5 @@ After updating `progress.md` for a **story** (not tasks), update the story's row
 - `.claude/templates/workflow/stories-md-format.md` -- stories.md phase/Tests/% column rules (tier-major and untiered)
 - `.claude/templates/workflow/plan-integrity-check.md` -- plan checks, staged-write check 8, and quality-evidence check 9
 - `.claude/templates/workflow/story-quality-checklist.md` -- required quality entries, dispatch, evidence, and resume reconciliation
+- `.claude/templates/workflow/quality-execution.md` -- quality scope scheduling, retained workers, inspection modes, and evidence reuse
 - `.claude/templates/workflow/continue-report-format.md` -- the re-orientation block that closes every stop-and-report

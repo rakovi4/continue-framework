@@ -4,9 +4,11 @@ Both backend and frontend stage coordinators load this contract before dispatch.
 Materialize each lane's phases using `story-quality-checklist.md` before its writers
 start. Update those checkboxes after each completed skill result; the evidence
 below is mandatory for the matching entry, including after resume or recovery.
+Load `quality-execution.md` for scope workers, phase overlap, reuse, and timing.
 The coordinator dispatches `/test-review`, `/test-coverage`, and `/refactor` as
-separate required phases using `/continue`'s sub-skill routing. A GREEN worker
-return is an implementation candidate, not a completed lane. Workers must not
+separate required phases using `/continue`'s sub-skill routing. One retained quality
+worker may serve successive explicit phases; inspection is not gate completion.
+A GREEN worker return is an implementation candidate, not a completed lane. Workers must not
 decide whether these phases are useful or run nested detector fan-outs.
 
 ## Scope and sequence
@@ -18,24 +20,29 @@ decide whether these phases are useful or run nested detector fan-outs.
    A lane may batch its targets, but may not sample files or omit a module or test.
    Related files outside the manifest are read-only context; the coordinator must
    reconcile ownership before assigning fixes there. Shared test review/refactor
-   evidence may be reused only when it covers the same targets and revisions.
+   evidence may be reused only when it covers the same targets, revisions, and
+   check-relevant context under `quality-execution.md`.
 2. After RED, run `/test-review` over every new or changed test and its helpers.
    Commit the reviewed RED tests, then run `/refactor` over that test surface and
    publish its changes separately before enabling the tests. Preserve RED
    assertions and recorded raw failure evidence. Test review may overlap GREEN
-   production work on disjoint paths; refactoring starts only after writers of its
-   target paths have returned.
-3. After GREEN, run `/test-coverage` for every touched production module using
+   production work on disjoint paths. Start test refactoring as soon as its test
+   writer/reviewer returns and reviewed tests are published; do not wait for GREEN.
+   Use the stable RED verification procedure in `quality-execution.md`.
+3. After joined GREEN tests pass, run report-only `/test-coverage` beside read-only
+   `/refactor` inspection on stable inputs for every touched production module using
    explicit lane paths and the recorded baseline, including committed changes.
    Measure frontend as well as backend code. Classify gaps and complete admitted
    follow-ups under the existing finding-admission rules. A missing report or empty
    focus caused by a bad filter cannot pass. For non-executable files, record why
    no coverage metric applies; they still belong to the refactor scope.
-4. Commit the verified behavior, then invoke `/refactor` over the lane's complete
-   production and test scope. Stage 1 skeleton scans and a worker's informal review
-   cannot satisfy this phase. Await the full checklist scan and any fixes; run
-   affected checks and publish refactoring in a separate commit. `NO_CHANGE` is
-   valid only as the result of that completed skill execution.
+4. Join coverage and inspection, resolve admitted follow-ups, and commit verified
+   behavior before granting `/refactor` fixes. Account for the complete production
+   and test scope through executed checks and validated reuse under
+   `quality-execution.md`; always inspect final cross-file interactions. Stage 1
+   skeleton scans and an author's informal review cannot satisfy this phase.
+   Await fixes and affected checks, then publish refactoring separately. `NO_CHANGE`
+   requires completed revision validation and verification, not just empty findings.
 5. For design alignment, the coordinator dispatches component build, alignment,
    design review, test review of the tests exercising the component, coverage,
    behavior commit, refactor, and verify-only alignment. Changed test behavior
@@ -45,7 +52,8 @@ decide whether these phases are useful or run nested detector fan-outs.
 
 ## Completion evidence
 
-Keep one checkpoint per lane in the invocation work log, with these named results:
+Keep one checkpoint per lane linking compact phase results and the shared manifest
+under `quality-execution.md`; do not repeat inventories or detector reports. Include:
 
 | Result | Required evidence |
 |--------|-------------------|
@@ -53,7 +61,7 @@ Keep one checkpoint per lane in the invocation work log, with these named result
 | Test review | Reviewed test targets and helpers, completed skill result, and joined verification |
 | RED refactor | Scanned test paths, completed skill result, commit or evidenced `NO_CHANGE` |
 | Coverage | Measured production paths per module, report location and counts, gap dispositions |
-| GREEN refactor | Scanned production and test paths, completed skill result, commit or evidenced `NO_CHANGE` |
+| GREEN refactor | Production/test scope, executed/reused check references and context, completed skill result, commit or evidenced `NO_CHANGE` |
 | Refactor applicability and exemptions | Role inventory, every applicable M/D/T check, and per-candidate KEEP evidence under `restraint.md`; no language/extension-based waiver of shared principles |
 | Structure and formatting | B13 capability grouping evidence; A60 formatter/manual check; A0 final physical line counts after formatting, for both RED and GREEN scopes |
 | Final verification | Affected suite results and final checked revisions; verify-only alignment for design lanes |

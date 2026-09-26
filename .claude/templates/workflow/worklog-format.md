@@ -42,6 +42,11 @@ storage: unit={boundary}; writes=[{path}: {delta}]; frozen-surfaces=[...]
 <!-- lanes: usecase=abc123 PASS; storage=def456 PASS -->
 ```
 
+For story quality phases, use the compact result and timing fields in
+`quality-execution.md`. Store manifests, check enumerations, and reports once;
+reference them from phase results and record only changes at later checkpoints.
+Do not append narrative for routine polls or copy a lane's history at each dispatch.
+
 Use only the fields the work unit produced. `Outcome` is required (`in-progress` or
 `completed`); prose bullets and
 machine-readable HTML comments are optional. Keep resumable coordinator state in

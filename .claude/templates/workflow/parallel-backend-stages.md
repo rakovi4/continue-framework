@@ -107,15 +107,17 @@ For each lane:
 2. After raw RED is observed, start the GREEN writer and `/test-review` as sibling
    work, bounded by available capacity. Test-review may complete validation omitted
    by the RED writer; GREEN owns production paths only.
-3. Join the reviewed test and production candidate. Reject overlapping writes;
-   commit the reviewed disabled test from explicit test paths while production edits
-   remain unstaged. Dispatch `/refactor` for every test and helper, publish its
-   changes separately, then enable and run against the candidate. A test defect
-   returns to test-review; an implementation failure returns to GREEN.
+3. As soon as test review returns, commit the reviewed disabled tests from explicit
+   test paths and dispatch their RED `/refactor`; production work need not have
+   returned. Use `quality-execution.md` for stable RED verification and the retained
+   quality worker. Publish test refactoring separately, then join with the production
+   candidate, enable, and run. A test defect returns to test-review; an implementation
+   failure returns to GREEN. Reject overlapping writes.
 4. When the complete reviewed target and module suite pass, dispatch focused
-   `/test-coverage` for every touched production module. Commit the verified
-   production paths plus the marker-only enable delta as GREEN, then dispatch
-   `/refactor` over all lane production and test paths and publish changes separately.
+   report-only `/test-coverage` beside read-only `/refactor` inspection. Follow
+   `quality-execution.md` for stable inputs, admitted follow-ups, evidence reuse,
+   verified behavior publication, and the subsequent refactor fix grant. Publish
+   production plus marker-only enables as GREEN, then refactoring separately.
 5. Complete admitted follow-ups, verify the final result, and reconcile the lane's
    quality-gate evidence before reporting it complete.
 

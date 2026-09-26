@@ -26,21 +26,22 @@ inheritance, or a named test-helper convention. Qualify reused IDs by cluster.
 Frozen contracts and lane locks require coordinator ownership resolution; they
 cannot turn a real violation into CLEAN.
 
-The checklist is split **per cluster** — each detector loads only its own file,
-nothing more:
+The checklist is organized by cluster. A combined scope worker loads all three;
+an explicitly selected cluster detector loads only its assigned file:
 
 - **`scan-mechanics.md`** — cluster M checks (structural mechanics).
 - **`scan-design.md`** — cluster D checks (design + domain-judgment).
 - **`scan-duplication.md`** — cluster T checks (duplication, tests, frontend).
 - **`code-smells-routing-table.md`** — smell → fix → template map (serial fixer only).
 
-## Detector clusters (parallel scan)
+## Checklist clusters
 
-`/refactor` fans the scan out to **three read-only detector agents** that run in
-parallel, then a **single serial fixer** applies fixes one refactoring at a time
-(re-scanning cascades after each). Each detector runs ONLY the categories below.
-Every check belongs to exactly one cluster — this table is the single source of
-truth, so the per-row checks never drift out of sync with the split.
+Use `quality-execution.md` in the workflow templates for scope-based scheduling
+and validated reuse. The default scope worker runs all clusters; the agents below
+remain available for an explicitly selected concurrent cluster fan-out. Partitioned
+scope inspectors also run all applicable clusters within their assigned scope.
+Apply one refactoring at a time per writable scope, rescanning affected checks.
+This table remains the authoritative check routing, regardless of dispatch mode.
 
 | Cluster | Detector agent | Loads | Section A categories | Section B |
 |---------|---------------|-------|----------------------|-----------|
@@ -57,7 +58,9 @@ templates; detectors only name the prescribed fix.
 
 ## Scan output format
 
-**Print this filled checklist before starting refactoring.**
+**Record complete check results before applying refactoring.** Store enumerations
+once and reference them from checks and later phases. Validated reuse identifies the
+prior check, inputs, and result; it never substitutes a bare PASS for evidence.
 
 **Enumeration rule:** Every check that says "enumerate", "list", "count", or "for each" MUST show the data, even when clean. Judgment checks cite inspected behavior or explain that none was found. NOT_APPLICABLE follows the role protocol above; bare language/file-type skips are invalid. B13 always requires grouping evidence. Preserve every candidate's FIX or evidenced KEEP disposition, including those declined by a detector.
 

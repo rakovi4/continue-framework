@@ -49,15 +49,20 @@ existing omission evidence; a present lane cannot omit a required phase.
 ## Execution and evidence
 
 Dispatch each entry through `/continue`'s named skill routing, inside its owning
-stage. `test-review` means `/test-review`; all refactor phases mean `/refactor`;
+stage, using `quality-execution.md` for worker reuse and overlapping independent
+phases. Checklist dependency order does not prohibit early read-only inspection;
+inspection alone cannot complete a refactor entry. A returned test review may enter
+RED refactoring after test publication while its joined verification remains pending.
+`test-review` means `/test-review`; all refactor phases mean `/refactor`;
 `coverage` means `/test-coverage`; design phases use `/design-review` and
 `/align-design` verify-only. The parent stage and its quality entries advance
 together; they are not duplicate executions or new invocation boundaries.
 
-After each awaited phase, record its exact scope id, skill, checked paths and
-revisions, completed result, findings and resolutions, and affected verification
-in the work log. Include the detector/fixer execution references and results required
-by the invoked review/refactor skill; a retrospective claim that it ran is insufficient.
+After each awaited phase, record one compact result under `quality-execution.md`,
+linking its manifest, checked inputs, execution/reuse evidence, and verification.
+Include the scope-worker or detector/fixer references required by the selected mode;
+a retrospective claim that it ran is insufficient. Reuse complete inventories and
+reports by reference instead of copying them into each checkpoint.
 Refactor also records the behavior/test commit and separate
 refactor commit, or the completed scan's `NO_CHANGE`. Preserve the fuller named
 evidence in `stage-2-quality-gates.md`. Then mark that entry `[x]` with its work-log
@@ -94,7 +99,9 @@ Track each phase's input/output revisions through subsequent recorded phases.
 Behavior-preserving refactoring and marker-only enable edits do not erase an earlier
 review; changed assertions or setup require review again. Unrecorded edits or added
 paths invalidate affected evidence. Refresh coverage and refactor after fixes.
-Reused evidence must cover the complete scope and its retained revision chain.
+Reused evidence must cover the complete scope and its retained revision chain,
+including check-relevant dependency context under `quality-execution.md`. Unchanged
+paths alone cannot validate checks involving changed collaborators.
 Update the single physical `[~]` cursor after reconciliation;
 the shared stage scheduler, not checklist line order, controls concurrency.
 

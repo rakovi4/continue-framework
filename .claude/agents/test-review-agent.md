@@ -1,29 +1,34 @@
 ---
 name: test-review-agent
-description: Gather detector findings and apply strict-assertion fixes serially
+description: Inspect all test-review checks within a scope and apply strict-assertion fixes
 ---
 
-# Test Review Agent — Serial Fixer
+# Test Review Agent — Scope Review and Fixes
 
-**IMPORTANT: Apply the fixes the detectors found. One file at a time. No concurrent writes.**
+**Run every applicable check. Resolve findings under one writer per scope.**
 
 ## Purpose
 
-The four read-only detector agents scan in parallel and return findings tables.
-They are fanned out by `/continue` itself, in one message and awaited, and this
-agent is handed the merged list — the scatter half lives on the orchestrator's
-surface because a dispatched sub-agent must nest no fan-out of its own. Which
-detectors those are, the flag that awaits them, and who runs the suite are named
-in `/continue`'s Sub-Skill Dispatch row for `/test-review`.
+Use `.claude/templates/workflow/quality-execution.md`. Default to an independent
+scope worker that inspects every applicable A/P/S/Se row of
+`test-review-checklist.md` before fixing. Load the matching technology context.
+The coordinator may supply partitioned or cluster findings instead. Never nest a
+fan-out; keep all shared helpers under their declared writer. In an explicit
+read-only inspection dispatch, return findings and input/context revisions without
+edits or a completed-review claim.
 
-This agent **applies** the fixes serially —
-replacing loose validation with strict, field-level assertions and correcting
-placement / Statements-quality / selenium violations, while the test still
-validates the same behavior.
+After review, return for the coordinator's test publication. The coordinator may
+retain this worker for a separately dispatched `/refactor` phase; do not start it
+implicitly. Keep results distinct while referencing common inspected data and
+resolutions. Send changed expectations to the concurrent production writer through
+the coordinator; do not edit that writer's paths.
 
 ## Workflow
 
-1. **Read** the merged findings list you were handed, ordered by file.
+1. **Inspect or gather.** Without supplied findings, run the complete applicable
+   checklist on the scope and read-only context. Otherwise validate the findings'
+   input revisions and gather every assigned partition, including cross-scope
+   checks. An inspection-only dispatch returns here; other modes proceed to fixes.
 2. **Dedup** — if two entries flag the same `file:line`, keep one and note both
    check numbers.
 3. **For assertion findings**, load `.claude/templates/testing/determinism-hierarchy.md`
@@ -39,8 +44,10 @@ validates the same behavior.
 6. **Verify execution.** Run the module tests yourself, unless GREEN production
    work is concurrent; then return the reviewed test paths for the coordinator's
    joined run.
-7. **Print the filled checklist** using `.claude/templates/workflow/test-review-output-format.md`
-   before reporting. Fix any remaining violation BEFORE reporting "no issues."
+7. **Return complete check results** using
+   `.claude/templates/workflow/test-review-output-format.md`. Record them once and
+   link from the phase result under `quality-execution.md`. Fix remaining violations
+   before reporting "no issues"; deferred joined verification stays explicitly pending.
 
 ## No Deferred Fixes
 

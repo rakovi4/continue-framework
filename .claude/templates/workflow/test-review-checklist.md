@@ -2,9 +2,10 @@
 
 Run EVERY check below on the test class file. Paste results. Fix violations before reporting.
 
-The **Cl** (cluster) column routes each check to the detector agent that owns it.
-Each detector runs ONLY its cluster's rows — the table stays the single source of
-truth, so check definitions never drift across agents:
+The default scope worker runs all applicable clusters under `quality-execution.md`.
+The **Cl** column also routes checks for an explicitly selected cluster fan-out;
+each such detector runs only its assigned rows. The table remains the single source
+of truth in both modes:
 
 | Cl | Detector agent | Theme |
 |----|----------------|-------|

@@ -1,36 +1,46 @@
 ---
 name: refactor-agent
-description: Gather refactor detector findings and apply refactorings serially, one at a time
+description: Inspect a complete refactor scope and apply verified refactorings one at a time
 ---
 
-# Refactor Agent — Serial Fixer
+# Refactor Agent — Scope Inspection and Fixes
 
 **One refactoring at a time. Run tests after each change. Re-scan cascades.**
 
 ## Purpose
 
-The three read-only detectors scan in parallel and return candidate tables. They
-are fanned out by `/continue` itself, in one message and awaited, and this agent
-is handed the merged list — the scatter half lives on the orchestrator's surface
-because a dispatched sub-agent must nest no fan-out of its own. Which detectors
-those are, and the flag that awaits them, are named in `/continue`'s Sub-Skill
-Dispatch row for `/refactor`.
+Use `.claude/templates/workflow/quality-execution.md`. Default to a complete
+scope pass across M/D/T in `scan-checklist.md`, independent of the source author.
+The coordinator may instead supply partitioned or cluster findings. Never nest a
+fan-out. Modes are `scan-and-fix`, `inspect`, and `fix`:
 
-This agent **applies** the refactorings
-serially — because refactorings cascade (a class split changes sizes, a
-parameter removal frees locals), fixing MUST stay single-threaded with a
-re-scan after each change.
+- `scan-and-fix`: inspect every applicable check, then apply fixes within ownership.
+- `inspect`: read-only checklist execution; return input revisions, context, and
+  candidates without edits or a completed-refactor claim. Coverage may run beside it.
+- `fix`: validate retained inspection inputs and approved reuse; rescan invalidated
+  checks before applying candidates. Write only after the coordinator's explicit
+  grant and required preceding publication, even when this worker did the inspection.
+
+Run cross-scope checks assigned by the coordinator with read-only sibling context.
+Refactoring remains one change at a time within each writable scope; independent
+scopes may run concurrently. Required verification depends on phase: stable expected
+RED checks for test refactoring, passing affected checks after GREEN. A disabled
+suite with no executed cases is not evidence. Follow `quality-execution.md` when
+production is still being written.
 
 ## Workflow
 
-1. **Read** the merged, deduped candidate list you were handed. If it arrived
+1. **Inspect or gather.** Without retained findings, load `scan-checklist.md` and
+   execute all M/D/T checks for the owned scope. Account for validated reused checks
+   explicitly. With findings, read the merged candidate list. If it arrived
    undeduped, deduplicate by cluster/check ID plus source range, preserving distinct
    findings at the same location. Require the role applicability record and every
    detector KEEP decision under `restraint.md`; reject syntax-only skips and
    unsupported exemptions. Require B13's directory inventory and
    boundary verdicts from `scan-design.md` alongside the candidates. If absent,
    perform that check inline before accepting an empty list; this also applies
-   to a small-file pass without detectors.
+   to a scope pass without detectors. In `inspect` mode, return here with the
+   complete check results and candidate table; do not apply fixes.
 2. **Order** the list: resolve formatting (A60) and remeasure A0/A1 first,
    then highest-impact first: class/file splits (A0) before method
    extractions (A1) before local/expression cleanups — so cascades resolve
@@ -44,7 +54,8 @@ re-scan after each change.
    then `wc -l` on every changed file (code, stylesheet, config). If any exceeds
    200 formatted lines, split further now. Recheck A60 after every extraction;
    formatting fixes cannot be waived under extraction restraint.
-5. **Run tests** for the module.
+5. **Run affected checks** for the module against stable inputs, preserving the
+   expected RED or GREEN outcome for the phase. Record failures, not skipped cases.
 6. **Re-scan cascades** — re-run the checks affected by this change
    (param removal A55 → re-check locals A8 + repeated expressions A7; method
    extraction → re-check A1; class split → re-check A0). Add any new candidate to
@@ -54,8 +65,11 @@ re-scan after each change.
    inline — do NOT re-dispatch the detectors.
 7. **Repeat** from step 2 until the list is empty AND the cascade re-scan is
    clean, with every finding resolved or supported by current KEEP evidence.
-   Then run the full build to catch missed files. Report ownership-blocked
-   violations explicitly; they cannot establish completion.
+   Then run final affected checks. For staged lanes, return the checked revisions
+   to the coordinator, which owes the combined build at the stage join; standalone
+   refactors run their full build here. Report ownership-blocked violations explicitly;
+   they cannot establish completion. Inspection and fix reports reference shared
+   inventories and enumerations under `quality-execution.md` instead of copying them.
 
 ## Rules
 

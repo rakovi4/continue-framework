@@ -5,46 +5,50 @@ description: Refactor code using Martin Fowler's patterns. Improves readability,
 
 # /refactor
 
-Scatter–gather: **three parallel read-only detectors** scan for smells, then a
-**single serial fixer** applies refactorings one at a time. Detectors never edit
-— only the fixer writes, and it re-scans cascades after each change, so the
-"one refactoring at a time" invariant is preserved.
+Dispatch one independent `refactor-agent` per coherent scope. The worker applies
+all applicable refactoring checks; scope partitioning controls parallelism, not
+checklist coverage. Load `.claude/templates/workflow/quality-execution.md` for
+ownership, scheduling, evidence reuse, inspection modes, and result joining.
 
 ## Usage
 
-```
-/refactor                    # Analyze current code for smells
-/refactor Email              # Create Email value object
-/refactor UserService         # Refactor specific file
-```
+- `/refactor` — analyze and refactor the current scope
+- `/refactor {Target}` — analyze and refactor a named target
 
-## Workflow
+## Dispatch
 
-1. **Identify the target** file (and its tests / siblings). This determines which
-   responsibilities to scan using `scan-checklist.md`'s applicability protocol.
-   Load shared coding detail for every target, frontend role rules where relevant,
-   and the active technology bindings. Syntax and runtime do not narrow shared checks.
-2. **Dispatch the detectors concurrently and await all of them** — start every
-   named agent before awaiting results, then gather every result. No dispatch is
-   detached or fire-and-forget: step 3 requires the complete result set.
-   Each runs only its cluster of `.claude/templates/refactoring/scan-checklist.md`
-   and returns candidates, evidenced KEEP decisions, and role applicability:
-   - `refactor-mechanics-agent` — cluster M (size, complexity, variables, dead code)
-   - `refactor-design-agent` — cluster D (domain modeling, behavior placement, type safety)
-   - `refactor-duplication-agent` — cluster T (sibling/cross-class duplication, tests, frontend)
-3. **Gather + fix:** hand all candidate tables to `.claude/agents/refactor-agent.md`
-   (the serial fixer). It merges, dedups, orders highest-impact-first, applies
-   ONE refactoring at a time (loading the template from the Code Smells Routing
-   Table), runs tests, and re-scans cascades inline — repeating until clean.
+1. Resolve the target, tests, helpers, and relevant collaborators. Load shared
+   coding detail, frontend rules where relevant, and active technology bindings.
+   Map responsibilities using `.claude/templates/refactoring/scan-checklist.md`.
+2. Dispatch `refactor-agent` with the scope manifest, input revisions, applicable
+   context, and execution mode. The worker must be independent of the primary
+   implementation/test author and load every applicable M, D, and T check. It must
+   not nest fan-outs.
+   For large scopes, partition by cohesive capability, assign each partition all
+   applicable clusters, and name an owner for cross-capability checks. Shared
+   writes have one owner. Partitioned dispatches are read-only initially; gather
+   every partition and cross-capability result before granting fixes.
+3. Default unpartitioned standalone/task mode is **scan-and-fix**: scan the complete scope,
+   resolve findings one refactoring at a time, verify, and return the completed
+   result using `refactor-agent.md`. A small scope uses this same route.
+4. Stage 2 may dispatch **inspect** on the stable joined candidate alongside
+   coverage. It returns findings without edits; this is not a completed gate.
+   After coverage-driven changes are verified and behavior is published, the
+   coordinator explicitly dispatches **fix**, granting owned paths and passing
+   current revisions and invalidations. Reuse the inspector when available;
+   otherwise pass its evidence to a new independent worker. Revalidate affected
+   checks, apply fixes, and await verification before completing the gate.
+5. A worker retained from `/test-review` may run `/refactor` only after the
+   coordinator publishes the reviewed tests and explicitly dispatches this skill.
+   Keep the two named phases and results distinct; never auto-run the next phase.
+   GREEN scope reuse follows `quality-execution.md`; every file and check remains
+   accounted for, including cross-file effects.
 
-### Small-file shortcut
-
-If the target is small with few methods/concerns, skip the fan-out and run a
-single `refactor-agent` pass over the whole checklist — the detector
-orchestration + merge overhead can exceed the single-agent cost on tiny files.
-Dispatch that lone pass and await its result. Here the fixer's report is this
-skill's entire output, so an unawaited call could report "refactored" before a
-file was touched.
+Optional cluster fan-out is a coordinator choice only when scope size and
+available capacity justify it without delaying ready independent scopes. Dispatch
+`refactor-mechanics-agent`, `refactor-design-agent`, and
+`refactor-duplication-agent` before awaiting any; gather every result, then grant
+one owning `refactor-agent` the fixes. Workers never nest this fan-out.
 
 ## Available Templates
 

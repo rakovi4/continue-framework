@@ -23,32 +23,36 @@ description: Review tests for strict assertions and complete omitted validation.
 
 ## Workflow
 
-Scatter–gather: **parallel read-only detectors** find violations, then a **single
-serial fixer** applies them. The detectors never edit — only the fixer writes, one
-file at a time — so there are no concurrent writes to shared Statements files.
+Load `.claude/templates/workflow/quality-execution.md` for scope ownership,
+parallel scheduling, retained workers, and compact phase evidence.
 
-1. **Determine the test's layer** (usecase / rest / storage / acceptance / selenium) —
-   this selects the tech file each detector loads and whether the selenium
-   detector runs.
-2. **Dispatch the detectors concurrently and await all of them** — start every
-   named agent before awaiting results, then gather every result. No dispatch is
-   detached or fire-and-forget: step 3 requires the complete result set.
-   Each runs only its cluster of `.claude/templates/workflow/test-review-checklist.md`
-   and returns a findings table:
-   - `test-review-assertions-agent` — cluster A (assertion strictness)
-   - `test-review-placement-agent` — cluster P (test-class vs Statements placement)
-   - `test-review-statements-agent` — cluster S (Statements internal quality)
-   - `test-review-selenium-agent` — cluster Se — **only for selenium/frontend tests**; skip for pure backend tests.
-3. **Gather + fix:** hand all findings to `.claude/agents/test-review-agent.md`
-   (the serial fixer). It merges, dedups, applies fixes one file at a time, and
-   prints the filled `test-review-output-format.md`. It runs `/test-runner` unless
-   Stage 2 production work is concurrent; in that case the coordinator runs the
-   joined test and implementation.
+1. Resolve the test scope and layer (usecase / rest / storage / acceptance /
+   selenium), including helpers and relevant collaborators. Load the matching
+   technology template and `.claude/templates/workflow/test-review-checklist.md`.
+2. Dispatch one independent `test-review-agent` per coherent scope. The worker
+   must be independent of the test author, run all applicable A, P, S, and Se
+   checks, then apply fixes under `.claude/agents/test-review-agent.md` for an
+   unpartitioned scope. Se applies to selenium/frontend tests only. A small scope
+   uses this same route.
+3. For large scopes, partition by cohesive capability with all applicable checks
+   per partition and a named cross-capability owner. Shared helpers have one
+   write owner. Dispatch partitions read-only initially; gather every partition
+   and cross-capability result before granting fixes. Workers must not nest
+   fan-outs.
+4. The worker runs the affected tests unless Stage 2 production work is concurrent;
+   then it returns reviewed test paths and the coordinator owns joined execution.
+   Review findings that affect required production behavior go to that writer.
+   Return a distinct `/test-review` result. The coordinator may publish reviewed
+   tests and dispatch RED refactoring while joined verification remains owed;
+   keep the review gate pending until that verification completes.
+5. Retain the quality worker for RED `/refactor` when available, preserving its
+   context. It must stop after the review result. Only the coordinator's explicit
+   `/refactor` dispatch after publication of reviewed tests starts that phase;
+   skill invocations, evidence, and commits remain distinct.
 
-### Small-file shortcut
-
-If the target test is small with very few assertions, skip the fan-out and run a
-single `test-review-agent` pass over the whole checklist — the detector
-orchestration + merge overhead can exceed the single-agent cost on tiny files.
-Await that one dispatch too. This pass both finds and fixes, so an unawaited call
-could report the review done before a single assertion has been tightened.
+Optional cluster fan-out requires coordinator justification from scope size and
+available capacity. Dispatch `test-review-assertions-agent`,
+`test-review-placement-agent`, `test-review-statements-agent`, and, for applicable
+scopes, `test-review-selenium-agent` before awaiting any. Gather every result and
+hand the findings to one owning `test-review-agent` for fixes. This exception does
+not replace parallel scheduling of ready independent scopes.

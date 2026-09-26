@@ -105,7 +105,9 @@ another lane's new output, apply the existing lane-plan gate: freeze the missing
 seam in Stage 1 or coalesce work within one architectural boundary. Workers never
 change frozen contracts. Shared writable paths stay under one owner, and the
 coordinator serializes publication under one lock across backend and frontend.
-Record dispatched phases and any capacity or prerequisite wait in the work log.
+Use `quality-execution.md` for scope-based scheduling, phase overlap, and compact
+ready/start/finish records with wait reasons. Prefer work that unblocks a lane's
+next phase, without starving older jobs or either backend/frontend work.
 
 Load `stage-2-quality-gates.md` and dispatch each lane's recorded quality entries as
 separate coordinator-owned phases; never delegate an entire stage to a generic
@@ -116,7 +118,8 @@ legacy serial routes.
 Update the corresponding scenario implementation checkboxes as lanes finish. Do not
 advance to Stage 3 until every required implementation lane, follow-up check, and
 refactor is complete and committed, and every Stage 2 quality entry has valid
-completion evidence. Then continue immediately in the same invocation.
+completion evidence. Run the combined build/checks once on the stable stage join;
+record its final inputs and results. Then continue immediately in the same invocation.
 
 ## Stage 3 — All acceptance GREEN, then sequential demos
 

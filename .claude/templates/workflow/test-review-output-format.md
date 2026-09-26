@@ -1,6 +1,11 @@
 # Test Review Output Format
 
-Print this filled checklist before reporting results:
+Record results for every applicable row in `test-review-checklist.md`, including
+rows beyond this summary. Store evidence once and reference it from phase records
+under `quality-execution.md`; this summary is not a substitute for the full check
+coverage. Include findings, resolutions, and pending joined verification explicitly.
+
+Summary format:
 
 ```
 ## Review Checklist

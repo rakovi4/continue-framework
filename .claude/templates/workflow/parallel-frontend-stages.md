@@ -3,8 +3,11 @@
 Frontend scenarios use one shared worktree. The coordinator alone owns
 `progress.md`, staging, commits, and stage transitions. Before every dispatch it
 records the file manifest and each path's baseline in the active work-log record;
-manifests must be disjoint. A manifest path already dirty before dispatch makes the
-lane undispatchable: never mix a worker edit with pre-existing work in one file.
+manifests must be disjoint. Unrelated or unaccounted-for pre-existing edits make a
+path undispatchable. Recorded output from an earlier phase of the same lane is valid
+input for its next phase, including an unpublished GREEN candidate for coverage and
+inspection. Verify its recorded revision before dispatch; never mix unknown edits
+with the lane's work.
 
 ## Stage 1 — Acceptance RED and Interface Design
 
@@ -32,14 +35,17 @@ For whole-story execution, use `story-stages.md`'s shared backend/frontend queue
 the sequences below advance each frontend lane within that queue.
 
 Build three manifests from the frozen design. Load `stage-2-quality-gates.md`;
-the coordinator dispatches each phase of every active lane, including review and
-refactor detectors, so workers never nest fan-outs. Use these sequences:
+the coordinator dispatches each phase using `quality-execution.md`, so workers
+never nest fan-outs. In the table, test quality means review → test publication →
+RED refactor publication; GREEN starts after raw RED beside test quality. Join both
+before enabling and running tests, then overlap coverage with read-only refactor
+inspection before behavior publication and the separate refactor fix phase:
 
 | Lane | Complete sequence | Owns |
 |------|-------------------|------|
-| Frontend logic | RED → test review → test refactor → GREEN → coverage → refactor | Pure capability models, operation/lifecycle controllers, and their tests; separate owners/files under the frontend role map |
-| API client (`layer=frontend-api`) | RED → test review → test refactor → GREEN → coverage → refactor | API-client production and test files |
-| Design alignment | Component build → align → design review → test review → coverage → refactor → verify-only align | Component, style, and explicitly owned test files |
+| Frontend logic | Raw RED → (test quality beside GREEN) → joined tests → coverage/inspection → refactor fixes | Pure capability models, operation/lifecycle controllers, and their tests; separate owners/files under the frontend role map |
+| API client (`layer=frontend-api`) | Raw RED → (test quality beside GREEN) → joined tests → coverage/inspection → refactor fixes | API-client production and test files |
+| Design alignment | Component build → align → design review → test review → joined tests → coverage/inspection → refactor fixes → verify-only align | Component, style, and explicitly owned test files |
 
 A lane with no implementation delta may be omitted with evidence. Small or trivial
 changes still require all quality gates; another lane never inherits files
