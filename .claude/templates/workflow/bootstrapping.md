@@ -28,6 +28,8 @@ genuinely absent from the path it was given.
    - `mockups`: `mockups/` has files
    - `api-spec`: `endpoints.md` exists
    - `test-spec`: `tests/01_API_Tests.md` exists
+   - `design`: place after `test-spec`; complete only when whole-story design approval
+     is recorded (see `story-stages.md`, "Spec — Whole-story design").
    - **Edge case**: if all spec items exist EXCEPT `interview.md`, mark
      `[S] interview (spec completed without interview)` — don't force retroactive
      interviews on old stories.
@@ -44,14 +46,15 @@ genuinely absent from the path it was given.
    next `[~]`, the rest `[ ]`.
 5. For new backend, integration, security, load, and infrastructure scenarios emit
    the three stages and their approval checkboxes from
-   `parallel-backend-stages.md`. Stage 1 includes design and adapter discovery.
+   `parallel-backend-stages.md`. Design and adapter discovery run in Spec;
+   their existing scenario checkboxes reuse that approval.
    Preserve the legacy serial shape when repository evidence shows that a scenario
    already started under it.
 6. For new frontend scenarios emit the three staged frontend checkboxes from
    `progress-format.md`. Preserve the legacy `red-selenium` through `demo` shape
    only when repository evidence shows that scenario already started under it.
 7. Append `## Quality gates` per `story-quality-checklist.md`. Acceptance entries
-   must exist before writers start; implementation entries are added when Stage 1
+   must exist before writers start; implementation entries are added when spec design
    defines the lanes. Existing code or passing tests never prove a quality phase
    completed; only matching skill execution evidence can mark its entry `[x]`.
 
