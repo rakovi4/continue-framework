@@ -10,7 +10,7 @@ Every story follows: **interview → spec → backend scenarios → integration 
 
 Those six scenario types are coverage categories. After the reviewed specification,
 one `/continue` invocation implements Tier 1 and Tier 2 together in three passes:
-all acceptance RED against contracts approved during Spec; all
+all acceptance RED alongside a design interview and frozen layer contracts; all
 implementation; then all acceptance GREEN and sequential demos. Scenario plans keep
 their existing tier/category layout and metrics; that layout no longer dictates
 execution order. Tier 3 remains deferred. The coordinator and its scoped overrides
@@ -22,7 +22,7 @@ are in `.claude/templates/workflow/story-stages.md`.
 
 **Backlog** stories have all `·` columns (no folder yet); rows are added by the `/story` skill. When `/continue N` targets a Backlog story, auto-promote it: move the row from **Backlog** to **In Progress** in `ProductSpecification/stories.md` before starting work.
 
-Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` → whole-story `design` via `/design-preview` (one at a time, review each before proceeding). The interview may capture technical constraints needed to understand feasibility, but the generated main story spec uses domain language exclusively. Implementation choices, architecture, technology, and integration mechanics belong in the story's Notes file. When a technical limitation changes externally observable behavior, state that behavior in domain terms in the main spec and keep the mechanism in Notes.
+Spec phase: `/interview` → story spec (dispatched by `/continue` via its internal template, not the `/story` skill) → `/mockups` → `/api-spec` → `/test-spec` (one at a time, review each before proceeding). The interview may capture technical constraints needed to understand feasibility, but the generated main story spec uses domain language exclusively. Implementation choices, architecture, technology, and integration mechanics belong in the story's Notes file. When a technical limitation changes externally observable behavior, state that behavior in domain terms in the main spec and keep the mechanism in Notes.
 
 **Cover the complete primary-user journey with focused scenarios.** Coverage must
 connect the user's in-scope entry to the story's promised value, including any
@@ -59,10 +59,10 @@ What the suite genuinely cannot hold, each with an existing home:
 ## Scenario Sequences
 
 Backend, integration, security, load, and infrastructure scenarios use three
-stages after spec design approval: acceptance RED; concurrent complete
+human-reviewed stages: acceptance RED beside contract design; concurrent complete
 RED-to-GREEN use-case and adapter lanes; then acceptance GREEN verification.
-Frontend scenarios also use three stages: browser acceptance RED; concurrent complete
-frontend-logic, API-client, and design-alignment lanes;
+Frontend scenarios also use three stages: Selenium RED beside interface
+design; concurrent complete frontend-logic, API-client, and design-alignment lanes;
 then Selenium GREEN and demo. Every Stage 2 lane must run `/test-review`,
 coverage checks, and `/refactor` across every touched backend and frontend module,
 production file, and test. Refactor execution is mandatory; only its separate
@@ -100,9 +100,9 @@ Story sections remain **tier-major** for tracking; whole-story execution selects
 
 ## Atomic Work Units
 
-For story implementation, execute all remaining passes through demos in one invocation; design questions and approval belong to Spec. Intermediate commits are checkpoints, not stop points. The single-work-unit stop rule below applies to tasks and specification.
+For story implementation, execute all remaining passes through demos in one invocation; Stage 1 may wait for design answers. Intermediate commits are checkpoints, not stop points. The single-work-unit stop rule below applies to tasks and specification.
 
-A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Spec design decisions and task-design approval may pause dependent work. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). Outside Stage 2, `/refactor` requires a preceding red/green agent in the work unit, except when recovering an owed story quality phase under `story-quality-checklist.md`. Every Stage 2 lane, including design alignment, follows the mandatory quality gates in `.claude/templates/workflow/stage-2-quality-gates.md`.
+A work unit is indivisible: ALL sub-skills in the dispatch sequence must execute to completion before stopping. Its only sanctioned pause is the task design's joined approval. A work unit with a `/refactor` step ends in **two commits**: the behavior commit (primary skill + verification + `progress.md` advance), then a separate refactor commit (`/refactor`'s changes only — skipped if it changed nothing). Outside Stage 2, `/refactor` requires a preceding red/green agent in the work unit, except when recovering an owed story quality phase under `story-quality-checklist.md`. Every Stage 2 lane, including design alignment, follows the mandatory quality gates in `.claude/templates/workflow/stage-2-quality-gates.md`.
 
 STOP only after the work unit's last commit; NEVER stop after the behavior commit while `/refactor` is still pending. The only valid stop points are: (1) after the last commit, (2) on sub-skill failure. If a sub-skill fails, stop immediately and report — but a successful sub-skill must be followed by the next sub-skill in the sequence without interruption.
 

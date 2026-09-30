@@ -1,6 +1,6 @@
 ---
 name: design-preview
-description: Design a whole story during Spec after test-spec, or preview a scenario before writing tests. Review domain changes, contracts, and implementation choices, with optional escalation to /architecture.
+description: Preview the planned design for a scenario before writing tests. Shows domain model changes, usecase patterns, and key design choices. Use before red-usecase to get user approval on the implementation approach. If the user rejects the design, offers to discuss inline or escalate to /architecture for a full ADR.
 ---
 
 # /design-preview - Scenario Design Preview
@@ -20,18 +20,17 @@ This is also the design gate for a scenario invented mid-cycle (see `.claude/gui
 
 ## Workflow
 
-### Whole-Story Spec Mode
+### Whole-Story Stage 1 Mode
 
-When invoked by the Spec — Whole-story design section of
-`.claude/templates/workflow/story-stages.md`, design for the complete story scope
-after `test-spec` and before acceptance RED. The coordinator interviews the user about
+When invoked by `.claude/templates/workflow/story-stages.md`, design for the complete
+story scope while acceptance RED proceeds. The coordinator interviews the user about
 material cross-layer choices, reuses settled answers, and waits for required decisions;
 workers return open questions to the coordinator instead of assuming agreement.
 Freeze the agreed contracts and lane boundaries together. Reuse the concurrent modes'
 interface/skeleton and boundary checks, but their infer-without-questions instruction
 and ordinary preview's per-scenario approval/stop rules do not apply here. The
 coordinator owns existing progress checkboxes and commits; after the joined freeze,
-return for the Spec design commit.
+return for immediate implementation without a new invocation or approval round.
 
 ### Concurrent Contract-Design Mode
 

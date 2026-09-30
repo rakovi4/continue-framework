@@ -11,7 +11,7 @@ description: Continue story or task work from compact progress state, recording 
 2. **Backlog promotion** -- if the story row is in the **Backlog** table in `ProductSpecification/stories.md`, move it to **In Progress** before proceeding
 3. **Read progress** file, bootstrap if missing (stories only — `.claude/templates/workflow/bootstrapping.md`). **Missing means both locations came back empty** — resolve `ProductSpecification/stories/NN-story-name/` *and* `ProductSpecification/stories/done/NN-story-name/` before the bootstrap may fire (`.claude/rules/workflow.md`, "Resolving a story folder"); a hit in either is the story, so read its `progress.md` and bootstrap nothing. What an unchecked bootstrap does to an already-shipped story is in the template's "Precondition: the story genuinely has no folder"
    For an existing task, normalize legacy `Type: bug` to `bugfix` and `Type: refactoring` to `refactor` in memory; do not rewrite its type or folder merely to migrate terminology.
-4. **Select execution mode** -- before selecting active story implementation, place or reuse `design` after `test-spec` in Spec, reuse recorded approval, and do not repeat completed design; run unfinished earlier Spec items first. For an active story with completed specification, load `.claude/templates/workflow/story-stages.md` and reconcile `story-quality-checklist.md` before deciding whether implementation remains, even when old scenario checkboxes are all complete. Preserve scenario order; add required quality entries and reopen unsupported completions. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md`; on a failed check report it and STOP without dispatching. Otherwise the first `[~]` or `[ ]` entry remains the physical cursor; story implementation selects eligible work by the coordinator's current pass, which may reach a later scenario before an earlier scenario's implementation. A task with none archives immediately.
+4. **Select execution mode** -- for an active story with completed specification, load `.claude/templates/workflow/story-stages.md` and reconcile `story-quality-checklist.md` before deciding whether implementation remains, even when old scenario checkboxes are all complete. Preserve scenario order; add required quality entries and reopen unsupported completions. **Find next step** -- run the plan-integrity check (`.claude/templates/workflow/plan-integrity-check.md`) over `progress.md`; on a failed check report it and STOP without dispatching. Otherwise the first `[~]` or `[ ]` entry remains the physical cursor; story implementation selects eligible work by the coordinator's current pass, which may reach a later scenario before an earlier scenario's implementation. A task with none archives immediately.
 5. **Read relevant context** -- for story implementation, scope summaries, referenced work logs, and ADRs to all included scenarios across both tiers as directed by `story-stages.md`. Otherwise read `carryover.md` (if present), the current scenario's summary, and only `worklog/` records matching the current heading/step or named by its compact pointer. Do not load the directory wholesale. `/continue` never writes journey files (`/handoff` is their sole writer).
 6. **Load ADR context** -- check for `decisions/*-decision.md` files in the story directory. If any exist AND the current step or whole-story scope references the ADR (via "see ADR" annotation or matching scenario), read it. ADRs contain architectural decisions, schema changes, edge cases, and implementation guidance that the work unit needs.
 7. **Execute** -- story implementation runs the whole-story coordinator through all remaining passes in this invocation. Tasks and specification execute one work unit: dispatch sub-skills per tables below. If no named row matches, execute the checkbox intent directly in the main agent.
@@ -38,13 +38,13 @@ Both work-item rows resolve the active location first and the `done/` archive se
 ## Whole-Story Implementation
 
 After specification review, run `.claude/templates/workflow/story-stages.md` inline:
-Spec design after `test-spec` covers the design interview, adapter discovery, and
-agreed frozen contracts. Stage 1 covers all acceptance RED; Stage 2 completes all
-implementation; Stage 3 verifies all acceptance GREEN before showing demos one by one. Use existing scenario checkboxes and metrics.
+Stage 1 covers all acceptance RED, the design interview, adapter discovery, and agreed
+frozen contracts; Stage 2 completes all implementation; Stage 3 verifies all acceptance
+GREEN before showing demos one by one. Use existing scenario checkboxes and metrics.
 The coordinator overrides the dispatch table's per-scenario approval/stop and
 no-next-stage rules: record agreed choices in existing approval steps and continue
-through all three implementation passes in one invocation, using the approved Spec
-design without routine stops. An existing harvest checkbox is
+without another invocation once the whole-story design is settled. Await required
+interview answers; no routine stops after freeze. An existing harvest checkbox is
 marked `[S]` with a work-log reason once its Tier 2 RED/baseline work is covered in
 Stage 1; do not dispatch harvest again. Tasks and specification retain their routes.
 Load `.claude/templates/workflow/quality-execution.md` for independent scope workers,
@@ -70,7 +70,7 @@ Each progress.md checkbox maps to sub-skills. Dispatch per `.claude/guidelines/w
 | `story` (spec item) | **Inline** — no subagent. Load `.claude/templates/spec/story-spec-generation.md` (internal template — NOT the `/story` skill) with the story number, name, and folder already resolved, execute its phases, then commit |
 | `root cause analysis` (bugfix tasks) | **Inline** — no subagent. Run `/rca`, record confirmed findings in `spec.md`, routine evidence in the active work-log record, and mark `[x]` → commit records |
 | task `design` | **Inline.** Freeze the task input, draft the design, ask for one approval, and commit. |
-| story `design` | **Inline coordinator.** Run the Spec — Whole-story design section of `story-stages.md` after `test-spec`, using `/design-preview`, then commit. |
+| story `design` | `/design-preview` → user approves (optionally with ADR) or `/architecture` → commit (if ADR produced) |
 | `red-*` (usecase, adapter, selenium, frontend, frontend-api) | `red-agent.md` → `/test-review` → commit → `/refactor` → commit |
 | `green-usecase`, `green-adapter X` | `green-agent.md` → `/test-coverage {module} --focus` → commit → `/refactor` → commit |
 | `red-workflow` | `red-agent.md` (layer `workflow`) → `/test-review` → commit → `/refactor` → commit |
@@ -96,7 +96,7 @@ without changing lane concurrency or creating additional invocation boundaries.
 
 ## Stop and Report
 
-Story implementation follows `story-stages.md` through all remaining passes and reports once at completion or a genuine blocker. The rest of this paragraph applies to tasks and specification: a single invocation executes exactly ONE work unit. Do not pause between sub-skills except for Spec-design decisions and task-design approval. A `/refactor` work unit ends with behavior then separate refactor commits (omit only an empty refactor commit, never the skill execution). STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
+Story implementation follows `story-stages.md` through all remaining passes and reports once at completion or a genuine blocker. The rest of this paragraph applies to tasks and specification: a single invocation executes exactly ONE work unit. Do not pause between sub-skills except for task-design approval. A `/refactor` work unit ends with behavior then separate refactor commits (omit only an empty refactor commit, never the skill execution). STOP only after the last owed commit. Then report the completed step, tests, next step, fraction, and how to continue; do not execute the next step.
 
 **Re-orientation block (mandatory, last):** close the report with the re-orientation block specified in `.claude/templates/workflow/continue-report-format.md` -- work item type/number/name, scenario or step, step just done, next step, position, and a two-sentence plain-language summary. It goes below everything else and immediately above the `/plain` hint: a terminal scrolls, and a user running several parallel `/continue` sessions must recover which work item this one is without reading back up. Emit it on both stop points, including a sub-skill failure.
 
@@ -128,7 +128,7 @@ Sub-skills use named agent dispatch for context isolation, following `.claude/gu
 
 Derive the layer from the checkbox (e.g., `red-adapter storage` → layer `storage`, `green-usecase` → layer `usecase`, any `red-workflow (...)` → layer `workflow`). Both red-agent and green-agent receive: layer, work-item folder path, scenario name, and ADR content (if loaded in step 5). The agent resolves test files and templates from its own workflow.
 
-**CHAINING:** After an awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts). In story implementation, immediately refill free slots with ready phases under `quality-execution.md`; each next phase requires an explicit dispatch and its own prerequisites. Tasks and specification immediately dispatch their next sub-step. Required story Spec interview/contract decisions and task-design approval may pause dependent work.
+**CHAINING:** After an awaited result returns, echo a 1-2 line status summary (agent name, outcome, pass/fail counts). In story implementation, immediately refill free slots with ready phases under `quality-execution.md`; each next phase requires an explicit dispatch and its own prerequisites. Tasks and specification immediately dispatch their next sub-step. Required story Stage 1 interview/contract decisions and task-design approval may pause dependent work.
 
 **AGENT LOG: Before the first agent dispatch, clear the log: `> infrastructure/agent-progress.log`. After the last commit, include the log contents in the stop-and-report summary.**
 

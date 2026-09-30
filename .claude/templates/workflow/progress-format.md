@@ -34,7 +34,6 @@ tier's scenarios are the gaps — and that is correct.
 - [x] mockups
 - [x] api-spec
 - [x] test-spec
-- [x] design
 
 ## Tier 1 — Backend Scenarios (01_API_Tests.md)
 
@@ -76,9 +75,8 @@ Integration (`06_Integration_Tests.md`), Load (`03_Load_Tests.md`) and
 Infrastructure (`04_Infrastructure_Tests.md`) sections take the same staged backend
 shape, under whichever tier their scenarios landed in.
 
-Design runs after `test-spec`; existing scenario design/approval entries reuse it.
-The three implementation passes run together under `story-stages.md`. Spec freezes
-shared interfaces, Stage 2 joins disjoint shared-worktree lanes, and Stage 3 owns final
+Frontend sections use the staged frontend shape shown above. Stage 1 freezes shared
+interfaces, Stage 2 joins disjoint shared-worktree lanes, and Stage 3 owns final
 Selenium verification and demo. Frontend scenarios whose
 legacy `red-selenium` through `demo` sequence already started keep that shape; never
 replace checkboxes underneath an active cursor.
